@@ -1,0 +1,46 @@
+
+und  create   -languages java  apache-solr650.udb
+und  add      apache-solr650/solr650src/solr/solrj/src/java
+und  analyze  apache-solr650.udb
+und  export   -dependencies     class    csv    apache-solr650csv.csv     apache-solr650.udb
+
+und  create   -languages java corendalwiki302.udb
+und  add      corendalwiki302/corendalwiki302src
+und  analyze  corendalwiki302.udb
+und  export   -dependencies     class    csv    corendalwiki302csv.csv    corendalwiki302.udb
+
+und  create   -languages java endeavour125.udb
+und  add      endeavour125/endeavour125src/src/WEB-INF/classes/org/endeavour
+und  analyze  endeavour125.udb
+und  export   -dependencies     class    csv    endeavour125csv.csv       endeavour125.udb
+
+und  create   -languages java freemind100.udb
+und  add      freemind100/freemind100src/freemind
+und  analyze  freemind100.udb
+und  export   -dependencies     class    csv    freemind100csv.csv        freemind100.udb
+
+
+und  create   -languages java jedit520.udb
+und  add      jedit520/jedit520src/org
+und  analyze  jedit520.udb
+und  export   -dependencies     class    csv    jedit520csv.csv          jedit520.udb
+
+und  create   -languages java jedit540.udb
+und  add      jedit540/jedit540src/org
+und  analyze  jedit540.udb
+und  export   -dependencies     class    csv    jedit540csv.csv          jedit540.udb
+
+und  create   -languages java jforum219.udb
+und  add      jforum219/jforum219src/src/net/jforum
+und  analyze  jforum219.udb
+und  export   -dependencies     class    csv    jforum219csv.csv         jforum219.udb
+
+und  create   -languages java jhotdraw76.udb
+und  add      jhotdraw76/jhotdraw76src/src/main
+und  analyze  jhotdraw76.udb
+und  export   -dependencies     class    csv    jhotdraw76csv.csv        jhotdraw76.udb
+
+und  create   -languages java opensyncro22.udb
+und  add      opensyncro22/opensyncro22src/Source/src/smilehouse
+und  analyze  opensyncro22.udb
+und  export   -dependencies     class    csv    opensyncro22csv.csv      opensyncro22.udb

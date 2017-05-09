@@ -1,0 +1,1 @@
+python getCompAPI.py  ../RS17_source_data/RS17_jpetstore6/static/source/jpetstore6_code_method_call_full.csv    ../RS17_jpetstore6/static/partitionCluster/jpetstore6_cluster_static_coupling_AVG_5.csv
