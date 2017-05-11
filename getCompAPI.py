@@ -27,16 +27,25 @@ def getCompAPI(methodCallList, class2compDict):
     APIList = list() #each=[comp2, method2, returntype, para]
     APIList.append(['component', 'method', 'returntype', 'paralist'])
     
+    uniCalleeDict = dict()
     for each in methodCallList:
         iscross = 0
         caller_comp = '-1'
         callee_comp = '-1'
         [caller_method, callee_method, callee_return, callee_para, caller_class, callee_class] = each
+
+        # delete duplicate callee, that is duplicated compAPI
+        uniLabel = callee_method + '(' + callee_para + ')'
+        if uniLabel in uniCalleeDict:
+            continue
+        else:
+            uniCalleeDict[uniLabel] = 1
+
         if caller_class in class2compDict:
             caller_comp = class2compDict[caller_class]
         if callee_class in class2compDict:
             callee_comp = class2compDict[callee_class]
-        
+         
         if callee_comp != -1 and callee_comp != caller_comp:
             iscross = 1 
         else:
@@ -68,11 +77,12 @@ if __name__ == "__main__":
     clustername = clustername.split('.csv')[0]
     clusterdir = tmp.pop()
     compAPIFileName = '/'.join(tmp) + '/partitionApi/' + clustername + '_' + apitype + '_api.csv' 
+    print compAPIFileName
    
 
     class2compDict = readCSV2Dict(clusterFileName)
     methodCallList = readCSV(methodCallFileName)
-    (APIList) = getCompAPI(methodCallList, class2compDict)
+    APIList = getCompAPI(methodCallList, class2compDict)
 
     writeCSV(compAPIFileName, APIList)
 
