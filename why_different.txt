@@ -19,6 +19,9 @@ A DomainXXXMapper 接口类方法对DomainXXX数据库的读写操作（XML文�
 B 被调用的类的构造函数
 C 前端代码间接调用？
 
+划分的时候如何避免这种情况呢？POJO 不考虑？？？？
+
+
 #部分是因为前端代码的调用，通过JSP，或者间接调用而非直接调用。
 org.mybatis.jpetstore.web.actions.AbstractActionBean.setMessage
 org.mybatis.jpetstore.web.actions.CartActionBean.getCart
