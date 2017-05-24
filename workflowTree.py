@@ -153,19 +153,41 @@ def GenMultiTree():
         ClearMethodTag()
         onetree = GenWorkflowTree(edgeList)
         treeList.append(onetree)
-        print '# ' + str(traceID) + ':' + onetree.get_node('0000000000').data.shortname
+        #print '# ' + str(traceID) + ':' + onetree.get_node('0000000000').data.shortname
 
     return treeList
 
 
-def writeTree(outfileName, treeList, treeType):
-    print outfileName
+
+
+#sortDict[rootname] =  traceID: tree; treeID2:tree
+#root name is the classname not method name
+def SortTree(treeList):
+    sortDict = dict()
 
     for traceID in range(0, len(treeList)):
-        fp = open(outfileName, 'a')
-        fp.write('# ' + str(traceID) + '\n')
-        fp.close()
-        treeList[traceID].save2file(outfileName, data_property = treeType)
+        thistree = treeList[traceID]
+        rootName = thistree.get_node('0000000000').data.longname
+        tmp = rootName.split('(')[0].split('.')
+        tmp.pop()
+        rootName = '.'.join(tmp)
+        if rootName not in sortDict:
+            sortDict[rootName] = dict()
+            sortDict[rootName][traceID] = thistree
+        else:
+            sortDict[rootName][traceID] = thistree
+    return sortDict
+
+def WriteTree(outfileName, sortTreeDict, treeType):
+    print outfileName
+    
+    for rootName in sortTreeDict:
+        for traceID in sortTreeDict[rootName]:
+            #print traceID
+            fp = open(outfileName, 'a')
+            fp.write('# ' + str(traceID) + '\n')
+            fp.close()
+            sortTreeDict[rootName][traceID].save2file(outfileName, data_property = treeType)
 
 
 
@@ -182,6 +204,8 @@ if __name__ == '__main__':
 
     ReadCSV(workflowFilename)
     treeList = GenMultiTree()
+    treeDict = SortTree(treeList)
 
     outfileName = outFileNamePre + 'workflow_' + treeType + '.tree'
-    writeTree(outfileName, treeList, treeType)
+    
+    WriteTree(outfileName, treeDict, treeType)
