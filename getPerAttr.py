@@ -6,7 +6,7 @@ METHODList = list() #[methodID] = Method()
 CLASSList = list()  #[classID] = Class()
 METHODEDGEList = list()
 CLASSEDGEList = list()
-
+METHOD2ClassDict = dict() #dict[methodlongname] = classname
 class MethodNode:
     def __init__(self, ID, methodName):
         self.ID = ID
@@ -44,6 +44,8 @@ def GetLongName(methodName, para):
 
     return methodName + post
 
+def getClassName(methodName):
+    return METHOD2ClassDict[methodName]
 
     
 def MergeTraceAttr(classEdgeIndex, methodEdgeIndex):
@@ -99,6 +101,9 @@ def ExtractClasses():
 
         startClassID = tmpClassDict[startClassName]
         endClassID = tmpClassDict[endClassName]
+        if startClassID == endClassID:
+            continue
+
         if startClassID not in tmpClassEdgeDict:
             oneClassEdge = ClassEdge(startClassID, endClassID, uniTraceCount=m_uniTraceCount, uniTraceList=m_uniTraceList, uniFlowTypeList=[flowType], traceCount=m_uniTraceCount, traceList=m_uniTraceList)
             CLASSEDGEList.append(oneClassEdge)
@@ -149,18 +154,22 @@ def ExtractMethods(initList):
         [traceID, order, structtype, startMethodName, endMethodName, m1_para, m2_para, class1, class2] = each
         startLongName = GetLongName(startMethodName, m1_para)
         endLongName = GetLongName(endMethodName, m2_para)
-
+          
         if startLongName not in tmpMethodDict:
             tmpMethodDict[startLongName] = methodIndex
             oneMethod = MethodNode(methodIndex, startLongName)
             METHODList.append(oneMethod)
             methodIndex += 1
+            METHOD2ClassDict[startLongName] = class1
+
 
         if endLongName not in tmpMethodDict:
             tmpMethodDict[endLongName] = methodIndex
             oneMethod = Method(methodIndex, endLongName)
             METHODList.append(oneMethod)
             methodIndex += 1
+            METHOD2ClassDict[endLongName] = class2
+
 
         startMethodID = tmpMethodDict[startLongName]
         endMethodID = tmpMethodDict[endLongName]
