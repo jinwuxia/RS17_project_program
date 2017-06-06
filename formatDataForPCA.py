@@ -44,7 +44,7 @@ def ReadVector(fileName):
     listlist = list()
     for index in range(0, GetClassCount()):
         listlist.append( [0] * GetClassCount() )
-    
+
     with open(fileName, "rb") as fp:
         reader = csv.reader(fp)
         for each in reader:
@@ -60,8 +60,14 @@ def ReadVector(fileName):
                 listlist[fromID][toID] = deps
     return listlist
 
+#to be filterd
+def IsFilter(className, filterStr):
+    if className.find(filterStr) != -1:
+        return True
+    else:
+        return False
 
-def WriteCSV(fileName, list1, list2, list3, list4):
+def WriteCSV(fileName, filterStr, list1, list2, list3, list4):
     print len(list1), ' ', len(list2), ' ', len(list3), ' ', len(list4)
     print fileName
 
@@ -70,8 +76,9 @@ def WriteCSV(fileName, list1, list2, list3, list4):
         writer.writerow(['From Class', 'To Class', 'structDep', 'semanticSim', 'commuCost', 'workflowCurency'])
         for i in range(0, GetClassCount()):
             for j in range(0, GetClassCount()):
-                each = [ GetClassName(i), GetClassName(j), list1[i][j], list2[i][j], list3[i][j], list4[i][j] ]
-                writer.writerow(each)
+                if i != j and IsFilter(GetClassName(i), filterStr) == False and IsFilter(GetClassName(j), filterStr) == False:
+                    each = [ GetClassName(i), GetClassName(j), list1[i][j], list2[i][j], list3[i][j], list4[i][j] ]
+                    writer.writerow(each)
 
 
 if __name__ == '__main__':
@@ -79,18 +86,11 @@ if __name__ == '__main__':
     commucostFileName = sys.argv[2] #../RS17_source_data/RS17_jpetstore6/dynamic/source/jpetstore6_class_commu_deps.csv
     workflowFileName = sys.argv[3]  #../RS17_source_data/RS17_jpetstore6/dynamic/source/jpetstore6_class_workflow_deps.csv
     semanticFileName = sys.argv[4]  #../RS17_source_data/RS17_jpetstore6/semantic/source/jpetstore6_clas_domain_10_deps.csv
+    filterStr = sys.argv[5]
 
     listS = ReadMatrix(structFileName)
     listW = ReadVector(workflowFileName)
     listM = ReadVector(commucostFileName)
     listC = ReadVector(semanticFileName)
 
-    WriteCSV("jpetstore6_all_fv.csv", listS, listC, listM, listW)
-     
-
-
-
-
-
-
-
+    WriteCSV("jpetstore6_all_fv.csv", filterStr, listS, listC, listM, listW)
