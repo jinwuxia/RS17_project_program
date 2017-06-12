@@ -4,7 +4,7 @@ import csv
 
 
 def isclassIncode(className):
-    if className.startswith('com.ibatis.jpetstore'):
+    if className.startswith('org.mybatis.jpetstore'):
         return True
     else:
         return False
@@ -133,7 +133,7 @@ class KiekerParser:
                     record = Record(tmp[1], tmp[2], tmp[3], tmp[4], tmp[5], tmp[6], tmp[7], int(tmp[8]), int(tmp[9]))
                     #update recordList
                     self.recordList.append(record)
-        print "record list len = ", len(self.recordList), "......"
+        #print "record list len = ", len(self.recordList), "......"
 
 	#begin: sorting records using sequence ID  for slice
         #sort all recordList using sequenceID. beacuse the distributed system logs come from different nodes, so we merge and sort all using sequenceID
@@ -346,7 +346,7 @@ def genClassDeps(fileName, nodeList, edgeList):
     with open(fileName, 'wb') as fp:
         writer = csv.writer(fp, delimiter=',')
         writer.writerows(resList)
-    print fileName
+    #print fileName
 
 
 
@@ -358,11 +358,11 @@ def genClassGraphFileGexf(fileName, nodeList, edgeList):
         DG.add_node(node.classID, label=node.className, vmname=node.vmname)
     for edge in edgeList:
         DG.add_edge(edge.startClassID, edge.endClassID, commuCost=edge.commuCost)
-    print fileName
+    #print fileName
     nx.write_gexf(DG, fileName)
 
 def genClassGraphFileIgraph(nodeFileName, edgeFileName, nodeList, edgeList):
-    print nodeFileName, edgeFileName
+    #print nodeFileName, edgeFileName
     nodeFp = open(nodeFileName, "w")
     edgeFp = open(edgeFileName, "w")
     for node in nodeList:
@@ -380,11 +380,12 @@ def genMethodGraphFileGexf(outfileName, nodeList, edgeList):
         #DG.add_node(node.methodID, label=node.methodName, classID=node.classID, className=node.className, vmname=node.vmname, timeAvg=node.executionTimeAvg, timeVar=node.executionTimeVar, paralen=node.paralen, infoCount=node.infoCount, paraTypeStr=','.join(node.paraTypeList))
     for edge in edgeList:
         DG.add_edge(edge.startMethodID, edge.endMethodID, freq=edge.freq, iscrossClass=edge.iscrossClass, commuCost=edge.commuCost)
-    print outfileName
+    #print outfileName
     nx.write_gexf(DG, outfileName)
+    print "node,", len(nodeList), ",edge", len(edgeList)
 
 def genMethodGraphFileIgraph(nodeFileName, edgeFileName, nodeList, edgeList):
-    print nodeFileName, edgeFileName
+    #print nodeFileName, edgeFileName
     nodeFp = open(nodeFileName, "w")
     edgeFp = open(edgeFileName, "w")
     for node in nodeList:
@@ -426,7 +427,7 @@ def findAllDataFileContent(dir):
     	    if name.startswith('kieker-') and name.endswith('.dat'):
     		f = dirpath + '/' + name
     		fileList.append(f)
-            print f
+            #print f
     totalContentList = list()
     for eachfile in fileList:
         with open(eachfile, "r") as fp:
@@ -448,11 +449,13 @@ if __name__ == "__main__":
     myparser = KiekerParser()
     myparser.firstParse(totalContentList) #generate recordlist,sessionlist,methodDict,methodList,classDict,classList,timeList
     myparser.setMethodTimeAvgVar()   #add timeVar, timeAvg to each methodNode
-
+    #print "before filter: len(session)   ", len(myparser.sessionList) 
     #3 use tracelable to filter out non-duplicated sesionID-traceID-records
     traceLabelDict = dict()
     filteredSessionList = dict()
+    print "before filter"
     for sessionID in myparser.sessionList:
+        print sessionID
         for traceID in myparser.sessionList[sessionID]:
             recordIDs = myparser.sessionList[sessionID][traceID]  #just ID
             records = list()
@@ -471,7 +474,9 @@ if __name__ == "__main__":
     print "filtered out trace number= ", len(traceLabelDict)
 
     #4 second parse: init methodEdge, extrace methodGraph     
+    print "after filter"
     for sessionID in filteredSessionList:
+        print sessionID
         methodFileNameGexf = sys.argv[1] + sessionID + "method.gexf"
         methodNodeFileName = sys.argv[1] + sessionID + "method.node"
         methodEdgeFileName = sys.argv[1] + sessionID + "method.edge"
@@ -491,15 +496,15 @@ if __name__ == "__main__":
         totalMethodEdgeList = myparser.setMethodEdgeCommuCost(totalMethodEdgeList)
 
         #5. generate method graph for eachsession
-        print "methodGraph: numberOfNode= ", len(myparser.methodNodeList), "; numberOfEdge= ", len(totalMethodEdgeList)
+        #print "methodGraph: numberOfNode= ", len(myparser.methodNodeList), "; numberOfEdge= ", len(totalMethodEdgeList)
         genMethodGraphFileGexf(methodFileNameGexf, myparser.methodNodeList, totalMethodEdgeList)
         genMethodGraphFileIgraph(methodNodeFileName, methodEdgeFileName, myparser.methodNodeList, totalMethodEdgeList)
-
+    print "session number = ", len(filteredSessionList)
     
 
     #6 generate classEdgeDict and claddEdgeList, write into file
-    classEdgeList = myparser.extractClassEdge(totalMethodEdgeList)
-    print "ClassGraph: numberOfNode= ", len(myparser.classNodeList), "; numberOfEdge= ", len(classEdgeList)
+    #classEdgeList = myparser.extractClassEdge(totalMethodEdgeList)
+    #print "ClassGraph: numberOfNode= ", len(myparser.classNodeList), "; numberOfEdge= ", len(classEdgeList)
     classFileNameGexf = sys.argv[1] + 'class.gexf'
     classNodeFileName = sys.argv[1] + 'class.node'
     classEdgeFileName = sys.argv[1] + 'class.edge'
