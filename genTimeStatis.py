@@ -164,20 +164,20 @@ def FindAllDataFileContent(dir):
 
 
 
-
+# python pro.py  kiekerlogdir  org.mybatis.jpetstore(filtered)  outfile_method_time.csv
 if __name__ == "__main__":
     import sys
-    if len(sys.argv) != 3 :
+    if len(sys.argv) != 4 :
         print "argument is less or more!"
     datadir = sys.argv[1]
     filterClass = sys.argv[2]
+    fileName = sys.argv[3]
 
     totalContentList = FindAllDataFileContent(datadir)
     myparser = KiekerParser()
     myparser.FirstParse(totalContentList, filterClass) #generate recordlist,sessionlist,methodDict,methodList,classDict,classList,timeList
     myparser.SetMethodTimeAttr()   #add timeVar, timeAvg to each methodNode
     
-    fileName = "timeList.csv"
     print fileName
     WriteTimeFile(fileName, myparser.methodNodeList)
 
