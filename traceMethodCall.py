@@ -324,13 +324,14 @@ def findAllDataFileContent(dir):
 
 
 
-#python tracemethodCall.py  logdir  filteredPrepackage
+#python tracemethodCall.py  logdir  filteredPrepackage  filename
 if __name__ == "__main__":
     import sys
-    if len(sys.argv) != 3 :
+    if len(sys.argv) != 4 :
         print "argument is less or more!"
     datadir = sys.argv[1]
     prepackage = sys.argv[2]
+    fileName = sys.argv[3]
 
     #1 2.first parse, init methodNode and classNode
     totalContentList = findAllDataFileContent(datadir)
@@ -358,20 +359,10 @@ if __name__ == "__main__":
             
     print "filtered out trace number= ", len(traceLabelDict)
 
-    #4 second parse: init methodEdge, extrace methodGraph     
-    for sessionID in filteredSessionList:
-        #fileName = sys.argv[1] + sessionID + "method.edge"
-        RS17name = sys.argv[1].split('/')[len(sys.argv[1].split('/')) - 3]
-        projectname = RS17name.split('_')[1]
-        fileName = projectname + '_trace_method_call_full.csv'
-        
-        fileNameDir = sys.argv[1].split('/')
-        fileNameDir.pop()
-
-        fileName = '/'.join(fileNameDir) + '/source/' + fileName
-
-        totalMethodEdgeDict = dict()
-        totalMethodEdgeList = list()
+    #4 second parse: init methodEdge, extrace methodGraph   
+    totalMethodEdgeDict = dict()
+    totalMethodEdgeList = list()	
+    for sessionID in filteredSessionList:          
         for traceID in filteredSessionList[sessionID]:
             recordIDs = filteredSessionList[sessionID][traceID]  #just ID
             #print 'filteresTrace= ', traceID, "recordIDs= ", recordIDs
@@ -382,8 +373,8 @@ if __name__ == "__main__":
             (methodEdgeDict, methodEdgeList) = myparser.extractCalls(records) #methodEdgeDict no use if only generate a wholesessionGraph
             (totalMethodEdgeDict, totalMethodEdgeList) = addToTotal(totalMethodEdgeDict, totalMethodEdgeList, methodEdgeList)
 
-        #5. generate method graph for eachsession
-        print "methodGraph: numberOfNode= ", len(myparser.methodNodeList), "; numberOfEdge= ", len(totalMethodEdgeList)
-        genMethodCallFile(fileName, myparser.methodNodeList, totalMethodEdgeList)
+    #5. generate method graph for eachsession
+    print "methodGraph: numberOfNode= ", len(myparser.methodNodeList), "; numberOfEdge= ", len(totalMethodEdgeList)
+    genMethodCallFile(fileName, myparser.methodNodeList, totalMethodEdgeList)
 
     
