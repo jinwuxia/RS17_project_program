@@ -33,7 +33,7 @@ def reduceWorkflow(initList):
         isDel = True
         for eachList in initList[index]:
             [order, structtype, method1, method2, m1_para, m2_para, className1, className2] = eachList
-            if method2.endswith('<init>') == False and isIncluded(className2):
+            if method2.endswith('<init>') == False and ('class$' not in method2) and ('BookmarkAction.process' not in method2) and ('InstallAction.process' not in method2) and isIncluded(className2):
                 isDel = False
                 oneStr = method2
                 #print oneStr
