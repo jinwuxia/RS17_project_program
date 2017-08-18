@@ -212,6 +212,7 @@ def write2File(classIDList, classID2ClusterIDDict, classID2NameDict, fileName):
     print fileName
 
 
+
 #process the clustering result
 #python pro.py   clusterFileName.csv  featureVectorFileName.csv  classFileName.csv  OutmergeClusterFile.csv
 if __name__ == '__main__':
@@ -228,7 +229,7 @@ if __name__ == '__main__':
     clusterList = processCluster(clusterList)
 
     #process the original cluster
-    clusterList = mergeCluster(clusterList, fvList, len(classID2NameDict))
+    clusterList = mergeCluster(clusterList, fvList, len(classID2NameDict))  #clusterList is the final cluster
     writeCSV(clusterList, outClusterFileName)
     clusterClassIDList = trans2Set(clusterList)
     classID2ClusterIDDict = reverseMap(clusterClassIDList)
