@@ -12,12 +12,12 @@ def readCSV(fileName):
     with open(fileName, "rb") as fp:
         reader = csv.reader(fp)
         for each in reader:
-            [traceID, order, structtype, method1, method2, m1_para, m2_para, className1, className2] = each
+            [traceID, order, structtype, method1, method2, m1_para, m2_para, className1, className2, m1_return, m2_return] = each
             if traceID == 'traceID':
                 continue
             if order == '0':
                 resList.append(list())
-            oneList = [order, structtype, method1, method2, m1_para, m2_para, className1, className2]
+            oneList = [order, structtype, method1, method2, m1_para, m2_para, className1, className2, m1_return, m2_return]
             resList[int(traceID)].append(oneList)
     return resList
 
@@ -32,7 +32,7 @@ def reduceWorkflow(initList):
         #print "\na new trace"
         isDel = True
         for eachList in initList[index]:
-            [order, structtype, method1, method2, m1_para, m2_para, className1, className2] = eachList
+            [order, structtype, method1, method2, m1_para, m2_para, className1, className2, m1_return, m2_return] = eachList
             if method2.endswith('<init>') == False and ('class$' not in method2) and ('BookmarkAction.process' not in method2) and ('InstallAction.process' not in method2) and isIncluded(className2):
                 isDel = False
                 oneStr = method2
@@ -53,7 +53,7 @@ def reduceWorkflow(initList):
 
 def writeCSV(aList, fileName):
     resList = list()
-    resList.append(['traceID', 'order', 'structtype', 'method1', 'method2', 'm1_para', 'm2_para', 'className1', 'className2'])
+    resList.append(['traceID', 'order', 'structtype', 'method1', 'method2', 'm1_para', 'm2_para', 'className1', 'className2', 'm1_return', 'm2_return'])
     for traceID in range(0, len(aList)):
         for oneList in aList[traceID]:
             tmpList = [traceID]

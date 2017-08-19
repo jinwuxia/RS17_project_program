@@ -28,7 +28,7 @@ def GetMethodID(partName):
         if key.startswith(partName):
             return methodDict[key]
     return -1
-        
+
 
 def GetFilterTraceID(filterTraceName):
     return GetMethodID(filterTraceName)
@@ -82,7 +82,7 @@ def GetMethodShortName(methodName, para):
     return shortname + post
 
 
-  
+
 
 def GetClassShortName(className):
     arr = className.split('.')
@@ -103,7 +103,7 @@ def GetShortList(paraList):
             shortname = para
         oneList.append(shortname)
 
-    return oneList	
+    return oneList
 
 def ReadCSV(filename):
     methodIndex = 0
@@ -114,20 +114,20 @@ def ReadCSV(filename):
         reader = csv.reader(fp)
         for each in reader:
             #print each
-            [traceID, order, structtype, startMethodName, endMethodName, m1_para, m2_para, class1, class2] = each
-            
+            [traceID, order, structtype, startMethodName, endMethodName, m1_para, m2_para, class1, class2, m1_return, m2_return] = each
+
             startLongName = GetMethodLongName(startMethodName, m1_para)
             endLongName = GetMethodLongName(endMethodName, m2_para)
-            
+
             startShortName = GetMethodShortName(startMethodName, m1_para)
             endShortName = GetMethodShortName(endMethodName, m2_para)
-            
+
             startShortClassName = GetClassShortName(class1)
             endShortClassName = GetClassShortName(class2)
 
             startLongClassName = class1
             endLongClassName = class2
-            
+
 
             if traceID == 'traceID':
                 continue
@@ -143,7 +143,7 @@ def ReadCSV(filename):
                 CLASSList.append(oneClass)
                 classIndex += 1
 
-            
+
             if startLongName not in methodDict:
                 methodDict[startLongName] = methodIndex
                 classID = classDict[startLongClassName]
@@ -185,22 +185,22 @@ def ProcessTrace():
         oneList.append(dict())
         oneList.append(dict())
         oneList.append(dict())
-    
+
         part1EndIndex = methodList.index(part1EndMethodID)
         part2EndIndex = methodList.index(part2EndMethodID)
-        print part1EndIndex, "   ....   ", part2EndIndex 
+        print part1EndIndex, "   ....   ", part2EndIndex
         if part1EndIndex == -1 or part2EndIndex == -1:
             print "one is not found...........\n\n"
             continue
-        
+
         #part1
         for i in range(0, part1EndIndex + 1):
             if GetClassID(methodList[i]) not in oneList[0]:
                 oneList[0][GetClassID(methodList[i])] = 1
             else:
                 oneList[0][GetClassID(methodList[i])] += 1
-            
-            
+
+
         #part2
         for i in range(part1EndIndex + 1, part2EndIndex + 1):
             if GetClassID(methodList[i]) not in oneList[1]:
@@ -252,7 +252,7 @@ def WriteFile(oneDict, fileName):
 
     with open(fileName, "w") as fp:
         writer = csv.writer(fp)
-        writer.writerows(oneList) 
+        writer.writerows(oneList)
     print fileName
 
 
@@ -274,21 +274,20 @@ if __name__ == '__main__':
     '''
     for ID in range(0,len(TRACEList)):
         print ID, len(TRACEList[ID])
-    
-    
+
+
     for key in classDict:
         print key
     '''
     #print len(methodDict)
 
     ProcessTrace() #split and generate RESULTList
-    
+
 
     GetPart1() #process RESULTList,  generate PART1Dict
     GetPart3() #process RESULTList,  generate PART3Dict
     GetPart2() #process RESULTList,  generate PART2Dict
-    
+
     WriteFile(PART1Dict, part1FileName)
     WriteFile(PART2Dict, part2FileName)
     WriteFile(PART3Dict, part3FileName)
-

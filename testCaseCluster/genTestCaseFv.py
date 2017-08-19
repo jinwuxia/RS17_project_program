@@ -30,7 +30,7 @@ def readCSV(fileName):
     with open(fileName, "rb") as fp:
         reader = csv.reader(fp)
         for each in reader:
-            [traceID,order,structtype,method1,method2,m1_para,m2_para,className1,className2] = each
+            [traceID,order,structtype,method1,method2,m1_para,m2_para,className1,className2, m1_return, m2_return] = each
             if traceID == 'traceID':
                 continue
             oneList = [int(traceID), className1, className2]

@@ -67,7 +67,7 @@ def ReadCSV(filename):
         reader = csv.reader(fp)
         for each in reader:
             #print each
-            [traceID, order, structtype, startMethodName, endMethodName, m1_para, m2_para, class1, class2] = each
+            [traceID, order, structtype, startMethodName, endMethodName, m1_para, m2_para, class1, class2, m1_return, m2_return] = each
             startLongName = GetLongName(startMethodName, m1_para)
             endLongName = GetLongName(endMethodName, m2_para)
             startShortName = GetShortName(startMethodName, m1_para)
