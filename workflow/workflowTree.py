@@ -136,7 +136,7 @@ def GenWorkflowTree(edgeList):
 
         #only process the callee
         if METHODList[startID].currtag == 'NULL':
-            print "[ERROR]: Another root comes up -  ", METHODList[startID].longname
+            print "[WARN]: Another root comes up -  ", METHODList[startID].longname
             #save the current tree, and create a new tree
             treeList.append(onetree)
             onetree = Tree()
@@ -194,7 +194,7 @@ def SortTree(treeList):
 
 def WriteTree(outfileName, sortTreeDict, treeType):
     print outfileName
-    
+
     for rootName in sortTreeDict:
         for traceID in sortTreeDict[rootName]:
             #print traceID
