@@ -23,12 +23,17 @@ def getMethodName(fullStr):
     else:
         methodStr = methodStr + '(' + paraStr + ')'
     return methodStr
- 
+
+#modifier returntype class.method
+#modifier class.method
 def getReturnType(fullstr):
     splitArr = fullstr.split('(')
     fullStr = splitArr[0]            #modifier returntype class.method
     splitArr = fullStr.split(' ')
-    returnType = splitArr[len(splitArr) - 2]
+    if '<init>' in fullStr:          #structor method name donnot have void
+        returnType = ''
+    else:
+        returnType = splitArr[len(splitArr) - 2]
     return returnType
 
 def getParaType(fullstr):
@@ -216,7 +221,7 @@ class KiekerParser:
         records.sort(key = cmpfun, reverse = False)
 
         #print "sorted List end............\n"
-        
+
         if len(records) < 2:
             return self.methodEdgeDict, self.methodEdgeList
 
@@ -244,7 +249,7 @@ class KiekerParser:
                 calleeMethodName = getMethodName(calleeRecord.methodName)
                 callerID = self.methodNodeDict[callerMethodName]
                 calleeID = self.methodNodeDict[calleeMethodName]
-                
+
                 self.methodEdgeList.append( MethodEdge(callerID, calleeID, "null", order) )
                 order += 1
 
@@ -255,12 +260,12 @@ class KiekerParser:
 
         return self.methodEdgeList
 
-    
+
     def mergeEdgeList(self, traceIndex, methodEdgeList, mergedEdgeList):
         for edge in methodEdgeList:
             startMethodName = self.methodNodeList[edge.startMethodID].methodName.split('(')[0]
             endMethodName = self.methodNodeList[edge.endMethodID].methodName.split('(')[0]
-            oneList = [traceIndex, edge.order, edge.structureType, startMethodName, endMethodName,  self.methodNodeList[edge.startMethodID].paraTypeListStr, self.methodNodeList[edge.endMethodID].paraTypeListStr,  self.methodNodeList[edge.startMethodID].className, self.methodNodeList[edge.endMethodID].className ]
+            oneList = [traceIndex, edge.order, edge.structureType, startMethodName, endMethodName,  self.methodNodeList[edge.startMethodID].paraTypeListStr, self.methodNodeList[edge.endMethodID].paraTypeListStr,  self.methodNodeList[edge.startMethodID].className, self.methodNodeList[edge.endMethodID].className, self.methodNodeList[edge.startMethodID].returnType, self.methodNodeList[edge.endMethodID].returnType ]
             mergedEdgeList.append(oneList)
 
         return mergedEdgeList
@@ -270,9 +275,9 @@ def genFile(fileName,  edgeList):
     print fileName
     with open(fileName, "wb") as fp:
         writer = csv.writer(fp)
-        writer.writerow(['traceID', 'order', 'structtype', 'method1', 'method2', 'm1_para', 'm2_para',  'class1', 'class2'])
+        writer.writerow(['traceID', 'order', 'structtype', 'method1', 'method2', 'm1_para', 'm2_para',  'class1', 'class2', 'm1_return', 'm2_return'])
         writer.writerows(edgeList)
-    
+
 
 #find all data file in this folder
 def findAllDataFileContent(dir):
@@ -325,17 +330,17 @@ if __name__ == "__main__":
                     filteredSessionList[sessionID][traceID] = myparser.sessionList[sessionID][traceID]
                 else:
                     filteredSessionList[sessionID][traceID] = myparser.sessionList[sessionID][traceID]
-            
+
     print "filtered out trace number= ", len(traceLabelDict)
 
-    #4 second parse: init methodEdge, extrace methodGraph     
+    #4 second parse: init methodEdge, extrace methodGraph
     for sessionID in filteredSessionList:
         #fileName = sys.argv[1] + sessionID + "method.edge"
         """
         RS17name = sys.argv[1].split('/')[len(sys.argv[1].split('/')) - 3]
         projectname = RS17name.split('_')[1]
         fileName = projectname + '_trace_method_workflow_1.csv'
-        
+
         fileNameDir = sys.argv[1].split('/')
         fileNameDir.pop()
 
@@ -354,7 +359,5 @@ if __name__ == "__main__":
             methodEdgeList = myparser.extractWorkFlow(records) #methodEdgeList has repetive edge, so they are workflows
             mergedEdgeList = myparser.mergeEdgeList(traceIndex, methodEdgeList, mergedEdgeList)
             traceIndex += 1
-        
-        genFile(fileName, mergedEdgeList)
 
-    
+        genFile(fileName, mergedEdgeList)
