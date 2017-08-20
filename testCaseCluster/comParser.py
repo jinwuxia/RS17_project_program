@@ -39,6 +39,8 @@ def readCSV(fileName):
         reader = csv.reader(fp)
         for each in reader:
             [traceID, order, stype, callerName, calleeName, m1_para, m2_para, className1, className2, m1_return, m2_return] = each
+            if traceID == 'traceID':
+                continue
             callerName = callerName + '(' + m1_para + ')'
             calleeName = calleeName + '(' + m2_para + ')'
             if callerName  not in methodDict:

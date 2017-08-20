@@ -22,6 +22,14 @@ python analyzeStructDeps.py  jforum219xml.csv  jforum219_testcase_class.csv   me
 #手动拼接上述两个文件，进行分析。
 
 
+
+#-----------------------------------根据聚类结果进行通信代价分析--------------
+python comParser.py   jforum219_workflow_reduced.csv     jforum219com.csv
+python analyzeComDeps.py   jforum219com.csv  jforum219_testcase_class.csv   mergeCluster.csv  split_class_overlap_non.csv    split_class_overlap_high.csv    com_highoverlap.csv     >  com_highoverlap.log
+python analyzeComDeps.py   jforum219com.csv  jforum219_testcase_class.csv   mergeCluster.csv  split_class_overlap_non.csv    split_class_overlap_low.csv    com_lowoverlap.csv     >  com_lowoverlap.log
+
+
+
 #------------------------------------------------------------------------
 #note:
 #Q1: workflowFilter
