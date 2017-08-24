@@ -3,7 +3,7 @@ import csv
 
 FINALClusters = list()
 MINSIMVALUE = 0
-STOPCLUSTERINGSIMVALUE = 0.01
+STOPCLUSTERINGSIMVALUE = 0.5
 DISTFUNCVALUE = 0.5
 TESTCASENAMEDict = dict() #testcase[id] = name
 
@@ -259,19 +259,34 @@ def printClustering(fileName):
     writeCSV(fileName, resList)
 
 
-def initCluster(N):
+def initClusterByDefault(N):
+    resList = list()
     for i in range(0, N):
-        FINALClusters.append([i])
+        resList.append([i])
+    return resList
+
+#initList=[cluterID, testcaseID],[...]
+def initClusterByInput(initList):
+    resList = list()
+    for each in initList:
+        [clusterID, testcaseID, testcaseName] = each
+        clusterID = int(clusterID)
+        testcaseID = int(testcaseID)
+        if clusterID == len(resList):
+            resList.append(list())
+        resList[clusterID].append(testcaseID)
+    return resList
 
 oneAlg = AlgClass()
 #use testcase feature to do clustering
-#python pro.py   tsfv.csv   distFunc=jm, uem, uemnm       mergeFunc= MIN_SINGLE, MAX_SINGLE, AVG       K=iterNum   feature=TS
+#python pro.py   tsfv.csv  initClusterFile.csv   distFunc=jm, uem, uemnm       mergeFunc= MIN_SINGLE, MAX_SINGLE, AVG       K=iterNum   feature=TS
 if __name__ == "__main__":
     featureFileName = sys.argv[1]    #testcase feature maxtrix filename
-    distFunc = sys.argv[2]           #similaroty distance metric
-    mergeFunc = sys.argv[3]          #how to merge the two similar custers to be a new cluster
-    K = int(sys.argv[4])
-    feature = sys.argv[5]  #Test case
+    initClusterFileName = sys.argv[2] #
+    distFunc = sys.argv[3]           #similaroty distance metric
+    mergeFunc = sys.argv[4]          #how to merge the two similar custers to be a new cluster
+    K = int(sys.argv[5])
+    feature = sys.argv[6]  #Test case
     oneAlg.setDistFunc(distFunc)
     oneAlg.setMergeFunc(mergeFunc)
     oneAlg.setK(K)
@@ -280,8 +295,13 @@ if __name__ == "__main__":
     #init fecture vector
     tsFv = readCSV(featureFileName)
     newTsFv = delFirstCol(tsFv)
+
     #init clusters
-    tsCount = len(newTsFv)
-    initCluster(tsCount)
+    if initClusterFileName == 'null':
+        tsCount = len(newTsFv)
+        FINALClusters = initClusterByDefault(tsCount)
+    else:
+        initClusterList = readCSV(initClusterFileName)
+        FINALClusters = initClusterByInput(initClusterList)
     #clustering
-    WCAClustering(newTsFv)
+    WCAClustering(newTsFv)   #operate on FINALClusters
