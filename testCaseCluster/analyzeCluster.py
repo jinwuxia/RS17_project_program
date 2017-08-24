@@ -162,7 +162,7 @@ def genJiaoSet(clusterClassIDList, classID2NameDict):
     jiaoSetList = list()
     clusterCount = len(clusterClassIDList)
     allCombinations = getCombination(clusterCount)
-    print "\nall combinations:\n", allCombinations
+    #print "\nall combinations:\n", allCombinations
     for eachCombination in allCombinations:
         #eachCombination = (clusterID1, clusterID2, ...)
         #compute each combination's jiaoji
@@ -214,12 +214,12 @@ def write2File(classIDList, classID2ClusterIDDict, classID2NameDict, fileName):
 
 
 #process the clustering result
-#python pro.py   clusterFileName.csv  featureVectorFileName.csv  classFileName.csv  OutmergeClusterFile.csv
+#python pro.py   project  clusterFileName.csv  featureVectorFileName.csv  classFileName.csv
 if __name__ == '__main__':
-    clusterFileName = sys.argv[1]
-    featureVectorFileName = sys.argv[2]
-    classFileName = sys.argv[3]
-    outClusterFileName = sys.argv[4]
+    project = sys.argv[1]
+    clusterFileName = sys.argv[2]
+    featureVectorFileName = sys.argv[3]
+    classFileName = sys.argv[4]
 
     classList = readCSV(classFileName)
     classID2NameDict = processClass(classList)
@@ -230,12 +230,12 @@ if __name__ == '__main__':
 
     #process the original cluster
     clusterList = mergeCluster(clusterList, fvList, len(classID2NameDict))  #clusterList is the final cluster
-    writeCSV(clusterList, outClusterFileName)
+    writeCSV(clusterList, project + "_merge_cluster_1.csv")
     clusterClassIDList = trans2Set(clusterList)
     classID2ClusterIDDict = reverseMap(clusterClassIDList)
 
     buSetList = genBuSet(clusterClassIDList, classID2NameDict)
-    writeBuSet2File(buSetList, classID2NameDict, "split_class_overlap_non.csv")
+    writeBuSet2File(buSetList, classID2NameDict, project + "_split_class_overlap_non_1.csv")
 
     jiaoSetList = genJiaoSet(clusterClassIDList, classID2NameDict)
     allOverlapClassIDList = genAllBingSet(jiaoSetList)
@@ -243,14 +243,14 @@ if __name__ == '__main__':
     #process the new cluster (after smooth)
     print "\n\n\n"
     newClusterList = smoothCluster(clusterList)
-    writeCSV(newClusterList, outClusterFileName + "new.csv")
+    #writeCSV(newClusterList, outClusterFileName + "new_1.csv")
     newClusterClassIDList = trans2Set(newClusterList)
 
     #newBuSetList = genBuSet(newClusterClassIDList, classID2NameDict)
 
     newJiaoSetList = genJiaoSet(newClusterClassIDList, classID2NameDict)
     highlyOverlapClassIDList = genAllBingSet(newJiaoSetList)
-    write2File(highlyOverlapClassIDList, classID2ClusterIDDict, classID2NameDict, "split_class_overlap_high.csv")
+    write2File(highlyOverlapClassIDList, classID2ClusterIDDict, classID2NameDict, project +  "_split_class_overlap_high_1.csv")
 
     lowlyOverlapClassIDList = list( set(allOverlapClassIDList) - set(highlyOverlapClassIDList) )
-    write2File(lowlyOverlapClassIDList, classID2ClusterIDDict, classID2NameDict, "split_class_overlap_low.csv")
+    write2File(lowlyOverlapClassIDList, classID2ClusterIDDict, classID2NameDict, project + "_split_class_overlap_low_1.csv")
