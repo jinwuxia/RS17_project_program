@@ -3,7 +3,7 @@ import csv
 
 FINALClusters = list()
 MINSIMVALUE = 0
-STOPCLUSTERINGSIMVALUE = 0.5
+STOPCLUSTERINGSIMVALUE = 0.6
 DISTFUNCVALUE = 0.5
 TESTCASENAMEDict = dict() #testcase[id] = name
 
@@ -12,8 +12,8 @@ class AlgClass:
     mergeFunc = ""
     K = 0 #iteration number
     simM = list()
-    pre = "TS"   #testcase clustering
-    feature = ""
+    #pre = "TS"   #testcase clustering
+    project = ""
 
     def __init__(self):
         print "init: do nothing"
@@ -27,8 +27,8 @@ class AlgClass:
     def setK(self, k):
         self.K = k
 
-    def setFeature(self, feature):
-        self.feature = feature
+    def setProject(self, project):
+        self.project = project
 
     #simM may be not a N*N, may be M*N
     def setSimM(self, M):
@@ -180,10 +180,39 @@ def WCACalDistCluster_ij(cluster_i, cluster_j):
     else:
         print "wrong merge function!!!!!!!!!!"
 
+#sortedList = [[custer1, cluster2, simVal],  [],  [],]
+#to avoid that new clusters tend to be clutered to a large cluter
+#large cluter become too larger
+def chooseMinSizeClusterPair(aList, preIndex):
+    newList = list()   #cluterID, cluterID,  simVal, sizesum
+    for index in range(0, preIndex):
+        [clusterID1, clusterID2, simVal] = aList[index]
+        mergedSize = len(FINALClusters[clusterID1]) + len(FINALClusters[clusterID2])
+        newList.append([clusterID1, clusterID2,   simVal, mergedSize])
+
+    sortedList = sorted(newList, key=lambda x:x[3], reverse=False)
+    minSize = sortedList[0][3]
+    tmpIndex = 0
+    for each in sortedList:
+        if each[3] > minSize:
+            break
+        else:
+            tmpIndex += 1
+    print tmpIndex
+    if tmpIndex == 1:
+        rd = 0
+    else:
+        #choose from 0 to tmpIndex-1 randomly
+        import random
+        rd = random.randint(0, tmpIndex-1)
+        merge_i = sortedList[rd][0]
+        merge_j = sortedList[rd][1]
+        mergeSimVal = sortedList[rd][2]
+    return merge_i, merge_j, mergeSimVal
+
 #choose most similar clusters to merge
 def WCAChooseMostSim(N):
     tmpList = list() # all cluster_pair distance
-
     for i in range(0, N):
         for j in range(0, N):
             if i != j:
@@ -193,7 +222,6 @@ def WCAChooseMostSim(N):
 
     #sort tmpList from big to small
     sortedList = sorted(tmpList, key=lambda x:x[2], reverse=True)
-
     maxValue = sortedList[0][2]
     tmpIndex = 0
     for each in sortedList:
@@ -201,15 +229,16 @@ def WCAChooseMostSim(N):
             break
         else:
             tmpIndex += 1
-    #print tmpIndex
-
+    print tmpIndex,'....',
+    '''
     #choose from 0 to tmpIndex-1 randomly
     import random
     rd = random.randint(0, tmpIndex-1)
     merge_i = sortedList[rd][0]
     merge_j = sortedList[rd][1]
     mergeSimVal = sortedList[rd][2]
-
+    '''
+    [merge_i, merge_j, mergeSimVal] = chooseMinSizeClusterPair(sortedList, tmpIndex)
     return merge_i, merge_j, mergeSimVal
 
 
@@ -239,7 +268,7 @@ def WCAClustering(fv):
             del FINALClusters[merge_j]
 
             if N-1 <= int(origN):
-                outfileName = oneAlg.pre + '_' + oneAlg.feature + '_' + oneAlg.distFunc + '_' + oneAlg.mergeFunc + '_' + str(N-1) + '.csv'
+                outfileName = oneAlg.project + '_' + oneAlg.distFunc + '_' + oneAlg.mergeFunc + '_' + str(N-1) + '.csv'
                 print "clustering result file: ", outfileName
                 printClustering(outfileName)
         iterk = iterk + 1
@@ -279,18 +308,19 @@ def initClusterByInput(initList):
 
 oneAlg = AlgClass()
 #use testcase feature to do clustering
-#python pro.py   tsfv.csv  initClusterFile.csv   distFunc=jm, uem, uemnm       mergeFunc= MIN_SINGLE, MAX_SINGLE, AVG       K=iterNum   feature=TS
+#python pro.py   tsfv.csv  initClusterFile.csv   distFunc=jm, uem, uemnm       mergeFunc= MIN_SINGLE, MAX_SINGLE, AVG       K=iterNum   project    simValue=0.6
 if __name__ == "__main__":
     featureFileName = sys.argv[1]    #testcase feature maxtrix filename
     initClusterFileName = sys.argv[2] #
     distFunc = sys.argv[3]           #similaroty distance metric
     mergeFunc = sys.argv[4]          #how to merge the two similar custers to be a new cluster
     K = int(sys.argv[5])
-    feature = sys.argv[6]  #Test case
+    project = sys.argv[6]
+    STOPCLUSTERINGSIMVALUE = float(sys.argv[7])   #default is 0.6
     oneAlg.setDistFunc(distFunc)
     oneAlg.setMergeFunc(mergeFunc)
     oneAlg.setK(K)
-    oneAlg.setFeature(feature)
+    oneAlg.setProject(project)
 
     #init fecture vector
     tsFv = readCSV(featureFileName)
