@@ -38,20 +38,35 @@ def readCSV(fileName):
             resList.append(oneList)
     return resList
 
+def isStrPackage(strstr):
+    if '.*' in strstr:
+        return True
+    else:
+        return False
 
 #use excludefile to judge that  className is included or not
 def isIncludedByExTag(className):
     for each in EXCLUDEDCLASSNAMEList:
-        if className == each:
-            return False
+        if isStrPackage(each):
+            each = each[0: len(each) - 2]
+            if className.startswith(each):  #belong to this package
+                return False
+        else:
+            if className == each:   #each can be packge.* or classname
+                return False
     return True
 
 #use includefile to judge that  className is included or not
 def isIncludedByInTag(className):
     #use includefile
-    for each in INCLUDEDCLASSNAMEList:
-        if className == each:
-            return True
+    for each in INCLUDEDCLASSNAMEList:  #each can be packge.* or classname
+        if isStrPackage(each):
+            each = each[0: len(each) - 2]
+            if className.startswith(each):
+                return True
+        else:
+            if className == each:
+                return True
     return False
 
 #className is included or not
