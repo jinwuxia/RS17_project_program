@@ -13,6 +13,7 @@ traceID   class1 class2  class3  class4 .......
 CLASSID2NAMEDict = dict()
 CLASSNAME2IDDict = dict()
 EXCLUDEDCLASSNAMEList = list()
+INCLUDEDCLASSNAMEList = list()
 
 def readTestCase(fileName):
     testCaseDict = dict()
@@ -37,46 +38,69 @@ def readCSV(fileName):
             resList.append(oneList)
     return resList
 
-#className can be packageName or className
-def isIncluded(className):
+
+#use excludefile to judge that  className is included or not
+def isIncludedByExTag(className):
     for each in EXCLUDEDCLASSNAMEList:
-        if className.startswith(each):
+        if className == each:
             return False
     return True
 
+#use includefile to judge that  className is included or not
+def isIncludedByInTag(className):
+    #use includefile
+    for each in INCLUDEDCLASSNAMEList:
+        if className == each:
+            return True
+    return False
+
+#className is included or not
+def isIncluded(className):
+    #use excludefile
+    if len(EXCLUDEDCLASSNAMEList) != 0:
+        return isIncludedByExTag(className)
+    #use includefile
+    if len(INCLUDEDCLASSNAMEList) != 0:
+        return isIncludedByInTag(className)
+
+    return '[ERROR: in isIncluded()]'
+
 #class or package name which should be excluded
-def readExcludedClass(fileName):
+def readTaggedClass(fileName):
+    resList = list()
     with open(fileName, "rb") as fp:
         reader = csv.reader(fp)
         for each in reader:
             [className] = each
-            EXCLUDEDCLASSNAMEList.append(className)
+            resList.append(className)
+    return resList
 
 #only process the calleeclass, beacause the caller class must be called by last class.
 #only root class is not processed, since root class belongs to exludedClass(zong instead of fen)
 def firstProcess(initList):
     resList = list()  #each element is a dict
     classIndex = 0
-
+    className2IDDict = dict()
+    classID2NameDict = dict()
     for each in initList:
         [traceID, className1, className2] = each
         if len(resList) == traceID:
             resList.append(dict())
-        if isIncluded(className1) and (className1 not in CLASSNAME2IDDict):
-            CLASSNAME2IDDict[className1] = classIndex
-            CLASSID2NAMEDict[classIndex] = className1
+        if isIncluded(className1) and (className1 not in className2IDDict):
+            className2IDDict[className1] = classIndex
+            classID2NameDict[classIndex] = className1
             classIndex += 1
-        if isIncluded(className2) and (className2 not in CLASSNAME2IDDict):
-            CLASSNAME2IDDict[className2] = classIndex
-            CLASSID2NAMEDict[classIndex] = className2
+        if isIncluded(className2) and (className2 not in className2IDDict):
+            className2IDDict[className2] = classIndex
+            classID2NameDict[classIndex] = className2
             classIndex += 1
         if isIncluded(className2):
-            classID2 = CLASSNAME2IDDict[className2]
+            classID2 = className2IDDict[className2]
             if classID2 not in resList[traceID]:
                 resList[traceID][classID2] = 1
             else:
                 resList[traceID][classID2] += 1
-    return resList
+    return resList, className2IDDict, classID2NameDict
 
 def secondProcess(aList):
     resList = list()            #is a maxtrix
@@ -111,20 +135,28 @@ def writeMatrix(matrix, testCaseDict, fileName):
     print fileName
 
 #From workflowFile,  generate testcase featureVector, and classFile
-#python pro.py  workflowfile  testcaseFile excluededFile  outClassFile   outMatrixFile
+#python pro.py  workflowfile  testcaseFile excluededFile    includedFileName  outClassFile   outMatrixFile
 if __name__ == "__main__":
     workflowFileName = sys.argv[1]
     testcaseFileName = sys.argv[2]
     excludedFileName = sys.argv[3]
-    outClassFileName = sys.argv[4]
-    outFeatureVectorFileName = sys.argv[5]
+    includedFileName = sys.argv[4]
+    outClassFileName = sys.argv[5]
+    outFeatureVectorFileName = sys.argv[6]
 
     testCaseDict = readTestCase(testcaseFileName)
     initList = readCSV(workflowFileName)
-    #read EXCLUDEDCLASSNAMEList
-    readExcludedClass(excludedFileName)
+
+    if  excludedFileName != 'null':
+        #read EXCLUDEDCLASSNAMEList
+        EXCLUDEDCLASSNAMEList = readTaggedClass(excludedFileName)
+
+    if includedFileName != 'null':
+        #read INCLUDEDCLASSNAMEList
+        INCLUDEDCLASSNAMEList = readTaggedClass(includedFileName)
+
     #generate CLASSNAME2IDDict, CLASSID2NAMEDict, listDict({classID1, num1}, {classID2, num2})
-    listDict = firstProcess(initList)
+    [listDict, CLASSNAME2IDDict, CLASSID2NAMEDict] = firstProcess(initList)
     matrix = secondProcess(listDict)
     writeClass(outClassFileName)
     writeMatrix(matrix, testCaseDict, outFeatureVectorFileName)
