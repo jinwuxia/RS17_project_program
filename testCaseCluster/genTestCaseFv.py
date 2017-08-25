@@ -78,7 +78,8 @@ def isIncluded(className):
     if len(INCLUDEDCLASSNAMEList) != 0:
         return isIncludedByInTag(className)
 
-    return '[ERROR: in isIncluded()]'
+    #if len(INCLUDEDCLASSNAMEList) == 0   and len(EXCLUDEDCLASSNAMEList) == 0
+    return True
 
 #class or package name which should be excluded
 def readTaggedClass(fileName):
