@@ -6,6 +6,8 @@ MINSIMVALUE = 0
 STOPCLUSTERINGSIMVALUE = 0.6
 DISTFUNCVALUE = 0.5
 TESTCASENAMEDict = dict() #testcase[id] = name
+PROCESSRECORDList = list()
+ZEROTSCount = 0
 
 class AlgClass:
     distFunc = ""
@@ -55,6 +57,7 @@ def writeCSV(fileName,listlist):
         writer = csv.writer(fp)
         for eachList in listlist:
             writer.writerow(eachList)
+    print fileName
 
 def isLess(floatNum, threshold):
     if floatNum - threshold <= 0.001:
@@ -81,6 +84,14 @@ def delFirstCol(fv):
             eachList[index] = int(eachList[index])
         newFv.append(eachList)
     return newFv
+
+#compute the zeroFV testcase_number
+def getZeroTsCount(fv):
+    res = 0
+    for eachList in fv:
+        if sum(eachList) == 0:
+            res += 1
+    return res
 
 
 #find the differ between two feature vector
@@ -264,6 +275,7 @@ def WCAClustering(fv):
         else:
             #merge the cluster_i and cluster_j, and update FINALClusters
             print FINALClusters[merge_i], " and ",  FINALClusters[merge_j], " simVal=", merge_simVal
+            PROCESSRECORDList.append([N - 1,  N - 1 - ZEROTSCount, merge_simVal])
             FINALClusters[merge_i].extend(FINALClusters[merge_j])
             del FINALClusters[merge_j]
 
@@ -325,6 +337,7 @@ if __name__ == "__main__":
     #init fecture vector
     tsFv = readCSV(featureFileName)
     newTsFv = delFirstCol(tsFv)
+    ZEROTSCount = getZeroTsCount(newTsFv)
 
     #init clusters
     if initClusterFileName == 'null':
@@ -335,3 +348,4 @@ if __name__ == "__main__":
         FINALClusters = initClusterByInput(initClusterList)
     #clustering
     WCAClustering(newTsFv)   #operate on FINALClusters
+    writeCSV(project + '_clustering_simvalue.csv', PROCESSRECORDList)
