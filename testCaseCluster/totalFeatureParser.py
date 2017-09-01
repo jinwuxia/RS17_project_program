@@ -7,8 +7,8 @@ COMMUNICATION_TYPE = 'total_freq' #call, para_num, ret_num, call_freq, para_num_
 MERGE_FUNC = 'AVG'   #class-cluster depvalue = min,max,avg
 
 STRUCT_W = 0.5
-COMMUN_W = 0.25
-COMMIT_W = 0.25
+COMMUN_W = 0.0
+COMMIT_W = 0.5
 
 STRUCT_DEP_DICT = dict() #dict[classname1][classname2] = depbitStr
 COMMIT_DEP_DICT = dict() #dict[classname1][classname2] = commitDep
@@ -157,8 +157,8 @@ def getAllDep():
             CLASSIDPAIRDICT[classID1][classID2].extend([structValue, commitValue, communValue, mixedValue])
             #print classID1, classID2, structValue, commitValue, communValue
 
-
-def normalized(oneList):
+#min-max 归一化
+def normalizedMinMax(oneList):
     resList = list()
     minValue = min(oneList)
     maxValue = max(oneList)
@@ -173,6 +173,18 @@ def normalized(oneList):
         resList.append(tmp)
     return resList
 
+#均值-方差归一化
+def normalizedMeanStd(oneList):
+    resList = list()
+    import numpy as np
+    mean = np.average(oneList)
+    sigma = np.std(oneList)
+    for each in oneList:
+        tmp = (each - mean) / float(sigma)
+        tmp = round(tmp, 5)
+        #print mean, sigma, each, tmp
+        resList.append(tmp)
+    return resList
 
 #normalized CLASSIDPAIRDICT and compute mixedValue
 def normCalMixedDep():
@@ -187,9 +199,12 @@ def normCalMixedDep():
     #print structList,'\n'
     #print commitList,'\n'
     #print communList,'\n'
-    structList = normalized(structList)
-    commitList = normalized(commitList)
-    communList = normalized(communList)
+    if sum(structList) > 0.00001:
+        structList = normalizedMinMax(structList)
+    if sum(commitList) > 0.00001:
+         commitList= normalizedMinMax(commitList)
+    if sum(communList) > 0.00001:
+        communList = normalizedMinMax(communList)
     #print structList,'\n'
     #print commitList,'\n'
     #print communList,'\n'
@@ -205,7 +220,7 @@ def normCalMixedDep():
             index += 1
 
 #write CLASSIDPAIRDICT to file
-def writeCSV(fileName):
+def writeDict2CSV(fileName):
     with open(fileName, 'wb') as fp:
         writer = csv.writer(fp)
         for classID1 in CLASSIDPAIRDICT:
@@ -218,18 +233,49 @@ def writeCSV(fileName):
                 writer.writerow(tmpList)
     print fileName
 
+def readClassListFile(fileName):
+    resList = list()
+    with open(fileName, 'rb') as fp:
+        reader = csv.reader(fp)
+        for each in reader:
+            [classID, className] = each
+            resList.append(className)
+    return resList
 
+def filterDep(classList):
+    resList = list()
+    for classID1 in CLASSIDPAIRDICT:
+        className1 = CLASSID2NAMEDict[classID1]
+        if className1 in classList:
+            for classID2 in CLASSIDPAIRDICT[classID1]:
+                className2 = CLASSID2NAMEDict[classID2]
+                if className2 in classList:
+                    tmpList = list()
+                    depList = CLASSIDPAIRDICT[classID1][classID2]
+                    tmpList.append(className1)
+                    tmpList.append(className2)
+                    tmpList.extend(depList)
+                    resList.append(tmpList )
+    return resList
+
+
+def writeCSV(fileName, resList):
+    with open(fileName, 'wb') as fp:
+        writer = csv.writer(fp)
+        writer.writerows(resList)
+    print fileName
 
 #before make decison about how to cluster the classes,
 #we compute three features first, and merge them using pre-set weight,
 #observe the feature values' distribution.
 #this will help us set the clustering threshold.
-#python pro.py   struct.csv  commit.csv  commun.csv  out.csv
+#python pro.py   struct.csv  commit.csv  commun.csv  classList.csv out.csv
 if __name__ == '__main__':
     structDepFileName = sys.argv[1]
     commitDepFileName = sys.argv[2]
     communDepFileName = sys.argv[3]
-    outfileName = sys.argv[4]
+    classListFileName = sys.argv[4]
+    outfileName = sys.argv[5]
     if structDepFileName != 'null':
         STRUCT_DEP_DICT = readStructDepFile(structDepFileName)
         #print STRUCT_DEP_DICT, '\n'
@@ -239,9 +285,15 @@ if __name__ == '__main__':
     if communDepFileName != 'null':
         COMMUN_DEP_DICT = readCommunicationDepFile(communDepFileName)
         #print COMMUN_DEP_DICT, '\n'
+    if classListFileName != 'null':
+        classList = readClassListFile(classListFileName)
 
     genAllClassDict() #generate CLASSNAME2IDDict, CLASSID2NAMEDict, CLASSIDPAIRDICT
     getAllDep()  #init  CLASSIDPAIRDICT
     normCalMixedDep() # normalized and compute mixed value in CLASSIDPAIRDICT
 
-    writeCSV(outfileName)
+    if classListFileName == 'null':
+        writeDict2CSV(outfileName)
+    else:
+        resList = filterDep(classList)
+        writeCSV(outfileName, resList)
