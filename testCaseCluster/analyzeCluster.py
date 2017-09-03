@@ -1,7 +1,10 @@
+
 import sys
 import csv
 
 SMOOTH_THR = 10
+
+
 
 def readCSV(fileName):
     resList = list()
@@ -15,7 +18,7 @@ def writeCSV(listList, fileName):
     with open(fileName, "wb") as fp:
         writer = csv.writer(fp)
         writer.writerows(listList)
-    print fileName
+    #print fileName
 #classList=[ [id1, name1], [id2, name2], [id3, name3], ...]
 def processClass(classList):
     classID2NameDict = dict()
@@ -117,39 +120,53 @@ def trans2Set(clusterList):
     '''
     return clusterClassIDList
 
+
+#dict[cluterID: [classIDList]]
+def excludeNullClassCluster(clusterClassIDList):
+    clusterClassIDDict = dict()
+    for clusterID in range(0, len(clusterClassIDList)):
+        classIDList = clusterClassIDList[clusterID]
+        if len(classIDList) != 0:
+            clusterClassIDDict[clusterID] = classIDList
+    return clusterClassIDDict
+
+
+
 #set operation: get each cluster's differSet
 #list = [classid1, classid2,..] ,  [classid3, classid2, .. ][]
-def genBuSet(clusterClassIDList, classID2NameDict):
-    print "compute each cluster's only ..."
+def genBuSet(clusterClassIDDict, classID2NameDict):
+    #print "compute each cluster's only ..."
     buSetList = list()   #eachelement is a set
-    for clusterID in range(0, len(clusterClassIDList)):
+    for clusterID in clusterClassIDDict:
         otherBingSet = set()
-        for otherClusterID in range(0, len(clusterClassIDList)):
+        for otherClusterID in clusterClassIDDict:
             if otherClusterID != clusterID:
                 otherBingSet = otherBingSet |  set(clusterClassIDList[otherClusterID])
         differSet = set(clusterClassIDList[clusterID]) - otherBingSet
-        buSetList.append(differSet)
-        print "cluster: ", clusterID, "allLen:", len(clusterClassIDList[clusterID]), ", diffLen:", len(differSet), "  differSet: ", printSet(differSet, classID2NameDict)
+        buSetList.append(list(differSet))
+        #print "cluster: ", clusterID, "allLen:", len(clusterClassIDDict[clusterID]), ", diffLen:", len(differSet), "  differSet: ", printSet(differSet, classID2NameDict)
         #print len(clusterClassIDList[clusterID]), ' ... ',clusterClassIDList[clusterID]
-    return buSetList
+    return clusterClassIDDict.keys(), buSetList
 
 #for each cluster, contanining classes (non-overlap) are saved to file
-def writeBuSet2File(buSetList, classID2NameDict, fileName):
+def writeBuSet2File(clusterIDList, buSetList, classID2NameDict, fileName):
     resList = list()
     resList.append(['classID', 'className', 'clusterID'])
 
-    for clusterID in range(0, len(buSetList)):
-        for classID in list(buSetList[clusterID]):
+    for index in range(0, len(buSetList)):
+        clusterID = clusterIDList[index]
+        for classID in list(buSetList[index]):
             resList.append([classID, classID2NameDict[classID], clusterID])
     with open(fileName, "wb") as fp:
         writer = csv.writer(fp)
         writer.writerows(resList)
-    print fileName
+    #print fileName
 
+#get combinations for list's all elements
 #C2 + C3 + C4 + CN
-def getCombination(N):
-    clusterIDList =  range(0, N)
+def getCombination(clusterIDList):
     resList = list()
+    N = len(clusterIDList)
     for m in range(2, N + 1):
         from itertools import combinations
         # comoute m zuhe
@@ -158,21 +175,24 @@ def getCombination(N):
     return resList
 
 #set operation: get all combination's jiaoSet
-def genJiaoSet(clusterClassIDList, classID2NameDict):
+def genJiaoSet(clusterClassIDDict, classID2NameDict):
     jiaoSetList = list()
-    clusterCount = len(clusterClassIDList)
-    allCombinations = getCombination(clusterCount)
+    jiaoClusterIDCombList = list()
+    clusterCount = len(clusterClassIDDict)
+    allClusterIDList = clusterClassIDDict.keys()
+    allCombinations = getCombination(allClusterIDList)
     #print "\nall combinations:\n", allCombinations
     for eachCombination in allCombinations:
         #eachCombination = (clusterID1, clusterID2, ...)
         #compute each combination's jiaoji
-        tmpSet = set( clusterClassIDList[eachCombination[0]] )
+        tmpSet = set( clusterClassIDDict[eachCombination[0]] )
         for eachClusterID in eachCombination:
-            tmpSet = tmpSet & set( clusterClassIDList[eachClusterID] )
+            tmpSet = tmpSet & set( clusterClassIDDict[eachClusterID] )
         if len(tmpSet) != 0:
-            jiaoSetList.append(tmpSet)
-            print "cluster: ", eachCombination, " jiaoSet: ", printSet(tmpSet, classID2NameDict)
-    return jiaoSetList
+            jiaoSetList.append(list(tmpSet))
+            jiaoClusterIDCombList.append(eachCombination)
+            #print "cluster: ", eachCombination, " jiaoSet: ", printSet(tmpSet, classID2NameDict)
+    return jiaoClusterIDCombList, jiaoSetList
 
 
 
@@ -180,7 +200,7 @@ def genJiaoSet(clusterClassIDList, classID2NameDict):
 def genAllBingSet(setList):
     resSet = set()
     for eachSet in setList:
-        resSet = resSet |  eachSet
+        resSet = resSet |  set(eachSet)
     return list(resSet)
 
 #clusterID: [classList]  into  classID:[clusterIDList]
@@ -209,10 +229,103 @@ def write2File(classIDList, classID2ClusterIDDict, classID2NameDict, fileName):
     with open(fileName, "wb") as fp:
         writer = csv.writer(fp)
         writer.writerows(resList)
-    print fileName
+    #print fileName
+
+#buset_clusterIDList = [cluster id1, id2,...]
+#buset_classIDList = [[class id1,  id2, id3],  [....], ]
+#jiaoset_clusterIDList = [ [cluster id1, id2], [id2, id3], [], ...]
+#jiaoset_classIDList = [[class id1,  id2, id3],  [....],]
+class ClusterAnalyzeResult:
+    buset_clusterIDList = list()
+    buset_classIDList = list()
+    buset_classAll = list()
+
+    jiaoset_clusterIDList = list()
+    jiaoset_classIDList = list()
+    jiaoset_classAll = list()
+
+    highJiaoClusterIDList = list()
+    highJiaoClassIDList = list()
+    highJiaoClassAll = list()
+
+    lowJiaoClassAll = list()
+    def setBusetCluster(self, buset_clusterIDList):
+        self.buset_clusterIDList = buset_clusterIDList
+
+    def setBusetClass(self, buset_classIDList):
+        self.buset_classIDList = buset_classIDList
+
+    def setBusetClassAll(self, buset_classAll):
+        self.buset_classAll = buset_classAll
+
+    def setJiaosetCluster(self, jiaoset_clusterIDList):
+        self.jiaoset_clusterIDList = jiaoset_clusterIDList
+
+    def setJiaosetClass(self, jiaoset_classIDList):
+        self.jiaoset_classIDList = jiaoset_classIDList
+
+    def setJiaosetClassAll(self, jiaoset_classAll):
+        self.jiaoset_classAll = jiaoset_classAll
+
+    def setHighJiaosetCluster(self, highJiaoClusterIDList):
+        self.highJiaoClusterIDList = highJiaoClusterIDList
+
+    def setHighJiaosetClass(self, highJiaoClassIDList):
+        self.highJiaoClassIDList = highJiaoClassIDList
+
+    def setHighJiaosetClassAll(self, highJiaoClassAll):
+        self.highJiaoClassAll = highJiaoClassAll
+
+    def setLowJiaosetClassAll(self, lowJiaoClassAll):
+        self.lowJiaoClassAll = lowJiaoClassAll
+
+def writeClusterResult2File(classID2ClusterIDDict):
+    # class count who is not overlapped
+    #print 'nonOverlappedclassCount=', len(clusterResult.buset_classAll)
+    # each cluster own the number of non-overlap
+    avg0 = len(clusterResult.buset_classAll) / float(len(clusterResult.buset_clusterIDList) )
+    #print 'nonoverLappedclassCount/Cluster=',  avg0
+    '''
+    print 'Detail='
+    for index in range(0, len(clusterResult.buset_clusterIDList)):
+        clusterID = clusterResult.buset_clusterIDList[index]
+        classIDList = clusterResult.buset_classIDList[index]
+        print 'cluster:', clusterID, ',', 'classCount:', len(classIDList)
+    '''
+    #how many class are overlapped
+    #print 'overlappedclassCount=', len(clusterResult.jiaoset_classAll)
+    #in average, how many clusters  which the class belongs to
+    avg1 = 0
+    for classID in clusterResult.jiaoset_classAll:
+        clusterIDList = classID2ClusterIDDict[classID]
+        avg1 += len(clusterIDList)
+    avg1 = avg1 / float( len(clusterResult.jiaoset_classAll) )
+    #print  'overlappedclusterCount/class=', avg1
+
+    #how many class are overlapped
+    #print 'highoverlappedclassCount=', len(clusterResult.highJiaoClassAll)
+    #in average, how many clusters  which the class belongs to
+    avg2 = 0
+    for classID in clusterResult.highJiaoClassAll:
+        clusterIDList = classID2ClusterIDDict[classID]
+        avg2 += len(clusterIDList)
+    avg2 = avg2 / float( len(clusterResult.highJiaoClassAll) )
+    #print 'highoverlappedclusterCount/class=', avg2
+
+    #how many class are overlapped
+    #print 'lowoverlappedclassCount=', len(clusterResult.lowJiaoClassAll)
+    #in average, how many clusters  which the class belongs to
+    avg3 = 0
+    for classID in clusterResult.lowJiaoClassAll:
+        clusterIDList = classID2ClusterIDDict[classID]
+        avg3 += len(clusterIDList)
+    avg3 = avg3 / float( len(clusterResult.lowJiaoClassAll) )
+    #print 'lowoverlappedclusterCount/class=', avg3
+
+    print str(len(clusterResult.buset_classAll)) + ',' + str(avg0) + ',' + str(len(clusterResult.jiaoset_classAll)) + ',' + str(avg1) + ',' + str(len(clusterResult.highJiaoClassAll)) + ',' + str(avg2) + ',' +  str(len(clusterResult.lowJiaoClassAll)) + ',' + str(avg3)
 
 
-
+clusterResult = ClusterAnalyzeResult()
 #process the clustering result
 #python pro.py   project  clusterFileName.csv  featureVectorFileName.csv  classFileName.csv
 if __name__ == '__main__':
@@ -228,29 +341,49 @@ if __name__ == '__main__':
     clusterList = readCSV(clusterFileName)
     clusterList = processCluster(clusterList)
 
-    #process the original cluster
+    #process the original cluster *******************************
     clusterList = mergeCluster(clusterList, fvList, len(classID2NameDict))  #clusterList is the final cluster
-    writeCSV(clusterList, project + "_merge_cluster_1.csv")
-    clusterClassIDList = trans2Set(clusterList)
+    #writeCSV(clusterList, project + "_merge_cluster_1.csv")
+    clusterClassIDList = trans2Set(clusterList)  #some cluster maybe null set
     classID2ClusterIDDict = reverseMap(clusterClassIDList)
 
-    buSetList = genBuSet(clusterClassIDList, classID2NameDict)
-    writeBuSet2File(buSetList, classID2NameDict, project + "_split_class_overlap_non_1.csv")
+    #exclude null set cluster
+    clusterClassIDDict = excludeNullClassCluster(clusterClassIDList)
 
-    jiaoSetList = genJiaoSet(clusterClassIDList, classID2NameDict)
+    [buClusterIDList, buSetList] = genBuSet(clusterClassIDDict, classID2NameDict)
+    allBuClassIDList= genAllBingSet(buSetList)
+    writeBuSet2File(buClusterIDList, buSetList, classID2NameDict, project + "_split_class_overlap_non_11.csv")
+
+    [jiaoClusterIDList, jiaoSetList] = genJiaoSet(clusterClassIDDict, classID2NameDict)
     allOverlapClassIDList = genAllBingSet(jiaoSetList)
 
-    #process the new cluster (after smooth)
-    print "\n\n\n"
+    clusterResult.setBusetCluster(buClusterIDList)
+    clusterResult.setBusetClass(buSetList)
+    clusterResult.setBusetClassAll(allBuClassIDList)
+    clusterResult.setJiaosetCluster(jiaoClusterIDList)
+    clusterResult.setJiaosetClass(jiaoSetList)
+    clusterResult.setJiaosetClassAll(allOverlapClassIDList)
+
+    #process the new cluster (after smooth)*****************************************
+    #print "\n\n\n"
     newClusterList = smoothCluster(clusterList)
     #writeCSV(newClusterList, outClusterFileName + "new_1.csv")
     newClusterClassIDList = trans2Set(newClusterList)
 
-    #newBuSetList = genBuSet(newClusterClassIDList, classID2NameDict)
+    #exclude null set cluster
+    newClusterClassIDDict = excludeNullClassCluster(newClusterClassIDList)
 
-    newJiaoSetList = genJiaoSet(newClusterClassIDList, classID2NameDict)
+    [newJiaoClusterIDList, newJiaoSetList] = genJiaoSet(newClusterClassIDDict, classID2NameDict)
     highlyOverlapClassIDList = genAllBingSet(newJiaoSetList)
-    write2File(highlyOverlapClassIDList, classID2ClusterIDDict, classID2NameDict, project +  "_split_class_overlap_high_1.csv")
+    write2File(highlyOverlapClassIDList, classID2ClusterIDDict, classID2NameDict, project +  "_split_class_overlap_high_11.csv")
 
     lowlyOverlapClassIDList = list( set(allOverlapClassIDList) - set(highlyOverlapClassIDList) )
-    write2File(lowlyOverlapClassIDList, classID2ClusterIDDict, classID2NameDict, project + "_split_class_overlap_low_1.csv")
+    write2File(lowlyOverlapClassIDList, classID2ClusterIDDict, classID2NameDict, project + "_split_class_overlap_low_11.csv")
+
+    clusterResult.setHighJiaosetCluster(newJiaoClusterIDList)
+    clusterResult.setHighJiaosetClass(newJiaoSetList)
+
+    clusterResult.setHighJiaosetClassAll(highlyOverlapClassIDList)
+    clusterResult.setLowJiaosetClassAll(lowlyOverlapClassIDList)
+
+    writeClusterResult2File(classID2ClusterIDDict)

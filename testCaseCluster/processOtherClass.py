@@ -60,11 +60,12 @@ def readClassFile(fileName):
                 continue
             CLASSID2NAMEDict[int(classID)] = className
             clusterList = clusterIDListStr.split(':')
-            clusterIDList = [int(clusterID)  clusterID in  clusterList]
+            clusterIDList = [int(clusterID)  for clusterID in  clusterList]
             class2ClusterDict[int(classID)] = clusterIDList
     return class2ClusterDict
 
 
+#in this function,  the dep[class1, class2] is a single-direction
 def getDepBetClass(classID1, classID2):
     className1 = CLASSID2NAMEDict[classID1]
     className2 = CLASSID2NAMEDict[classID2]
@@ -75,6 +76,7 @@ def getDepBetClass(classID1, classID2):
 
 def getDep(classID, clusterID):
     resList = list()
+    print classID, clusterID, FINALCLUSTERDict
     for otherClassID in FINALCLUSTERDict[clusterID]:
         tmpValue = getDepBetClass(classID, otherClassID)
         resList.append(tmpValue)
@@ -92,11 +94,13 @@ def getDep(classID, clusterID):
 #return resList=[clusterID1, clusterID2].
 #if return =null, extract  it to be a single cluster
 def getClusterDecision(depList):
+    print 'before making decision, depList=', depList
     resList = list()
     for each in depList:
         [clusterID, depValue] = each
         if depValue > ASSIGN_THR:
             resList.append(clusterID)
+    print 'after making decision, resList=', resList
     return resList
 
 
@@ -106,16 +110,15 @@ def coreProcess(class2ClusterDict, currentClusterIndex):
         if CONSIDER_FLAG == 'onlyoverlap':  # hypothesis 1
             clusterList = class2ClusterDict[eachClassID]
         elif CONSIDER_FLAG == 'all':        # hypothesis 2
-            clusterList = range(0, len(FINALCLUSTERDict))
+            clusterList = FINALCLUSTERDict.keys()
 
-        #clusterList = ...
         depList = list()
         for eachClusterID in clusterList:
             #depList[]=([eachClusterID, mixedValue])
             mixedDep = getDep(eachClassID, eachClusterID)
-            depList.append([eachClusterID, smixedDep])
+            depList.append([eachClusterID, mixedDep])
 
-        #make decision
+        #make decision, clusterList = ...
         decisionClusterList = getClusterDecision(depList)
         if len(decisionClusterList) == 0:  #extract a single cluster
             FINALCLUSTERDict[currentClusterIndex] = list()
@@ -134,12 +137,14 @@ if __name__ == '__main__':
     DEP_DICT = readDepFile(depFileName)
     [CLASSID2NAMEDict, FINALCLUSTERDict] = readClusterFile(clusterFileName)  #list[clusterID] = classIDList
     class2ClusterDict = readClassFile(classListFileName) #dict[classID] = clusterIDList
-
+    print 'class2ClusterDict=',class2ClusterDict
     tmpList = list()
     for tmpClassID in class2ClusterDict:
         tmpClusterList = class2ClusterDict[tmpClassID]
         tmpList.extend(tmpClusterList)
     tmpList.extend(FINALCLUSTERDict.keys())
     currentClusterIndex = 1 + max(tmpList)
+    print 'currentClusterIndex=', currentClusterIndex
+    print 'intiClusters', FINALCLUSTERDict
 
     coreProcess(class2ClusterDict, currentClusterIndex)
