@@ -352,7 +352,7 @@ if __name__ == '__main__':
 
     [buClusterIDList, buSetList] = genBuSet(clusterClassIDDict, classID2NameDict)
     allBuClassIDList= genAllBingSet(buSetList)
-    writeBuSet2File(buClusterIDList, buSetList, classID2NameDict, project + "_split_class_overlap_non_11.csv")
+    writeBuSet2File(buClusterIDList, buSetList, classID2NameDict, project + "_split_class_overlap_non_20.csv")
 
     [jiaoClusterIDList, jiaoSetList] = genJiaoSet(clusterClassIDDict, classID2NameDict)
     allOverlapClassIDList = genAllBingSet(jiaoSetList)
@@ -375,10 +375,10 @@ if __name__ == '__main__':
 
     [newJiaoClusterIDList, newJiaoSetList] = genJiaoSet(newClusterClassIDDict, classID2NameDict)
     highlyOverlapClassIDList = genAllBingSet(newJiaoSetList)
-    write2File(highlyOverlapClassIDList, classID2ClusterIDDict, classID2NameDict, project +  "_split_class_overlap_high_11.csv")
+    write2File(highlyOverlapClassIDList, classID2ClusterIDDict, classID2NameDict, project +  "_split_class_overlap_high_20.csv")
 
     lowlyOverlapClassIDList = list( set(allOverlapClassIDList) - set(highlyOverlapClassIDList) )
-    write2File(lowlyOverlapClassIDList, classID2ClusterIDDict, classID2NameDict, project + "_split_class_overlap_low_11.csv")
+    write2File(lowlyOverlapClassIDList, classID2ClusterIDDict, classID2NameDict, project + "_split_class_overlap_low_20.csv")
 
     clusterResult.setHighJiaosetCluster(newJiaoClusterIDList)
     clusterResult.setHighJiaosetClass(newJiaoSetList)
