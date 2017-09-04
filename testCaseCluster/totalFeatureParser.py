@@ -2,7 +2,7 @@
 import sys
 import csv
 
-STRUCT_MASK = '0001000110'  #Extend,Typed,Import,Call,cast,create,Implement,set,use,throw
+STRUCT_MASK = '0101000110'  #Extend,Typed,Import,Call,cast,create,Implement,set,use,throw
 COMMUNICATION_TYPE = 'total_freq' #call, para_num, ret_num, call_freq, para_num_freq, ret_num_freq, total, total_freq
 MERGE_FUNC = 'AVG'   #class-cluster depvalue = min,max,avg
 
@@ -46,7 +46,7 @@ def readCommunicationDepFile(fileName):
     return resDict
 
 
-#hypothisis: only call, set, use are the structure relation
+#hypothisis: only call, set, use,Typed are the structure relation
 def readStructDepFile(fileName):
     resDict = dict()
     with open(fileName, 'rb') as fp:
