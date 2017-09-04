@@ -12,9 +12,9 @@ input:已有的cluster结果作为初始值，classID， 重叠的cluster ID。
 #假设2:更新过的非Lappcluster也有可能与class有关系
 '''
 
-CONSIDER_FLAG = 'onlyoverlap' # onlyoverlap, all
+CONSIDER_FLAG = 'all' # onlyoverlap, all
 MERGE_FUNC = 'AVG'   #class-cluster depvalue = min,max,avg
-ASSIGN_THR = 0.16
+ASSIGN_THR = 0.03
 
 FINALCLUSTERDict = dict()  #[clusterID] = classIDList
 DEP_DICT = dict() #dict[classname1][classname2] = [structdep, commitdep, commudep, mixeddep]
@@ -76,9 +76,14 @@ def getDepBetClass(classID1, classID2):
 
 def getDep(classID, clusterID):
     resList = list()
-    print classID, clusterID, FINALCLUSTERDict
+    #print classID, clusterID, FINALCLUSTERDict
+    if clusterID not in FINALCLUSTERDict:   #this cluster's classes are all overlapped
+        return -1
     for otherClassID in FINALCLUSTERDict[clusterID]:
-        tmpValue = getDepBetClass(classID, otherClassID)
+        tmpValue_1 = getDepBetClass(classID, otherClassID)
+        tmpValue_2 = getDepBetClass(otherClassID, classID)
+        tmpValue = max(tmpValue_2, tmpValue_1)
+        #print tmpValue
         resList.append(tmpValue)
     if MERGE_FUNC == 'AVG':
         depValue = sum(resList)/ float(len(resList))
@@ -94,19 +99,22 @@ def getDep(classID, clusterID):
 #return resList=[clusterID1, clusterID2].
 #if return =null, extract  it to be a single cluster
 def getClusterDecision(depList):
-    print 'before making decision, depList=', depList
     resList = list()
     for each in depList:
         [clusterID, depValue] = each
+        if int(depValue) == -1: #assign the class into null cluster at first
+            resList = list()
+            resList.append(clusterID)
+            return resList
         if depValue > ASSIGN_THR:
             resList.append(clusterID)
-    print 'after making decision, resList=', resList
     return resList
 
 
 def coreProcess(class2ClusterDict, currentClusterIndex):
     classList = class2ClusterDict.keys()  #IDlist
     for eachClassID in classList:
+        print '\nprocessing: ', eachClassID, CLASSID2NAMEDict[eachClassID]
         if CONSIDER_FLAG == 'onlyoverlap':  # hypothesis 1
             clusterList = class2ClusterDict[eachClassID]
         elif CONSIDER_FLAG == 'all':        # hypothesis 2
@@ -119,13 +127,18 @@ def coreProcess(class2ClusterDict, currentClusterIndex):
             depList.append([eachClusterID, mixedDep])
 
         #make decision, clusterList = ...
+        print 'before making decision, depList=', depList
         decisionClusterList = getClusterDecision(depList)
+        print 'after making decision, resList=', decisionClusterList
+
         if len(decisionClusterList) == 0:  #extract a single cluster
             FINALCLUSTERDict[currentClusterIndex] = list()
             FINALCLUSTERDict[currentClusterIndex].append(eachClassID)
             currentClusterIndex += 1
         else: #multiCopy or singleCopy
             for assignedClusterID in decisionClusterList:
+                if assignedClusterID not in FINALCLUSTERDict:
+                    FINALCLUSTERDict[assignedClusterID] = list()
                 FINALCLUSTERDict[assignedClusterID].append(eachClassID)
 
 #pro.py  filterDep.csv   initclusterFile.csv    classListFile.csv
@@ -148,3 +161,7 @@ if __name__ == '__main__':
     print 'intiClusters', FINALCLUSTERDict
 
     coreProcess(class2ClusterDict, currentClusterIndex)
+    for clusterID in FINALCLUSTERDict:
+        print '\n',clusterID, ':'
+        for classID in FINALCLUSTERDict[clusterID]:
+            print CLASSID2NAMEDict[classID]
