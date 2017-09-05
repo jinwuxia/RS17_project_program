@@ -1,5 +1,5 @@
 '''
-do testcase clustering 
+do testcase clustering
 '''
 
 import sys
@@ -284,7 +284,7 @@ def WCAClustering(fv):
             del FINALClusters[merge_j]
 
             if N-1 <= int(origN):
-                outfileName = oneAlg.project + '_' + oneAlg.distFunc + '_' + oneAlg.mergeFunc + '_' + str(N-1) + '.csv'
+                outfileName = oneAlg.project + '_' + 'testcase1_' + oneAlg.distFunc + '_' + oneAlg.mergeFunc + '_' + str(N-1) + '.csv'
                 print "clustering result file: ", outfileName
                 printClustering(outfileName)
         iterk = iterk + 1
@@ -352,4 +352,4 @@ if __name__ == "__main__":
         FINALClusters = initClusterByInput(initClusterList)
     #clustering
     WCAClustering(newTsFv)   #operate on FINALClusters
-    writeCSV(project + '_clustering_simvalue.csv', PROCESSRECORDList)
+    writeCSV(project + '_testcase1_clusters_simvalue.csv', PROCESSRECORDList)
