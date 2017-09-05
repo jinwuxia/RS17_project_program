@@ -1,3 +1,8 @@
+'''
+extract class-class struct dependency from xmlFileName
+xml file is exported from understand tool
+'''
+
 import sys
 import csv
 try:

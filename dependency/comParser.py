@@ -1,3 +1,6 @@
+'''
+extract communication cost between classes from workflow.csv
+'''
 import sys
 import csv
 

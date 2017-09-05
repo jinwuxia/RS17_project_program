@@ -1,3 +1,6 @@
+'''
+#from commit log, extract the commit deps(history/evolutionary coupling) for class pairs
+'''
 import sys
 import csv
 import re
