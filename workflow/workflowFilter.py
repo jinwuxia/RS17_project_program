@@ -1,4 +1,8 @@
-
+'''
+accoring to the layering structure,(presentation->service->persistece)
+filter out xass_part1, class_part2 and class_part3.
+part2 is our splitting objects
+'''
 import sys
 import csv
 from treelib import Node, Tree
