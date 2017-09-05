@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 import sys
 import csv
-
+'''
+#before make decison about how to cluster the classes,
+#we compute three features first, and merge them using pre-set weight,
+#observe the feature values' distribution.
+#this will help us set the clustering threshold.
+'''
 STRUCT_MASK = '0101000110'  #Extend,Typed,Import,Call,cast,create,Implement,set,use,throw
 COMMUNICATION_TYPE = 'total_freq' #call, para_num, ret_num, call_freq, para_num_freq, ret_num_freq, total, total_freq
 MERGE_FUNC = 'AVG'   #class-cluster depvalue = min,max,avg
