@@ -1,3 +1,6 @@
+'''
+generate workflow.csv  from keker-log files
+'''
 import string
 import csv
 
@@ -298,14 +301,15 @@ def findAllDataFileContent(dir):
 
 
 
-#python tracemethodCall.py  logdir  filteredPrepackage
+#python pro.py  logdir   outworkflow.csv  filteredPrepackage
 #generate workflow.csv
 if __name__ == "__main__":
     import sys
-    if len(sys.argv) != 3 :
+    if len(sys.argv) != 4 :
         print "argument is less or more!"
     datadir = sys.argv[1]
-    prepackage = sys.argv[2]
+    fileName = sys.argv[2]
+    prepackage = sys.argv[3]
 
     #1 2.first parse, init methodNode and classNode
     totalContentList = findAllDataFileContent(datadir)
@@ -346,7 +350,7 @@ if __name__ == "__main__":
 
         fileName = '/'.join(fileNameDir) + '/source/' + fileName
         """
-        fileName = "workflow.csv"
+        #fileName = "workflow.csv"
         traceIndex = 0
         mergedEdgeList = list()
         for traceID in filteredSessionList[sessionID]:
