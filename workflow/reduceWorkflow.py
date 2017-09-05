@@ -78,7 +78,6 @@ def writeCSV(aList, fileName):
             tmpList = [traceID]
             tmpList.extend(oneList)
             resList.append(tmpList)
-
     with open(fileName, "wb") as fp:
         writer = csv.writer(fp)
         writer.writerows(resList)
