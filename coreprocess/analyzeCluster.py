@@ -328,11 +328,14 @@ def writeClusterResult2File(classID2ClusterIDDict):
 clusterResult = ClusterAnalyzeResult()
 #process the clustering result
 #python pro.py   project  clusterFileName.csv  featureVectorFileName.csv  classFileName.csv
+#../testcase_data/jforum219/coreprocess/jforum219_testcase1_jm_AVG_'${i}'.csv'
 if __name__ == '__main__':
     project = sys.argv[1]
     clusterFileName = sys.argv[2]
     featureVectorFileName = sys.argv[3]
     classFileName = sys.argv[4]
+
+    clusterNum = clusterFileName.split('_')[len(clusterFileName.split('_')) - 1]
 
     classList = readCSV(classFileName)
     classID2NameDict = processClass(classList)
@@ -352,7 +355,7 @@ if __name__ == '__main__':
 
     [buClusterIDList, buSetList] = genBuSet(clusterClassIDDict, classID2NameDict)
     allBuClassIDList= genAllBingSet(buSetList)
-    writeBuSet2File(buClusterIDList, buSetList, classID2NameDict, project + "_split_class_overlap_non_20.csv")
+    writeBuSet2File(buClusterIDList, buSetList, classID2NameDict, project + "testcase1_class_overlap_no_" + clusterNum + ".csv")
 
     [jiaoClusterIDList, jiaoSetList] = genJiaoSet(clusterClassIDDict, classID2NameDict)
     allOverlapClassIDList = genAllBingSet(jiaoSetList)
@@ -375,10 +378,10 @@ if __name__ == '__main__':
 
     [newJiaoClusterIDList, newJiaoSetList] = genJiaoSet(newClusterClassIDDict, classID2NameDict)
     highlyOverlapClassIDList = genAllBingSet(newJiaoSetList)
-    write2File(highlyOverlapClassIDList, classID2ClusterIDDict, classID2NameDict, project +  "_split_class_overlap_high_20.csv")
+    write2File(highlyOverlapClassIDList, classID2ClusterIDDict, classID2NameDict, project + "testcase1_class_overlap_hh" + clusterNum + ".csv")
 
     lowlyOverlapClassIDList = list( set(allOverlapClassIDList) - set(highlyOverlapClassIDList) )
-    write2File(lowlyOverlapClassIDList, classID2ClusterIDDict, classID2NameDict, project + "_split_class_overlap_low_20.csv")
+    write2File(lowlyOverlapClassIDList, classID2ClusterIDDict, classID2NameDict, project + "testcase1_class_overlap_ll_" + clusterNum + ".csv")
 
     clusterResult.setHighJiaosetCluster(newJiaoClusterIDList)
     clusterResult.setHighJiaosetClass(newJiaoSetList)
