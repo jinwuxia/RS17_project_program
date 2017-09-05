@@ -1,15 +1,16 @@
-import sys
-import csv
 
-#generate testcase feature vector and classnameList, the result format is as following:
 '''
+according to the worflow_reduced.csv
+generate testcase feature vector and classnameList, the result format is as following:
 traceID   class1 class2  class3  class4 .......
       t1      2     3       0         1
       t2      2     1       1         0
       t3      1     1       0         3
+because x and y stannds for different things, so also generate classListFIle
 '''
 
-
+import sys
+import csv
 CLASSID2NAMEDict = dict()
 CLASSNAME2IDDict = dict()
 EXCLUDEDCLASSNAMEList = list()
