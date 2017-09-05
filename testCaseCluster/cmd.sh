@@ -1,11 +1,76 @@
 #!/bin/sh
-#python workflowFilter.py  jforum219_workflow.csv    jforum219_workflow_filter_part_1, part2, part_3
-#merge part1 and part3 to be part1
+cd testcase_data
+mkdir jforum219
+mkdir jforum219/workflow
+mkdir jforum219/dependency
 
-python reduceWorkflow.py   jforum219_workflow.csv   jforum219_workflow_reduced.csv     jforum219_testCaseName.csv
-python ../workflow/workflowTree.py   jforum219_workflow_reduced.csv     longname
-mv workflow_longname.tree    jforum219_workflow_reduced_longname.tree
-#
+
+cd ../../RS17_project_program/workflow
+#generate workflow.csv from kiekerlogfile
+python traceWorkflow.py  ../jforumlogFileDir    ../testcase_data/jforum219/workflow/jforum219_workflow.csv    net.jforum
+#filter part1, part2 and part3
+python workflowFilter.py  ../testcase_data/jforum219/workflow/jforum219_workflow.csv    ../testcase_data/jforum219/workflow/jforum219_workflow_part1.csv  ../testcase_data/jforum219/workflow/jforum219_workflow_part2.csv ../testcase_data/jforum219/workflow/jforum219_workflow_part3.csv
+#manual:     merge part1 and part3 to be part1. part2 adjust
+#generate testcaseName and reduced_workflow
+python reduceWorkflow.py   ../testcase_data/jforum219/workflow/jforum219_workflow.csv   ../testcase_data/jforum219/workflow/jforum219_workflow_reduced.csv     ../testcase_data/jforum219/workflow/jforum219_testcase_name.csv
+python workflowTree.py   ../testcase_data/jforum219/workflow/jforum219_workflow_reduced.csv     longname    ../testcase_data/jforum219/workflow/jforum219_workflow_reduced_longname.tree
+python workflowTree.py   ../testcase_data/jforum219/workflow/jforum219_workflow_reduced.csv     shortname   ../testcase_data/jforum219/workflow/jforum219_workflow_reduced_shortname.tree
+
+
+#generate struct, commit, commun dependency between classes
+cd ../../RS17_project_program/dependency
+git log --name-status > ../testcase_data/jforum219/dependency/jforum219.gitlog   #显示新增、修改、删除的文件清单
+python xmlParser.py  ../testcase_data/jforum219/dependency/jforum219.xml     ../testcase_data/jforum219/dependency/jforum219xml.csv
+python cmtParser.py  ../testcase_data/jforum219/dependency/jforum219.gitlog     ../testcase_data/jforum219/dependency/jforum219cmt.csv  java
+python comParser.py ../testcase_data/jforum219/workflow/jforum219_workflow_reduced.csv   ../testcase_data/jforum219/dependency/jforum219com.csv
+
+
+#do testcase clutering by core_function_entity (entity class in part2)
+cd testcase_data/jforum219
+#manul: generate  coreprocess/jforum219_testcase0_in_entity.csv (can  be class or package.*)
+python ../../coreprocess/genTestCaseFv.py  workflow/jforum219_workflow_reduced.csv   workflow/jforum219_testcase_name.csv   null  coreprocess/jforum219_testcase0_in_entity.csv  coreprocess/jforum219_testcase0_class.csv  coreprocess/jforum219_testcase0_fv.csv
+python ../../coreprocess/testCaseClusteringByEntity.py   coreprocess/jforum219_testcase0_fv.csv coreprocess/jforum219_testcase0_clusters.csv
+
+#do testcase clusteing by core_function_class(all class in part2)
+#manul: generate  coreprocess/jforum219_testcase1_in_class.csv (can  be class or package.*)
+cp  workflow/jform219_workflow_part2.csv   coreprocess/jforum219testcase1_in.csv
+python   ../../coreprocess/genTestCaseFv.py  workflow/jforum219_workflow_reduced.csv  workflow/jforum219_testcase_name.csv   null  coreprocess/jforum219_testcase1_in.csv   coreprocess/jforum219_testcase1_class.csv   coreprocess/jforum219_testcase1_fv.csv
+python ../../coreprocess/testCaseClustering.py   coreprocess/jforum219_testcase1_fv.csv    coreprocess/jforum219_testcase0_clusters.csv   jm  AVG  1  jforum219   0.2
+mv jforum219_testcase1_*  coreprocess/
+
+#analyze which jforum219_testcase1_cluster is best
+cd coreprocess
+./batch_analyzeCluster.py
+
+#process overlapped core_function_class
+cd testcase_data/jforum219
+#generate filterDep
+python ../../coreprocess/featureParser.py   dependency/jforum219xml.csv   null  dependency/jforum219com.csv  coreprocess/jforum219_testcase1_class.csv  coreprocess/jforum219_testcase1_FilterDep.csv
+#process overlapped class
+python ../../coreprocess/processOverlappedClass.py  coreprocess/jforum219_testcase1_FilterDep.csv    coreprocess/jforum219_testcase1_class_overlap_no_20.csv    coreprocess/jforum219_testcase1_class_overlap_20.csv    ../testCaseCluster_1/jforum219_cluster_2.csv
+
+
+#do class clutering for other_non_core_class
+python ../../coreprocess/featureParser.py   dependency/jforum219xml.csv   null  dependency/jforum219com.csv  null  dependency/jforum219TotalDep.csv
+
+
+python  processOtherClass.py    jforum219TotalDep.csv      ../testCaseCluster_1/jforum219_testcase_class_1.csv     ../testCaseCluster_1/jforum219_testcase_class_all.csv   hehe.csv
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #
 python genTestCaseFv.py  jforum219_workflow_reduced.csv    jforum219_testCaseName.csv   jforum219_workflow_filter_class_part_1.csv    jforum219_testcase_class.csv   jforum219_testcase_fv.csv
 python testCaseClustering.py   jforum219_testcase_fv.csv    jm   AVG    3   TS
