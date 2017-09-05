@@ -1,4 +1,7 @@
-
+'''
+according to workflow.csv falt structure,
+generate tree-structual workflow, for easy observation
+'''
 import sys
 import csv
 from treelib import Node, Tree
@@ -206,10 +209,11 @@ def WriteTree(outfileName, sortTreeDict, treeType):
 
 
 
-#python pro.py  workflow.csv  shortname or longname
+#python pro.py  workflow.csv  shortname or longname outtree.tree
 if __name__ == '__main__':
     workflowFilename = sys.argv[1] # ../RS17_source_data/RS17_jpetstore/dynamic/source/jpetstore6_trace_method_workflow.csv
     treeType = sys.argv[2] #shortname or longname
+    outfileName = sys.argv[3]
     '''
     arr = workflowFilename.split('/')
     tmp = arr.pop()
@@ -221,5 +225,5 @@ if __name__ == '__main__':
     treeDict = SortTree(treeList)
 
     #outfileName = outFileNamePre + 'workflow_' + treeType + '.tree'
-    outfileName = 'workflow_' + treeType + '.tree'
+    #outfileName = 'workflow_' + treeType + '.tree'
     WriteTree(outfileName, treeDict, treeType)
