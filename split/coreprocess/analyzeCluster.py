@@ -164,15 +164,25 @@ def writeBuSet2File(clusterIDList, buSetList, classID2NameDict, fileName):
 
 #get combinations for list's all elements
 #C2 + C3 + C4 + CN
+#if , write to file in case that  memory error
 def getCombination(clusterIDList):
-    resList = list()
+    from itertools import combinations
     N = len(clusterIDList)
+    fp = open('comb_tmp.txt', 'w')
+    #print 'open comb_tmp.txt success...'
     for m in range(2, N + 1):
-        from itertools import combinations
         # comoute m zuhe
-        tmp = list(combinations(clusterIDList, m))
-        resList.extend(tmp)
-    return resList
+        #print m, '\n'
+        # list(combinations(clusterIDList, m))  memory error
+        for comb in combinations(clusterIDList, m):
+            a = list(comb)
+            a = [str(each) for each in a]
+            strstr = (','.join(a)) + '\n'
+            #print strstr
+            fp.write(strstr)
+    fp.close()
+    #print 'write comb_tmp.txt end...'
+
 
 #set operation: get all combination's jiaoSet
 def genJiaoSet(clusterClassIDDict, classID2NameDict):
@@ -180,9 +190,17 @@ def genJiaoSet(clusterClassIDDict, classID2NameDict):
     jiaoClusterIDCombList = list()
     clusterCount = len(clusterClassIDDict)
     allClusterIDList = clusterClassIDDict.keys()
-    allCombinations = getCombination(allClusterIDList)
+
+    #allCombinations = getCombination(allClusterIDList)
     #print "\nall combinations:\n", allCombinations
-    for eachCombination in allCombinations:
+    getCombination(allClusterIDList) #write allcombinations into 'comb_tmp.txt'
+
+    fp = open('comb_tmp.txt', 'r')
+    for line in fp:
+        aline = line.split(',')
+        eachCombination = [int(each) for each in aline]
+        #print eachCombination
+        #for eachCombination in allCombinations:
         #eachCombination = (clusterID1, clusterID2, ...)
         #compute each combination's jiaoji
         tmpSet = set( clusterClassIDDict[eachCombination[0]] )
