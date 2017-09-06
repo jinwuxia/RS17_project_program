@@ -1,5 +1,10 @@
+# -*- coding: utf-8 -*-
+
 import sys
 import csv
+'''
+根据非核心功能class的特征向量，对non-core class 进行聚类
+'''
 
 FINALCLUSTERS = list()
 CLASSID2NAMEDict = dict()   #classDoct[classID] = className

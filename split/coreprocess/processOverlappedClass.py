@@ -3,6 +3,13 @@ import sys
 import csv
 
 '''
+处理重叠的class， 得出最终的非重叠+重叠 class 聚类结果。
+使用的特征包括mixedDep(struct+comn+commit), 也包含traceDep.
+traceDep是class 在某个cluster（根据test case聚类的结果）中出现的次数。
+之所以使用traceDep 是因为在假设1的情况下，存在cluster不具有单独拥有的class，所以为空，
+导致不存在class-cluster的mixeddep.
+而在假设1下，traceDep肯定有（除了test caseFV=[0]）
+
 算法思路：处理每一个要处理的class， 对其进行分配到已有的cluster或者
 input:已有的cluster结果作为初始值，classID， 重叠的cluster ID。
 读入要处理的class list，以及所在的clusterIDList
@@ -17,10 +24,11 @@ MERGE_FUNC = 'AVG'   #class-cluster depvalue = min,max,avg
 ASSIGN_THR = 0.03
 
 FINALCLUSTERDict = dict()  #[clusterID] = classIDList
-DEP_DICT = dict() #dict[classname1][classname2] = [structdep, commitdep, commudep, mixeddep]
+MIXED_DEP_DICT = dict() #dict[classname1][classname2] = [structdep, commitdep, commudep, mixeddep]
+TRACE_DEP_DICT = dict() #dict[className][clusterID] = classCount #this class ccount in this cluster
 CLASSID2NAMEDict = dict()
 
-def readDepFile(fileName):
+def readMixedDepFile(fileName):
     resDict = dict()
     with open(fileName, 'rb') as fp:
         reader = csv.reader(fp)
@@ -31,9 +39,17 @@ def readDepFile(fileName):
             resDict[className1][className2] = [round(float(structDep), 5), round(float(commitDep), 5), round(float(communDep), 5), round(float(mixedDep), 5)]
     return resDict
 
+
+def readTraceDepFile(fileName):
+    trace_dep_dict = dict()
+
+    return trace_dep_dict
+
+
 #file=[classID, className, clusterID]
+#this file is the non-overlap classFile
 #return dict[clusterID] = classIDList
-def readClusterFile(fileName):
+def readNonlapClassFile(fileName):
     classID2NameDict = dict()
     clusterDict = dict()
     with open(fileName, 'rb') as fp:
@@ -50,7 +66,7 @@ def readClusterFile(fileName):
 
 #file = [classID, className, clusterIDListStr]
 #return dict[classID] = clusterIDList
-def readClassFile(fileName):
+def readOverlapClassFile(fileName):
     class2ClusterDict = dict()
     with open(fileName, 'rb') as fp:
         reader = csv.reader(fp)
@@ -66,23 +82,23 @@ def readClassFile(fileName):
 
 
 #in this function,  the dep[class1, class2] is a single-direction
-def getDepBetClass(classID1, classID2):
+def getMixedDepBetClass(classID1, classID2):
     className1 = CLASSID2NAMEDict[classID1]
     className2 = CLASSID2NAMEDict[classID2]
-    if className1 in DEP_DICT:
-        if className2 in DEP_DICT[className1]:
-            return DEP_DICT[className1][className2][3]   #mixed value
+    if className1 in MIXED_DEP_DICT:
+        if className2 in MIXED_DEP_DICT[className1]:
+            return MIXED_DEP_DICT[className1][className2][3]   #mixed value
     return round(float(0), 5)
 
 #dep from classID to clusterID
-def getDep(classID, clusterID):
+def getMixedDep(classID, clusterID):
     resList = list()
     #print classID, clusterID, FINALCLUSTERDict
     if clusterID not in FINALCLUSTERDict:   #this cluster's classes are all overlapped
-        return -1
+        return 0
     for otherClassID in FINALCLUSTERDict[clusterID]:
-        tmpValue_1 = getDepBetClass(classID, otherClassID)
-        tmpValue_2 = getDepBetClass(otherClassID, classID)
+        tmpValue_1 = getMixedDepBetClass(classID, otherClassID)
+        tmpValue_2 = getMixedDepBetClass(otherClassID, classID)
         tmpValue = max(tmpValue_2, tmpValue_1)
         #print tmpValue
         resList.append(tmpValue)
@@ -94,22 +110,30 @@ def getDep(classID, clusterID):
         depValue = max(resList)
     return depValue
 
-#dep from classIDList to clusterID
-def getDepClassList2Cluster(classList, clusterID):
-    depValueList = list()
-    for classID in classList:
-        depValue = getDep(classID, clusterID)
-        depValueList.append(depValue)
 
-    #filter out -1
-    newDepValueList = list()
-    for each in depValueList:
-        if int(each) != -1:
-            newDepValueList.append(each)
+#dep from classID to clusterID
+def getTraceDep(classID, clusterID):
+    dep = 0
+    className = CLASSID2NAMEDict[classID]
+    if className in TRACE_DEP_DICT:
+        if clusterID in TRACE_DEP_DICT[className]:
+            dep = TRACE_DEP_DICT[className][clusterID]
+    return dep
 
-    if len(newDepValueList)  == 0:
-        return -1
-    return sum(newDepValueList) / float(len(newDepValueList))
+
+#mixed dep = (dep + trace_dep)/2   from classID to clusterID
+def getFinalDep(classID, clusterID):
+    depValue1 = getMixedDep(classID, clusterID)
+    depValue2 = getTraceDep(classID, clusterID)
+    depValue = 0
+    if MERGE_FUNC == 'MIN':
+        depValue = min(depValue1, depValue2)
+    elif MERGE_FUNC == 'MAX':
+        depValue = max(depValue1, depValue2)
+    elif MERGE_FUNC == 'AVG':
+        depValue = (depValue1 + depValue2) / 2.0
+    return depValue
+
 
 
 #depList = [clusterID, mixdep][...]
@@ -120,77 +144,43 @@ def getClusterDecision(depList):
     resList = list()
     for each in depList:
         [clusterID, depValue] = each
+        '''
         if int(depValue) == -1: #assign the class into null cluster at first
             resList = list()
             resList.append(clusterID)
             return resList
+        '''
         if depValue > ASSIGN_THR:
             resList.append(clusterID)
     return resList
 
 
-#judge the two list is equal or not
-def isEqualList(list1, list2):
-    set1 = set(list1)
-    set2 = set(list2)
-    if len(set1 & set2) == len(set1) and len(set1 & set2) == len(set2):
-        return True
-    else:
-        return False
-
-
-#if merge class into classList, when the classes appears same dependency pattern with clusters
-def preProcess(class2ClusterDict):
-    isProcessed = dict()  #[classID] = 1
-    classSetList = list() #list[1] = classIDs
-    clusterSetList = list() # list[1] = clusterIDs.   classIDs and clusterSetList is corresponding
-
-    classIDKeysList = class2ClusterDict.keys()
-    for index1 in range(0, len(classIDKeysList)):
-        classID1 = classIDKeysList[index1]
-        if classID1 not in isProcessed:
-            classSetList.append([classID1])
-            isProcessed[classID1] = 1
-            clusterIDList1 = class2ClusterDict[classID1]
-            clusterSetList.append(clusterIDList1)
-            for index2 in range(index1 + 1, len(classIDKeysList)):
-                classID2 = classIDKeysList[index2]
-                if classID2 not in isProcessed:
-                    clusterIDList2 = class2ClusterDict[classID2]
-                    if isEqualList(clusterIDList1, clusterIDList2):
-                        classSetList[len(classSetList) - 1].append(classID2)
-                        isProcessed[classID2] = 1
-    print '\nafter merging class: ', classSetList
-    return classSetList, clusterSetList
-
-
-def coreProcess(mergedClassList, mergedClusterList, currentClusterIndex):
-    for index in range(0, len(mergedClassList)):
-        print '\nProcessing: classes=', mergedClassList[index], ' clusters=', mergedClusterList[index]
+def coreProcess(class2ClusterDict, currentClusterIndex):
+    for classID in class2ClusterDict:
         if CONSIDER_FLAG == 'onlyoverlap':  # hypothesis 1
-            clusterList = mergedClusterList[index]
+            clusterList = class2ClusterDict[classID]
         elif CONSIDER_FLAG == 'all':        # hypothesis 2
             clusterList = FINALCLUSTERDict.keys()
 
         depList = list()
         for eachClusterID in clusterList:
             #depList[]=([eachClusterID, mixedValue])
-            mixedDep = getDepClassList2Cluster(mergedClassList[index], eachClusterID)
-            depList.append([eachClusterID, mixedDep])
+            finalDep = getFinalDep(classID, eachClusterID)
+            depList.append([eachClusterID, finalDep])
 
         #make decision, clusterList = ...
-        print 'before making decision, depList=', depList
+        print 'before making decision, depList=[clusterID, dep]=', depList
         decisionClusterList = getClusterDecision(depList)
-        print 'after making decision, resList=', decisionClusterList
+        print 'after making decision, resList[clusterID]=', decisionClusterList
 
         if len(decisionClusterList) == 0:  #extract a single cluster
-            FINALCLUSTERDict[currentClusterIndex] = mergedClassList[index]
+            FINALCLUSTERDict[currentClusterIndex] = [classID]
             currentClusterIndex += 1
         else: #multiCopy or singleCopy
             for assignedClusterID in decisionClusterList:
                 if assignedClusterID not in FINALCLUSTERDict:
                     FINALCLUSTERDict[assignedClusterID] = list()
-                FINALCLUSTERDict[assignedClusterID].extend(mergedClassList[index])
+                FINALCLUSTERDict[assignedClusterID].append(classID)
 
 
 
@@ -206,17 +196,27 @@ def write2CSV(fileName):
     print fileName
 
 
-#pro.py  filterDep.csv   initclusterFile.csv    classListFile.csv
+#pro.py  filterDep.csv  traceDep.csv
+#        initclusterFile.csv(non-lapped classFile)
+#        classListFile.csv(overlapped classFile)
+#        FinalClusterFile
 if __name__ == '__main__':
+    #beacuse some clusters's classes are all overlapped,
+    #the cluster is null, mixeddep=0.
+    #so use traceDep to compensate this situation
     depFileName = sys.argv[1]
-    clusterFileName = sys.argv[2]
-    classListFileName = sys.argv[3]
-    outClusterFileName = sys.argv[4]
+    traceDepFileName = sys.argv[2]
+    clusterFileName = sys.argv[3]
+    classListFileName = sys.argv[4]
+    outClusterFileName = sys.argv[5]
 
-    DEP_DICT = readDepFile(depFileName)
-    [CLASSID2NAMEDict, FINALCLUSTERDict] = readClusterFile(clusterFileName)  #list[clusterID] = classIDList
-    class2ClusterDict = readClassFile(classListFileName) #dict[classID] = clusterIDList
+    MIXED_DEP_DICT = readMixedDepFile(depFileName)
+    TRACE_DEP_DICT = readTraceDepFile(traceDepFileName)
+
+    [CLASSID2NAMEDict, FINALCLUSTERDict] = readNonlapClassFile(clusterFileName)  #list[clusterID] = classIDList
+    class2ClusterDict = readOverlapClassFile(classListFileName) #dict[classID] = clusterIDList
     print 'class2ClusterDict=',class2ClusterDict
+
     tmpList = list()
     for tmpClassID in class2ClusterDict:
         tmpClusterList = class2ClusterDict[tmpClassID]
@@ -226,8 +226,7 @@ if __name__ == '__main__':
     print 'currentClusterIndex=', currentClusterIndex
     print 'intiClusters', FINALCLUSTERDict
 
-    [mergedClassList, mergedClusterList]= preProcess(class2ClusterDict)
-    coreProcess(mergedClassList, mergedClusterList, currentClusterIndex)
+    coreProcess(class2ClusterDict, currentClusterIndex)
 
     write2CSV(outClusterFileName)
     for clusterID in FINALCLUSTERDict:

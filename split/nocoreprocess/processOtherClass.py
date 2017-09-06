@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+'''
+生成除了非核心功能相关的class的特征向量
+非核心功能相关的class = allclass - testcase2class(core class) - DAO - view.Action
+
+'''
 import sys
 import csv
 
@@ -121,7 +126,7 @@ def write2CSV(matrix, fileName):
     print fileName
 
 
-#pro.py  filterDep.csv   hasProcessedClassFile,  totalClassFile, outFeatureFileName
+#pro.py  totalDep.csv   hasProcessedClassFile,  totalClassFile(action+dao+other+testcase2class), outFeatureFileName
 if __name__ == '__main__':
     depFileName = sys.argv[1]
     hasProcessedClassFileName = sys.argv[2]
