@@ -48,12 +48,6 @@ def processCluster(clusterList):
         resList[clusterID].append(tsID)
     return resList
 
-#print set by classname instead of classID
-def printSet(oneSet):
-    resList = list()
-    for classID in list(oneSet):
-        resList.append(CLASSID2NAMEDict[classID])
-    return resList
 
 #compute the classcount for each cluster
 def mergeClusterFv(clusterList, fvList, classCount):
