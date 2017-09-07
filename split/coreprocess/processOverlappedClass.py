@@ -21,7 +21,7 @@ input:已有的cluster结果作为初始值，classID， 重叠的cluster ID。
 
 CONSIDER_FLAG = 'onlyoverlap' # onlyoverlap, all
 MERGE_FUNC = 'AVG'   #class-cluster depvalue = min,max,avg
-ASSIGN_THR = 0.03
+ASSIGN_THR = 0.03    #defalut, is a cmd argv
 
 FINALCLUSTERDict = dict()  #[clusterID] = classIDList
 MIXED_DEP_DICT = dict() #dict[classname1][classname2] = [structdep, commitdep, commudep, mixeddep]
@@ -211,6 +211,7 @@ def write2CSV(fileName):
 #        initclusterFile.csv(non-lapped classFile)
 #        classListFile.csv(overlapped classFile)
 #        FinalClusterFile
+#        ASSIGN_THR
 if __name__ == '__main__':
     #beacuse some clusters's classes are all overlapped,
     #the cluster is null, mixeddep=0.
@@ -220,13 +221,14 @@ if __name__ == '__main__':
     clusterFileName = sys.argv[3]
     classListFileName = sys.argv[4]
     outClusterFileName = sys.argv[5]
+    ASSIGN_THR = float(sys.argv[6])   #default is 0.03
 
     MIXED_DEP_DICT = readMixedDepFile(depFileName)
     TRACE_DEP_DICT = readTraceDepFile(traceDepFileName) #read and normalized
 
     [CLASSID2NAMEDict, FINALCLUSTERDict] = readNonlapClassFile(clusterFileName)  #list[clusterID] = classIDList
     class2ClusterDict = readOverlapClassFile(classListFileName) #dict[classID] = clusterIDList
-    print 'class2ClusterDict=',class2ClusterDict
+    #print 'class2ClusterDict=',class2ClusterDict
 
     tmpList = list()
     for tmpClassID in class2ClusterDict:
@@ -234,13 +236,15 @@ if __name__ == '__main__':
         tmpList.extend(tmpClusterList)
     tmpList.extend(FINALCLUSTERDict.keys())
     currentClusterIndex = 1 + max(tmpList)
-    print 'currentClusterIndex=', currentClusterIndex
-    print 'intiClusters', FINALCLUSTERDict
+    #print 'currentClusterIndex=', currentClusterIndex
+    #print 'intiClusters', FINALCLUSTERDict
 
     coreProcess(class2ClusterDict, currentClusterIndex)
 
     write2CSV(outClusterFileName)
+    '''
     for clusterID in FINALCLUSTERDict:
-        print '\n',clusterID, ':'
+        #print '\n',clusterID, ':'
         for classID in FINALCLUSTERDict[clusterID]:
             print CLASSID2NAMEDict[classID]
+    '''

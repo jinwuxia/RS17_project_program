@@ -53,14 +53,16 @@ python ../../coreprocess/analyzeOneCluster.py  coreprocess/jforum219_testcase1_j
 
 #process overlapped core_function_class
 cd testcase_data/jforum219
-#generate filterDep
-python ../../coreprocess/featureParser.py   dependency/jforum219xml.csv   null  dependency/jforum219com.csv  coreprocess/jforum219_testcase1_class.csv  coreprocess/jforum219_testcase1_FilterDep.csv
+#generate mixDep
+python ../../coreprocess/mixParser.py   dependency/jforum219xml.csv   null  dependency/jforum219com.csv  coreprocess/jforum219_testcase1_class.csv  coreprocess/jforum219_testcase1_mixedDep.csv
+#generate traceDep
+python ../../coreprocess/traceParser.py  coreprocess/jforum219_testcase1_20_classclusterFv.csv    dependency/jforum219_testcase1_traceDep.csv
 #process overlapped class
-python ../../coreprocess/processOverlappedClass.py  coreprocess/jforum219_testcase1_FilterDep.csv    coreprocess/jforum219_testcase1_class_overlap_no_20.csv    coreprocess/jforum219_testcase1_class_overlap_20.csv    ../testCaseCluster_1/jforum219_cluster_2.csv
+python ../../coreprocess/processOverlappedClass.py  dependency/jforum219_testcase1_mixedDep.csv    dependency/jforum219_testcase1_traceDep.csv  coreprocess/jforum219_testcase1_class_overlap_no_20.csv    coreprocess/jforum219_testcase1_class_overlap_20.csv    ../testCaseCluster_1/jforum219_cluster_2.csv
 
 
 #do class clutering for other_non_core_class
-python ../../coreprocess/featureParser.py   dependency/jforum219xml.csv   null  dependency/jforum219com.csv  null  dependency/jforum219TotalDep.csv
+python ../../coreprocess/mixParser.py   dependency/jforum219xml.csv   null  dependency/jforum219com.csv  null  dependency/jforum219TotalDep.csv
 
 
 python  processOtherClass.py    jforum219TotalDep.csv      ../testCaseCluster_1/jforum219_testcase_class_1.csv     ../testCaseCluster_1/jforum219_testcase_class_all.csv   hehe.csv
