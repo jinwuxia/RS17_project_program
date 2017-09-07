@@ -39,10 +39,21 @@ def readMixedDepFile(fileName):
             resDict[className1][className2] = [round(float(structDep), 5), round(float(commitDep), 5), round(float(communDep), 5), round(float(mixedDep), 5)]
     return resDict
 
-
+#fileName = 'testcase1_20_classclusterFv'
 def readTraceDepFile(fileName):
-    trace_dep_dict = dict()
-
+    trace_dep_dict = dict()  #dict[classNAme][clusterID] = dep
+    tmpList = list()
+    with open(fileName, 'r') as fp:
+        reader = csv.reader(fp)
+        for each in reader:
+            [className, clusterID, depValue] = each
+            if className == 'className':
+                continue
+            clusterID = int(clusterID)
+            depValue = float(depValue)
+            if className not in trace_dep_dict:
+                trace_dep_dict[className] = dict()
+            trace_dep_dict[className][clusterID] = depValue
     return trace_dep_dict
 
 
@@ -196,7 +207,7 @@ def write2CSV(fileName):
     print fileName
 
 
-#pro.py  filterDep.csv  traceDep.csv
+#pro.py  mixDep.csv  traceDep.csv
 #        initclusterFile.csv(non-lapped classFile)
 #        classListFile.csv(overlapped classFile)
 #        FinalClusterFile
@@ -211,7 +222,7 @@ if __name__ == '__main__':
     outClusterFileName = sys.argv[5]
 
     MIXED_DEP_DICT = readMixedDepFile(depFileName)
-    TRACE_DEP_DICT = readTraceDepFile(traceDepFileName)
+    TRACE_DEP_DICT = readTraceDepFile(traceDepFileName) #read and normalized
 
     [CLASSID2NAMEDict, FINALCLUSTERDict] = readNonlapClassFile(clusterFileName)  #list[clusterID] = classIDList
     class2ClusterDict = readOverlapClassFile(classListFileName) #dict[classID] = clusterIDList

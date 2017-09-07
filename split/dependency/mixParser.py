@@ -13,8 +13,8 @@ MERGE_FUNC = 'AVG'   #class-cluster depvalue = min,max,avg
 
 FENWEI_THR = 0.9
 STRUCT_W = 0.5
-COMMUN_W = 0.0
-COMMIT_W = 0.5
+COMMUN_W = 0.5
+COMMIT_W = 0.0
 
 STRUCT_DEP_DICT = dict() #dict[classname1][classname2] = depbitStr
 COMMIT_DEP_DICT = dict() #dict[classname1][classname2] = commitDep
