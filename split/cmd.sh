@@ -58,8 +58,10 @@ python ../../coreprocess/mixParser.py   dependency/jforum219xml.csv   null  depe
 #generate traceDep
 python ../../coreprocess/traceParser.py  coreprocess/jforum219_testcase1_20_classclusterFv.csv    dependency/jforum219_testcase1_traceDep.csv
 #process overlapped class
-python ../../coreprocess/processOverlappedClass.py  dependency/jforum219_testcase1_mixedDep.csv    dependency/jforum219_testcase1_traceDep.csv  coreprocess/jforum219_testcase1_class_overlap_no_20.csv    coreprocess/jforum219_testcase1_class_overlap_20.csv    ../testCaseCluster_1/jforum219_cluster_2.csv
+#python ../../coreprocess/processOverlappedClass.py  dependency/jforum219_testcase1_mixedDep.csv    dependency/jforum219_testcase1_traceDep.csv  coreprocess/jforum219_testcase1_class_overlap_no_20.csv    coreprocess/jforum219_testcase1_class_overlap_20.csv    ../testCaseCluster_1/jforum219_cluster_2.csv
+in linux:   ./batch_processOverlap.sh
 
+#analyze processoverlap result, choose  a best clusters result
 
 #do class clutering for other_non_core_class
 python ../../coreprocess/mixParser.py   dependency/jforum219xml.csv   null  dependency/jforum219com.csv  null  dependency/jforum219TotalDep.csv
