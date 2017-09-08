@@ -29,6 +29,7 @@ TRACE_DEP_DICT = dict() #dict[className][clusterID] = classCount #this class cco
 CLASSID2NAMEDict = dict()
 
 def readMixedDepFile(fileName):
+    #print fileName
     resDict = dict()
     with open(fileName, 'rb') as fp:
         reader = csv.reader(fp)
@@ -57,12 +58,22 @@ def readTraceDepFile(fileName):
     return trace_dep_dict
 
 
+def readOrignalClusterFile (fileName):
+    finalClusterDict = dict()  #dict[clusterID] = list()
+    with open(fileName) as fp:
+        reader = csv.reader(fp)
+        for each in reader:
+            [clusterID, testcaseID, testcaseName] = each
+            clusterID = int(clusterID)
+            if clusterID not in finalClusterDict:
+                finalClusterDict[clusterID] = list()
+    return finalClusterDict
+
 #file=[classID, className, clusterID]
 #this file is the non-overlap classFile
 #return dict[clusterID] = classIDList
 def readNonlapClassFile(fileName):
     classID2NameDict = dict()
-    clusterDict = dict()
     with open(fileName, 'rb') as fp:
         reader = csv.reader(fp)
         for each in reader:
@@ -70,10 +81,8 @@ def readNonlapClassFile(fileName):
             if classID == 'classID':
                 continue
             classID2NameDict[int(classID)] = className
-            if int(clusterID) not in clusterDict:
-                clusterDict[int(clusterID)] = list()
-            clusterDict[int(clusterID)].append(int(classID))
-    return classID2NameDict, clusterDict
+            FINALCLUSTERDict[int(clusterID)].append(int(classID))
+    return classID2NameDict
 
 #file = [classID, className, clusterIDListStr]
 #return dict[classID] = clusterIDList
@@ -103,15 +112,17 @@ def getMixedDepBetClass(classID1, classID2):
 
 #dep from classID to clusterID
 def getMixedDep(classID, clusterID):
+
     resList = list()
+    print classID,clusterID, FINALCLUSTERDict[clusterID]
     #print classID, clusterID, FINALCLUSTERDict
-    if clusterID not in FINALCLUSTERDict:   #this cluster's classes are all overlapped
+    if len(FINALCLUSTERDict[clusterID]) == 0:   #this cluster's classes are all overlapped
         return 0
     for otherClassID in FINALCLUSTERDict[clusterID]:
         tmpValue_1 = getMixedDepBetClass(classID, otherClassID)
         tmpValue_2 = getMixedDepBetClass(otherClassID, classID)
         tmpValue = max(tmpValue_2, tmpValue_1)
-        #print tmpValue
+
         resList.append(tmpValue)
     if MERGE_FUNC == 'AVG':
         depValue = sum(resList)/ float(len(resList))
@@ -208,6 +219,7 @@ def write2CSV(fileName):
 
 
 #pro.py  mixDep.csv  traceDep.csv
+#        originalClusterFile.csv (classID, testcaseID, testcaseName)(include fv=0 clusters)
 #        initclusterFile.csv(non-lapped classFile)
 #        classListFile.csv(overlapped classFile)
 #        FinalClusterFile
@@ -218,25 +230,31 @@ if __name__ == '__main__':
     #so use traceDep to compensate this situation
     depFileName = sys.argv[1]
     traceDepFileName = sys.argv[2]
-    clusterFileName = sys.argv[3]
-    classListFileName = sys.argv[4]
-    outClusterFileName = sys.argv[5]
-    ASSIGN_THR = float(sys.argv[6])   #default is 0.03
+    orignalClusterFileName = sys.argv[3]
+    clusterFileName = sys.argv[4]
+    classListFileName = sys.argv[5]
+    outClusterFileName = sys.argv[6]
+    ASSIGN_THR = float(sys.argv[7])   #default is 0.03
 
     MIXED_DEP_DICT = readMixedDepFile(depFileName)
     TRACE_DEP_DICT = readTraceDepFile(traceDepFileName) #read and normalized
 
-    [CLASSID2NAMEDict, FINALCLUSTERDict] = readNonlapClassFile(clusterFileName)  #list[clusterID] = classIDList
+    #overlappedClassFIle and nonoverlapclassFIle are not including fv=0 clusterID, alloverlapedCLusterID
+    FINALCLUSTERDict = readOrignalClusterFile (orignalClusterFileName)   #init FINALCLUSTERS.key
+    CLASSID2NAMEDict = readNonlapClassFile(clusterFileName)  #init dict[clusterID] = classIDList
     class2ClusterDict = readOverlapClassFile(classListFileName) #dict[classID] = clusterIDList
     #print 'class2ClusterDict=',class2ClusterDict
 
+    currentClusterIndex = len(FINALCLUSTERDict) #include fv=0 clustersID
+    '''
     tmpList = list()
     for tmpClassID in class2ClusterDict:
         tmpClusterList = class2ClusterDict[tmpClassID]
         tmpList.extend(tmpClusterList)
     tmpList.extend(FINALCLUSTERDict.keys())
     currentClusterIndex = 1 + max(tmpList)
-    #print 'currentClusterIndex=', currentClusterIndex
+    '''
+    print 'currentClusterIndex=', currentClusterIndex
     #print 'intiClusters', FINALCLUSTERDict
 
     coreProcess(class2ClusterDict, currentClusterIndex)
