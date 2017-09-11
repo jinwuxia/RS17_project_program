@@ -16,11 +16,14 @@ EDGEList = list()   #[edgeID] = EDGE()
 EDGEDict = dict()  #dict[methodID1][methodID2] = edgeID
 
 class MethodNode:
-    def __init__(self, ID, longname, shortname, className):
+    def __init__(self, ID, justname, longname, shortname, className, parameter, returnType):
         self.ID = ID
+        self.justname = justname
         self.longname = longname #has paralist
         self.shortname = shortname #has paralist
         self.className = className
+        self.parameter = parameter
+        self.returnType = returnType
 
 class MethodEdge:
     def __init__(self, startID, endID):
@@ -28,7 +31,7 @@ class MethodEdge:
         self.endID = endID
 
 # methodname_full.(prafulltype, parafulltype)
-def GetLongName(methodName, para):
+def getLongName(methodName, para):
     if para == '':
         post = '()'
     else:
@@ -36,7 +39,7 @@ def GetLongName(methodName, para):
     return methodName + post
 
 #paraList = ['A.B.C', 'D.E.F'], return ['B.C','E.F']
-def GetShortParaList(paraList):
+def getShortParaList(paraList):
     oneList = list()
     for para in paraList:
         arr = para.split('.')
@@ -49,7 +52,7 @@ def GetShortParaList(paraList):
 
 
 # methodname_short(prashorrtype, parashottype)
-def GetShortName(methodName, para):
+def getShortName(methodName, para):
     arr = methodName.split('.')
     if len(arr) >= 2:
         shortname = arr[len(arr) - 2] + '.' + arr[len(arr) - 1]
@@ -60,7 +63,7 @@ def GetShortName(methodName, para):
         post = '()'
     else:
         paraList = para.split(',')
-        shortParaList = GetShortList(paraList)
+        shortParaList = getShortParaList(paraList)
         post = '('  + ','.join(shortParaList) + ')'
     return shortname + post
 
@@ -80,29 +83,29 @@ def readWorkflowFile(filename):
             [traceID, order, structtype, startMethodName, endMethodName, m1_para, m2_para, class1, class2, m1_return, m2_return] = each
             if traceID == 'traceID':
                 continue
-            startLongName = GetLongName(startMethodName, m1_para)
-            endLongName = GetLongName(endMethodName, m2_para)
-            startShortName = GetShortName(startMethodName, m1_para)
-            endShortName = GetShortName(endMethodName, m2_para)
+            startLongName = getLongName(startMethodName, m1_para)
+            endLongName = getLongName(endMethodName, m2_para)
+            startShortName = getShortName(startMethodName, m1_para)
+            endShortName = getShortName(endMethodName, m2_para)
             if startLongName not in tmpMethodDict:
                 tmpMethodDict[startLongName] = methodIndex
-                oneMethod = MethodNode(methodIndex, startLongName, startShortName, class1)
+                oneMethod = MethodNode(methodIndex, startMethodName, startLongName, startShortName, class1, m1_para, m1_return)
                 METHODList.append(oneMethod)
                 methodIndex += 1
             if endLongName not in tmpMethodDict:
                 tmpMethodDict[endLongName] = methodIndex
-                oneMethod = MethodNode(methodIndex, endLongName, endShortName, class2)
+                oneMethod = MethodNode(methodIndex, endMethodName, endLongName, endShortName, class2, m2_para, m2_return)
                 METHODList.append(oneMethod)
                 methodIndex += 1
 
             startID = tmpMethodDict[startLongName]
             endID = tmpMethodDict[endLongName]
             if startID not in EDGEDict:
-                EDGEDIct = dict()
+                EDGEDict[startID] = dict()
             if endID not in EDGEDict[startID]:
                 EDGEDict[startID][endID] = edgeIndex
                 oneEdge = MethodEdge(startID, endID)
-                EDGELIST.append(edgeIndex)
+                EDGEList.append(oneEdge)
                 edgeIndex += 1
 
             edgeID = EDGEDict[startID][endID]
@@ -128,21 +131,16 @@ def isInterEdge(clusterID, startID, endID):
     if classID2 != -1:
         clusterIDList2 = CLASSID2CLUSTERDict[classID2]
 
-    if classID1 == -1 and classID2 == -1:
+    if classID1 == -1:
         return False
-    elif classID1 == -1 and clusterID in clusterIDList2:
+    if classID2 == -1:
         return False
-    elif clusterID in clusterIDList1 and clusterID in clusterIDList2:
-        return False
-    elif clusterID in clusterIDList1 and classID2 == -1:
-        return False
-    elif classID1 != -1 and classID2 != -1:
+    if classID1 != -1 and classID2 != -1:
         set1 = set(clusterIDList1)
         set2 = set(clusterIDList2)
         if len(set1 & set2) != 0:
             return False
-    else:
-        return True
+    return True
 
 
 
@@ -151,20 +149,21 @@ def isInterEdge(clusterID, startID, endID):
 # not process fv=0 cluster, beacuse it is not in CLUSTERID2CLASSDict
 def filterOutInterEdge():
     resDict = dict()  #dict[traceID][interEdgeID] = count
-    for clusterID in CLUSTERID2CLASSDict:
-        traceIDList = CLUSTERID2TSDict[clusterID]
-        for traceID in TRACEList:
-            for egdeID in TRACEList[traceID]:
-                startMethodID = EDGEList[edgeID].startID
-                endMethodID = EDGEList[edgeID].endID
-                isCross = isInterEdge(clusterID, startID, endID)
-                if isCross == True:
-                    if traceID not in resDict:
-                        resDict[traceID] = dict()
-                    if edgeID not in resDict[traceID]:
-                        resDict[traceID][edgeID] = 1
-                    else:
-                        resDict[traceID][edgeID] += 1
+    for traceID in TRACEList:
+        print 'traceID=', traceID
+        for edgeID in TRACEList[traceID]:
+            print 'edgeID=', edgeID
+            startMethodID = EDGEList[edgeID].startID
+            endMethodID = EDGEList[edgeID].endID
+            isCross = isInterEdge(startMethodID, endMethodID)
+            if isCross == True:
+                print 'True'
+                if traceID not in resDict:
+                    resDict[traceID] = dict()
+                if edgeID not in resDict[traceID]:
+                    resDict[traceID][edgeID] = 1
+                else:
+                    resDict[traceID][edgeID] += 1
     return resDict
 
 #generate res[traceID][interedgeID] = count
@@ -179,7 +178,7 @@ def workflowMetric(interDict):
     interComWfCount = len(interDict)
     withinComWfCount = len(CLUSTERID2CLASSDict) - interComWfCount
     tmpList = list()
-    for traceID in interDict[traceID]:
+    for traceID in interDict:
         keyList = interDict[traceID].keys()  #interEdgeIDList
         tmpList.append(len(keyList))
     interCallCount =sum(tmpList)
@@ -189,9 +188,9 @@ def workflowMetric(interDict):
         interCallCount_avg = 0.0
 
     tmpList = list()
-    for traceID in interDict[traceID]:
+    for traceID in interDict:
         valueList = interDict[traceID].values()  #interEdgeCountList
-        tmpList.append(len(valueList))
+        tmpList.append(sum(valueList))
     interCallCount_f =sum(tmpList)
     if len(tmpList) != 0:
         interCallCount_avg_f = interCallCount_f / float(len(tmpList))
@@ -201,34 +200,71 @@ def workflowMetric(interDict):
     return interComWfCount, withinComWfCount, interCallCount, interCallCount_avg, interCallCount_f, interCallCount_avg_f
 
 
+def getClustersofClass(classID):
+    resList = list()
+    for clusterID in CLUSTERID2CLASSDict:
+        classIDList = CLUSTERID2CLASSDict[clusterID]
+        if classID in classIDList:
+            resList.append(clusterID)
+    return resList
 # -1 => yourself.
 # other-> -1 is your provided private API
 # other-> your is your provided PrivateAPI
 #generate res[traceID][interedgeID] = count
 def extractAPI(interDict):
     clusterAPIDict = list()  #dict[cluserID] = [uniqueCalleeMethodID1, 2, ...]
-    for clusterID in CLUSTERID2CLASSDict:
-        clusterAPIDict[clusterID] = list()
-        traceID = CLUSTERID2TSDict[clusterID]
-        if traceID in interDict:
-            for interEdgeID in interDict[traceID]:
-                oneEdge = EDGEList[interEdgeID]
-                #className1 = METHODList[oneEdge.startID].className
-                className2 = METHODList[oneEdge.endID].className2
-                if className2 in CLASSNAME2IDDict:
-                    classID = CLASSNAME2IDDict[className2]
-                    if classID in CLUSTERID2CLASSDict[clusterID]:
-                        clusterAPIDict[clusterID].append(oneEdge.endID)
+    for traceID in interDict:
+        print 'traceID=', traceID,
+        for interEdgeID in interDict[traceID]:
+            print 'interEdgeID=', interEdgeID,
+            oneEdge = EDGEList[interEdgeID]
+            className2 = METHODList[oneEdge.endID].className
+            print 'className2=',className2,
+            if className2 in CLASSNAME2IDDict:
+                classID2 = CLASSNAME2IDDict[className2]
+                print 'classID=',classID,
+                itsClusterIDList = getClustersofClass(classID2)
+
+                for eachClusterID in itsClusterIDList:
+                    if eachClusterID not in clusterAPIDict:
+                        clusterAPIDict[eachClusterID] = list()
+                    clusterAPIDict[eachClusterID].append(oneEdge.endID)
+
     return clusterAPIDict
+
+def writeAPI(clusterAPIDict):
+    resList = list()
+    resList.append(['clusterID', 'api', 'parameter', 'return'])
+    for clusterID in clusterAPIDict:
+        methodIDList = clusterAPIDict[clusterID]
+        for methodID in methodIDList:
+            tmpList = list()
+            tmpList.append(clusterID)
+            oneMethod = METHODList[methodID]
+            tmpList.append(oneMethod.justname)
+            tmpList.append(oneMethod.parameter)
+            tmpList.append(oneMethod.returnType)
+            resList.append(tmpList)
+    '''
+    with open(fileName, 'wb') as fp:
+        writer = csv.writer(fp)
+        writer.writerows(resList)
+    print fileName
+    '''
+
 
 
 def APIMetric(clusterAPIDict):
+    print clusterAPIDict
     APICount = 0
     APICount_avg = 0 #api count /clusterNum
     for clusterID in clusterAPIDict:
         APIList = clusterAPIDict[clusterID]
         APICount += len(APIList)
-    APICount_avg = APICount / float(len(clusterAPIDict))
+    if len(clusterAPIDict) != 0:
+        APICount_avg = APICount / float(len(clusterAPIDict))
+    else:
+        APICount_avg = 0
     return APICount, APICount_avg
 
 
@@ -254,6 +290,9 @@ def readOverlapResFile(fileName):
             if clusterID not in clusterID2ClassDict:
                 clusterID2ClassDict[clusterID] = list()
             clusterID2ClassDict[clusterID].append(classID)
+    #print 'classID2NameDict:' ,classID2NameDict
+    #print 'classID2ClusterDict:', classID2ClusterDict
+    #print 'clusterID2ClassDict:', clusterID2ClassDict
     return classID2NameDict, classID2ClusterDict, clusterID2ClassDict
 
 
@@ -275,13 +314,9 @@ def readTestCaseClusterFile(fileName):
     return clusterID2TsDict, tsID2NameDict
 
 
-
-
-
-
 #return clusterNum, noZeroFvClusterNum,  repeatClassNum,  repeatCount/repeatClassNum
 def basicMetric():
-    totalClusterNum = len(CLUSTERID2TSDict)
+    totalClusterNum = max(CLUSTERID2CLASSDict.keys()) + 1
     noZeroClusterNum = len(CLUSTERID2CLASSDict)
 
     repeatClassDict = dict()  #classID, repeatCount
@@ -298,24 +333,40 @@ def basicMetric():
     return totalClusterNum, noZeroClusterNum, repeatNum, repeatAvg
 
 
+#python pro.py
+#coreprocess/processOverlap/jforum219Testcase1_clusters_0.03csv
+#coreprocess/testcaseClusteirng/jforum219Testcase1_jm_AVG_20.csv
+#workflow/jforum219_workflow_reduced.csv
+
 if __name__ == '__main__':
     overlapResFileName = sys.argv[1]  #[classID, className, clusterID ]
     testcaseClusterFileName = sys.argv[2] #[clusterID, testcaseID, testcaseName]
     workflowFileName = sys.argv[3]
-
+    #apiFileName = sys.argv[4]
     [CLASSID2NAMEDict, CLASSID2CLUSTERDict, CLUSTERID2CLASSDict] = readOverlapResFile(overlapResFileName)
     [CLUSTERID2TSDict, TSID2NAMEDict] = readTestCaseClusterFile(testcaseClusterFileName)
+    #print CLUSTERID2TSDict
+    #print TSID2NAMEDict
 
     #return TRACEList
     # methodNodeList,    methodEdgeList. egdeDict
     readWorkflowFile(workflowFileName)
+    #print 'TRACEList', TRACEList
+    print 'METHODList', METHODList
+    print 'EDGEDict', EDGEDict
+    [totalClusterNum, noZeroClusterNum, repeatClassNum, repeatClassAvg] = basicMetric()
 
     #operate TRACEList[traceID]=[edgeID1, edgeID2]
     #generate res[traceID][interedgeID] = count
     interTsEdgeDict = filterOutInterEdge()
-
-    [totalClusterNum, noZeroClusterNum, repeatClassNum, repeatClassAvg] = basicMetric()
+    print 'interTsEdgeDict=',interTsEdgeDict
     [interComWfCount, withinComWfCount, interCallCount, interCallCount_avg, interCallCount_f, interCallCount_avg_f] = workflowMetric(interTsEdgeDict)
-
     clusterAPIDict = extractAPI(interTsEdgeDict)
     (APICount, APICount_avg) = APIMetric(clusterAPIDict)
+    writeAPI(clusterAPIDict)
+
+    resList = list()
+    resList.extend([totalClusterNum, noZeroClusterNum, repeatClassNum, repeatClassAvg])
+    resList.extend([interComWfCount, withinComWfCount, interCallCount, interCallCount_avg, interCallCount_f, interCallCount_avg_f])
+    resList.extend([APICount, APICount_avg])
+    print resList
