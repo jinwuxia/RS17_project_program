@@ -62,6 +62,13 @@ python ../../coreprocess/traceParser.py  coreprocess/jforum219_testcase1_20_clas
 in linux:   ./batch_processOverlap.sh
 
 #analyze processoverlap result, choose  a best clusters result
+in linux: ./batch/analyzeProcessOverlapRes.sh
+
+#choose a best threshold, then extract componentAPI.
+python coreprocess/getComponentAPI.py   ../testcase_data/jforum219/coreprocess/processOverlap/jforum219_testcase1_clusters_0.17.csv   ../testcase_data/jforum219/coreprocess/testcaseClustering/jforum219_testcase1_jm_AVG_20.csv    ../testcase_data/jforum219/workflow/jforum219_workflow_reduced.csv  ../testcase_data/jforum219/coreprocess/jforum219_testcase1_0.17_clustersAPI.csv
+
+
+
 
 #do class clutering for other_non_core_class
 python ../../coreprocess/mixParser.py   dependency/jforum219xml.csv   null  dependency/jforum219com.csv  null  dependency/jforum219TotalDep.csv
