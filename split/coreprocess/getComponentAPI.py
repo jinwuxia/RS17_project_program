@@ -188,6 +188,13 @@ def getClustersofClass(classID):
     return resList
 
 
+def isInitMethod(methodID):
+    methodName = METHODList[methodID].justname
+    if '.<init>' in methodName:
+        return True
+    else:
+        return False
+
 # -1 => yourself.
 # other-> -1 is your provided private API
 # other-> your is your provided PrivateAPI
@@ -209,7 +216,7 @@ def extractAPI(interDict):
                 for eachClusterID in itsClusterIDList:
                     if eachClusterID not in clusterAPIDict:
                         clusterAPIDict[eachClusterID] = dict()
-                    if oneEdge.endID not in clusterAPIDict[eachClusterID]:
+                    if isInitMethod(oneEdge.endID) == False and (oneEdge.endID not in clusterAPIDict[eachClusterID]):
                         clusterAPIDict[eachClusterID][oneEdge.endID] = 1
 
     return clusterAPIDict
