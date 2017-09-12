@@ -214,10 +214,11 @@ def getClustersofClass(classID):
         if classID in classIDList:
             resList.append(clusterID)
     return resList
+
 # -1 => yourself.
 # other-> -1 is your provided private API
 # other-> your is your provided PrivateAPI
-#generate res[traceID][interedgeID] = count
+#generate res[clusterID][apiID] = 1 in case the api is repetitive
 def extractAPI(interDict):
     clusterAPIDict = dict()  #dict[cluserID] = [uniqueCalleeMethodID1, 2, ...]
     for traceID in interDict:
@@ -234,39 +235,19 @@ def extractAPI(interDict):
 
                 for eachClusterID in itsClusterIDList:
                     if eachClusterID not in clusterAPIDict:
-                        clusterAPIDict[eachClusterID] = list()
-                    clusterAPIDict[eachClusterID].append(oneEdge.endID)
+                        clusterAPIDict[eachClusterID] = dict()
+                    if oneEdge.endID not in clusterAPIDict[eachClusterID]:
+                        clusterAPIDict[eachClusterID][oneEdge.endID] = 1
 
     return clusterAPIDict
 
-def writeAPI(clusterAPIDict):
-    resList = list()
-    resList.append(['clusterID', 'api', 'parameter', 'return'])
-    for clusterID in clusterAPIDict:
-        methodIDList = clusterAPIDict[clusterID]
-        for methodID in methodIDList:
-            tmpList = list()
-            tmpList.append(clusterID)
-            oneMethod = METHODList[methodID]
-            tmpList.append(oneMethod.justname)
-            tmpList.append(oneMethod.parameter)
-            tmpList.append(oneMethod.returnType)
-            resList.append(tmpList)
-    '''
-    with open(fileName, 'wb') as fp:
-        writer = csv.writer(fp)
-        writer.writerows(resList)
-    print fileName
-    '''
-
-
-
+# clusterAPIDict[clusterID][apiID] = 1
 def APIMetric(clusterAPIDict):
     #print clusterAPIDict
     APICount = 0
     APICount_avg = 0 #api count /clusterNum
     for clusterID in clusterAPIDict:
-        APIList = clusterAPIDict[clusterID]
+        APIList = clusterAPIDict[clusterID].keys()
         APICount += len(APIList)
     if len(clusterAPIDict) != 0:
         APICount_avg = APICount / float(len(clusterAPIDict))
@@ -372,7 +353,7 @@ if __name__ == '__main__':
     [interComWfCount, withinComWfCount, interCallCount, interCallCount_avg, interCallCount_f, interCallCount_avg_f] = workflowMetric(interTsEdgeDict)
     clusterAPIDict = extractAPI(interTsEdgeDict)
     (APICount, APICount_avg) = APIMetric(clusterAPIDict)
-    writeAPI(clusterAPIDict)
+
 
     resList = list()
     resList.extend([totalClusterNum, noZeroClusterNum, repeatClassNum, repeatClassAvg])

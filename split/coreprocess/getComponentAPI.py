@@ -186,10 +186,12 @@ def getClustersofClass(classID):
         if classID in classIDList:
             resList.append(clusterID)
     return resList
+
+
 # -1 => yourself.
 # other-> -1 is your provided private API
 # other-> your is your provided PrivateAPI
-#generate res[traceID][interedgeID] = count
+#generate res[clusterID][apiID] = 1 in case the api is repetitive
 def extractAPI(interDict):
     clusterAPIDict = dict()  #dict[cluserID] = [uniqueCalleeMethodID1, 2, ...]
     for traceID in interDict:
@@ -206,17 +208,18 @@ def extractAPI(interDict):
 
                 for eachClusterID in itsClusterIDList:
                     if eachClusterID not in clusterAPIDict:
-                        clusterAPIDict[eachClusterID] = list()
-                    clusterAPIDict[eachClusterID].append(oneEdge.endID)
+                        clusterAPIDict[eachClusterID] = dict()
+                    if oneEdge.endID not in clusterAPIDict[eachClusterID]:
+                        clusterAPIDict[eachClusterID][oneEdge.endID] = 1
 
     return clusterAPIDict
 
+#clusterAPIDict[clusterID][apiID] = 1
 def writeAPI(clusterAPIDict, fileName):
     resList = list()
     resList.append(['clusterID', 'api', 'parameter', 'return'])
     for clusterID in clusterAPIDict:
-        methodIDList = clusterAPIDict[clusterID]
-        for methodID in methodIDList:
+        for methodID in clusterAPIDict[clusterID]:
             tmpList = list()
             tmpList.append(clusterID)
             oneMethod = METHODList[methodID]
