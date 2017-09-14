@@ -361,7 +361,9 @@ if __name__ == "__main__":
                 records.append(myparser.recordList[each])
 
             methodEdgeList = myparser.extractWorkFlow(records) #methodEdgeList has repetive edge, so they are workflows
-            mergedEdgeList = myparser.mergeEdgeList(traceIndex, methodEdgeList, mergedEdgeList)
-            traceIndex += 1
+            #print 'traceIndex=', traceIndex, 'methodEdgeList=', methodEdgeList
+            if len(methodEdgeList) != 0:
+                mergedEdgeList = myparser.mergeEdgeList(traceIndex, methodEdgeList, mergedEdgeList)
+                traceIndex += 1
 
         genFile(fileName, mergedEdgeList)

@@ -96,6 +96,7 @@ def ReadCSV(filename):
             currentLen = len(TRACEList)
             if int(traceID) == currentLen:
                 TRACEList.append(list())
+            #print traceID
             TRACEList[int(traceID)].append(oneEdge)
 
 
