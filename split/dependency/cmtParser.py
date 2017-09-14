@@ -5,14 +5,28 @@ import sys
 import csv
 import re
 
-
+JPETSTORE_COMMIT_LOG_PRE_NAME = 'src/main/java/'
 ID2NAMEDict = dict()
 NAME2IDDict = dict()
 
 #fileName = 'dir1/dir2/filename'
 def getSimpleName(fileName):
+    if JPETSTORE_COMMIT_LOG_PRE_NAME == '':
+        return fileName
 
-    return fileName
+    else:
+        if JPETSTORE_COMMIT_LOG_PRE_NAME in fileName:
+            tmp = fileName.split('.java')[0]
+            preLen = len(JPETSTORE_COMMIT_LOG_PRE_NAME)
+            tmp = tmp[preLen: len(tmp)]
+            tmp = tmp.split('/')
+            fileName = '.'.join(tmp)
+            print fileName
+        else:
+            fileName = ''
+        return fileName
+
+
 
 
 def isIncluded(fileName, fileType):
@@ -46,12 +60,13 @@ def processLog(fileName, fileType):
                 print commitType, commitFileName
                 if commitType == 'M' and isIncluded(commitFileName, fileType): #just modify, not include Delete and Add
                     simpleName = getSimpleName(commitFileName)
-                    if simpleName not in name2IDDict:
-                        name2IDDict[simpleName] = index
-                        ID2NameDict[index] = simpleName
-                        index += 1
-                    ID = name2IDDict[simpleName]
-                    newList.append(ID)
+                    if simpleName != '':
+                        if simpleName not in name2IDDict:
+                            name2IDDict[simpleName] = index
+                            ID2NameDict[index] = simpleName
+                            index += 1
+                        ID = name2IDDict[simpleName]
+                        newList.append(ID)
         if len(newList) >= 2:
             listList.append(newList)
 
