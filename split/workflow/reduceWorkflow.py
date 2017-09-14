@@ -6,9 +6,13 @@ testcase_name is the service_method name like XXXAction.func1()
 import sys
 import csv
 
+#TESTCASE_PACKAGE_NAME = 'net.jforum.view'
+TESTCASE_PACKAGE_NAME = 'org.mybatis.jpetstore.web.actions'
+#iNotDel aand reduceworklow function need to be care
+
 
 def isIncluded(className):
-    if className.startswith('net.jforum.view'):
+    if className.startswith(TESTCASE_PACKAGE_NAME):
         return True
     else:
         return False
@@ -16,7 +20,9 @@ def isIncluded(className):
 #judge this methodname 'view.method()' can stand for the testname name or not
 #beacause BookmarkAction.process()  InstallAction.process() are total entry, so they cannot be the testcasename
 def isNotDel(methodName, className):
-    if methodName.endswith('<init>') == False and ('class$' not in methodName) and ('BookmarkAction.process' not in methodName) and ('InstallAction.process' not in methodName) and isIncluded(className):
+    #OPTION:
+    #if methodName.endswith('<init>') == False and ('class$' not in methodName) and ('BookmarkAction.process' not in methodName) and ('InstallAction.process' not in methodName) and isIncluded(className):
+    if methodName.endswith('<init>') == False and ('class$' not in methodName)  and isIncluded(className):
         return True
     else:
         return False
@@ -42,24 +48,30 @@ def readCSV(fileName):
 
 #if one trace is repetitive or not included in view, then delete this trace
 def reduceWorkflow(initList):
+    #print 'traceLen=', len(initList)
     resList = list()
     newID = 0
     methodID2NameDict = dict()
-    methodDict = dict()
+    methodDict = dict()  #dict[methodName] = traceID
     #judge this trace should be deleted or not
     for index in range(0, len(initList)):
         #print "\na new trace"
         isDel = True
         for eachList in initList[index]:
             [order, structtype, method1, method2, m1_para, m2_para, className1, className2, m1_return, m2_return] = eachList
-            if isNotDel(method2, className2):
+            #OPTION:
+            #if isNotDel(method2, className2):
+            if isNotDel(method1, className1):
                 isDel = False
-                oneStr = method2
+                #OPTION:
+                #oneStr = method2
+                oneStr = method1
                 #print oneStr
                 break  #break the loop, use the fisrt found name as testcaseName
 
         if isDel == False:
-            if oneStr not in methodDict:  #ignore the duplicate
+            #ignore the duplicate and ;
+            if oneStr not in methodDict:
                 methodID2NameDict[newID] = oneStr
                 methodDict[oneStr] = newID
                 print 'traceID=', newID, 'traceName=', oneStr
@@ -68,7 +80,16 @@ def reduceWorkflow(initList):
                 for eachList in initList[index]:
                     resList[newID].append(eachList)
                 newID += 1
+            else: #duplicate, repalce with longer oneStr
+                oldTraceID = methodDict[oneStr]
+                oldTraceLen= len(resList[oldTraceID])
+                if oldTraceLen < len(initList[index]):
+                    print 'repalce_traceID=', oldTraceID, 'traceName=', oneStr
+                    resList[oldTraceID] = list()
+                    for eachList in initList[index]:
+                        resList[oldTraceID].append(eachList)
     return resList, methodID2NameDict
+
 
 def writeCSV(aList, fileName):
     resList = list()
