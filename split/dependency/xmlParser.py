@@ -88,8 +88,9 @@ def xmlParser(fileName):
         depList = getDepList(deps)
         depStr = ''.join(depList)
         oneEdge = Edge(startNodeID, endNodeID, depStr)
-        EDGEList.append(oneEdge)
-        print startNodeID, endNodeID, depStr
+        if startNodeID in NODEDict and endNodeID in NODEDict:
+            EDGEList.append(oneEdge)
+            print startNodeID, endNodeID, depStr
 
 def writeCSV(fileName):
     resList = list()
