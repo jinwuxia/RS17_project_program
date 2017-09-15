@@ -1,28 +1,36 @@
-cd testcase_data/jpetstore6/workflow
-python ../../../split/workflow/traceWorkflow.py  ../../../../RS17_source_data/RS17_jpetstore6/dynamic/log   jpetstore6_workflow.csv   org.mybatis
-python ../../../split/workflow/workflowTree.py   jpetstore6_workflow.csv longname  jpetstore6_workflow_longname.tree
+project='jpetstore6'
+filter='org.mybatis'
 
-python ../../../split/workflow/reduceWorkflow.py  jpetstore6_workflow.csv   jpetstore6_workflow_reduced.csv  jpetstore6_testcase_name.csv
-python ../../../split/workflow/workflowTree.py   jpetstore6_workflow_reduced.csv   longname  jpetstore6_workflow_reduced_longname.tree
+cd testcase_data/${project}/workflow
+code_workflow_dir='../../../split/workflow/'
+python ${code_workflow_dir}traceWorkflow.py  ../../../../RS17_source_data/RS17_${project}/dynamic/log   ${project}_workflow.csv  $filter
+python ${code_workflow_dir}workflowTree.py   ${project}_workflow.csv longname  ${project}_workflow_longname.tree
+
+python  ${code_workflow_dir}reduceWorkflow.py  ${project}_workflow.csv   ${project}_workflow_reduced.csv  ${project}_testcase_name.csv
+python  ${code_workflow_dir}workflowTree.py   ${project}_workflow_reduced.csv   longname  ${project}_workflow_reduced_longname.tree
 
 
-cd testcase_data/jpetstore6/dependency
+cd testcase_data/${project}/dependency
+code_depend_dir='../../../split/dependency/'
 git log --name-status > ../testcase_data/jforum219/dependency/jforum219.gitlog
 #manual: delete update.init commit log
-und export -dependencies class cytoscape jpetstore6.xml  jpetstore6.udb
-python ../../../split/dependency/xmlParser.py  jpetstore6.xml   jpetstore6xml.csv
-python ../../../split/dependency/cmtParser.py  jpetstore6.gitlog   jpetstore6cmt.csv  java
-python ../../../split/dependency/comParser.py  ../workflow/jpetstore6_workflow_reduced.csv   jpetstore6com.csv
+und export -dependencies class cytoscape ${project}.xml  ${project}.udb
+python ${code_depend_dir}xmlParser.py  ${project}.xml   ${project}xml.csv
+python ${code_depend_dir}cmtParser.py  ${project}.gitlog   ${project}cmt.csv  java
+python ${code_depend_dir}comParser.py  ../workflow/${project}_workflow_reduced.csv   ${project}com.csv
+
+cd testcase_data/${project}/coreprocess
+code_core_dir='../../../split/coreprocess/'
+python ${code_core_dir}genTestCaseFv.py  ../workflow/${project}_workflow_reduced.csv   ../workflow/${project}_testcase_name.csv  null  ${project}_testcase0_in_entity.csv     ${project}_testcase0_class.csv  ${project}_testcase0_fv.csv
+python ${code_core_dir}testCaseClusteringByEntity.py   ${project}_testcase0_fv.csv   ${project}_testcase0_clusters.csv
 
 
-python ../../../split/coreprocess/genTestCaseFv.py  ../workflow/jpetstore6_workflow_reduced.csv   ../workflow/jpetstore6_testcase_name.csv  null  jpetstore6_testcase0_in_entity.csv     jpetstore6_testcase0_class.csv  jpetstore6_testcase0_fv.csv
-python ../../../split/coreprocess/testCaseClusteringByEntity.py   jpetstore6_testcase0_fv.csv   jpetstore6_testcase0_clusters.csv
-
-
-python ../../../split/coreprocess/genTestCaseFv.py  ../workflow/jpetstore6_workflow_reduced.csv   ../workflow/jpetstore6_testcase_name.csv  jpetstore6_testcase1_ex_actdao.csv  null jpetstore6_testcase1_class.csv  jpetstore6_testcase1_fv.csv
-python ../../../split/coreprocess/testCaseClustering.py   jpetstore6_testcase1_fv.csv    jpetstore6_testcase0_clusters.csv  jm AVG  1  jpetstore6 0.01
+python ../../../split/coreprocess/genTestCaseFv.py  ../workflow/${project}_workflow_reduced.csv   ../workflow/${project}_testcase_name.csv  ${project}_testcase1_ex_actdao.csv  null ${project}_testcase1_class.csv  ${project}_testcase1_fv.csv
+python ../../../split/coreprocess/testCaseClustering.py   ${project}_testcase1_fv.csv    ${project}_testcase0_clusters.csv  jm AVG  1  ${project} 0.01
 mkdir testCaseClustering
-mv jpetstore6_testcase1_jm_AVG_*   testCaseClustering/
+mv ${project}_testcase1_jm_AVG_*   testCaseClustering/
 
 ./coreprocess/batch_analyzeCluster.sh  > log.csv
-python ../../../split/coreprocess/analyzeOneCluster.py  testcaseClustering/jpetstore6_testcase1_jm_AVG_4.csv   jpetstore6_testcase1_fv.csv   jpetstore6_testcase1_class.csv   jpetstore6_testcase1_4_class_nolap.csv  jpetstore6_testcase1_4_class_lap.csv     jpetstore6_testcase1_4_classclusterFv.csv
+python ../../../split/coreprocess/analyzeOneCluster.py  testcaseClustering/${project}_testcase1_jm_AVG_4.csv   ${project}_testcase1_fv.csv   ${project}_testcase1_class.csv   ${project}_testcase1_4_class_nolap.csv  ${project}_testcase1_4_class_lap.csv     ${project}_testcase1_4_classclusterFv.csv
+
+python ../../../split/dependency/mixParser.py    ${project}xml.csv   null ${project}com.csv   ../coreprocess/${project}_testcase1_class.csv   ${project}_testcase1_mixedDep.csv

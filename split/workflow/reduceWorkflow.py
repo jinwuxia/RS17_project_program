@@ -6,9 +6,10 @@ testcase_name is the service_method name like XXXAction.func1()
 import sys
 import csv
 
-#TESTCASE_PACKAGE_NAME = 'net.jforum.view'
-TESTCASE_PACKAGE_NAME = 'org.mybatis.jpetstore.web.actions'
+TESTCASE_PACKAGE_NAME = 'net.jforum.view'
+#TESTCASE_PACKAGE_NAME = 'org.mybatis.jpetstore.web.actions'
 #iNotDel aand reduceworklow function need to be care
+
 
 
 def isIncluded(className):
@@ -17,16 +18,36 @@ def isIncluded(className):
     else:
         return False
 
-#judge this methodname 'view.method()' can stand for the testname name or not
-#beacause BookmarkAction.process()  InstallAction.process() are total entry, so they cannot be the testcasename
+
 def isNotDel(methodName, className):
+    filter_list = list()
+    filter_list.append('BookmarkAction.process')
+    filter_list.append('InstallAction.process')
+    filter_list.append('LuceneStatsAction.process')
+    filter_list.append('AdminAction.process')
+    filter_list.append('AdminCommand.process')
+    flag = True
+    for each in filter_list:
+        if each in methodName:
+            flag = False
+            break
     #OPTION:
-    #if methodName.endswith('<init>') == False and ('class$' not in methodName) and ('BookmarkAction.process' not in methodName) and ('InstallAction.process' not in methodName) and isIncluded(className):
-    if methodName.endswith('<init>') == False and ('class$' not in methodName)  and isIncluded(className):
+    if methodName.endswith('<init>') == False and ('class$' not in methodName)  and isIncluded(className) and flag == True:
         return True
     else:
         return False
 
+
+'''
+judge this methodname 'view.method()' can stand for the testname name or not
+beacause BookmarkAction.process()  InstallAction.process() are total entry, so they cannot be the testcasename
+def isNotDel(methodName, className):
+    #OPTION:
+    if methodName.endswith('<init>') == False and ('class$' not in methodName)  and isIncluded(className):
+        return True
+    else:
+        return False
+'''
 
 #resList[traceID] = [ [list1][list2][list3] ]
 def readCSV(fileName):
@@ -60,12 +81,12 @@ def reduceWorkflow(initList):
         for eachList in initList[index]:
             [order, structtype, method1, method2, m1_para, m2_para, className1, className2, m1_return, m2_return] = eachList
             #OPTION:
-            #if isNotDel(method2, className2):
-            if isNotDel(method1, className1):
+            if isNotDel(method2, className2):
+                #if isNotDel(method1, className1):
                 isDel = False
                 #OPTION:
-                #oneStr = method2
-                oneStr = method1
+                oneStr = method2
+                #oneStr = method1
                 #print oneStr
                 break  #break the loop, use the fisrt found name as testcaseName
 
