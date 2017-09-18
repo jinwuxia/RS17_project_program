@@ -1,6 +1,6 @@
 '''
 accoring to the layering structure,(presentation->service->persistece)
-filter out xass_part1, class_part2 and class_part3.
+filter out class_part1, class_part2 and class_part3.
 part2 is our splitting objects
 '''
 import sys
@@ -250,27 +250,26 @@ def WriteFile(oneDict, fileName):
     print fileName
 
 
+def SaveAllClass(fileName):
+    oneList = list()
+    for className in CLASSDICT:
+        oneList.append([className])
+    with open(fileName, 'w') as fp:
+        writer = csv.writer(fp)
+        writer.writerows(oneList)
+    print fileName
 
 #split by layer (3 layers)
-#python pro.py  workflow.csv  outfile1.csv  outfile2.csv  outfile3.csv
+#python pro.py  workflow.csv  outfile1.csv  outfile2.csv  outfile3.csv allFile.csv
 if __name__ == '__main__':
     workflowFilename = sys.argv[1] # ../RS17_source_data/RS17_jpetstore/dynamic/source/jpetstore6_trace_method_workflow.csv
     part1FileName = sys.argv[2]
     part2FileName = sys.argv[3]
     part3FileName = sys.argv[4]
-    '''
-    arr = workflowFilename.split('/')
-    tmp = arr.pop()
-    project = tmp.split('_')[0]
-    outFileNamePre = '/'.join(arr) + '/' + project + '_'
-    '''
+    allClassFileName = sys.argv[5]
+
     ReadCSV(workflowFilename)
-    '''
-    for ID in range(0,len(TRACEList)):
-        print ID, len(TRACEList[ID])
-    for key in CLASSDICT:
-        print key
-    '''
+    
     #print len(METHODDICT)
     ProcessTrace() #split and generate RESULTList
     #NOTICE: this processing order
@@ -278,6 +277,7 @@ if __name__ == '__main__':
     GetPart3() #process RESULTList,  generate PART3Dict
     GetPart2() #process RESULTList,  generate PART2Dict
 
-    WriteFile(PART1Dict, part1FileName)
-    WriteFile(PART2Dict, part2FileName)
-    WriteFile(PART3Dict, part3FileName)
+    #WriteFile(PART1Dict, part1FileName)
+    #WriteFile(PART2Dict, part2FileName)
+    #WriteFile(PART3Dict, part3FileName)
+    SaveAllClass(allClassFileName)
