@@ -10,7 +10,7 @@ FINALCLUSTERS = list()
 CLASSID2NAMEDict = dict()   #classDoct[classID] = className
 CLASSNAME2IDDict = dict()
 MINSIMVALUE = 0
-
+SIMVALUE_LIST = list()
 class AlgClass:
     distFunc = ""
     mergeFunc = ""
@@ -256,9 +256,10 @@ def WCAClustering(fv):
     #for index in range(0, len(oneAlg.simM)):
     #    print oneAlg.simM[index]
     iterk = 1
+    STOP_SIM = 1.0
     origN = len(FINALCLUSTERS)
     N = len(FINALCLUSTERS)
-    while N > oneAlg.K:
+    while N > oneAlg.K and STOP_SIM > 0.0001:
         merge_i = -1
         merge_j = -1
         (merge_i, merge_j, merge_simVal) = WCAChooseMostSim(N)
@@ -268,19 +269,21 @@ def WCAClustering(fv):
         else:
             #merge the cluster_i and cluster_j, and update FINALCLUSTERS
             print FINALCLUSTERS[merge_i], " and ",  FINALCLUSTERS[merge_j], " simVal=", merge_simVal
+            STOP_SIM = merge_simVal
             FINALCLUSTERS[merge_i].extend(FINALCLUSTERS[merge_j])
             del FINALCLUSTERS[merge_j]
+            SIMVALUE_LIST.append([N, merge_simVal])
             #print FINALCLUSTERS
             #update  structSimM  and concernSimM, delete one row and one column, compute the new changedSim
             #updateSimM(merge_i, merge_j)
             #print N-1, origN
             if N-1 <= int(origN):
                 outfileName = oneAlg.pre + '_' + oneAlg.feature + '_' + oneAlg.distFunc + '_' + oneAlg.mergeFunc + '_' + str(N-1) + '.csv'
-                print "clustering result file: ", outfileName
-                printClustering(outfileName)
         iterk = iterk + 1
         N = N - 1
     print "clustering end...."
+    print "clustering result file: ", outfileName
+    printClustering(outfileName)
 
 
 def printClustering(fileName):
@@ -333,8 +336,13 @@ def initClusterFromFile(fileName):
 
     #printClustering("tmp.csv")
 
+def saveSimValue(aList, fileName):
+    with open(fileName, 'wb') as fp:
+        writer = csv.writer(fp)
+        writer.writerows(aList)
+    print fileName
 
-#python pro.py   fv.csv   distFunc=coupling,jm, uem, uemnm       mergeFunc= MIN_SINGLE, MAX_SINGLE, AVG       K=iterNum     clusterFile=null    mixed
+#python pro.py   fv.csv   distFunc=coupling,jm, uem, uemnm       mergeFunc= MIN_SINGLE, MAX_SINGLE, AVG       K=iterNum     clusterFile=null    mixed  sialue
 oneAlg = AlgClass()
 if __name__ == "__main__":
     structFileName = sys.argv[1]
@@ -343,6 +351,8 @@ if __name__ == "__main__":
     K = int(sys.argv[4])
     clusterConfigFileName = sys.argv[5] #clusterList file
     feature = sys.argv[6]  #struct or commu
+    saveSimValueFilename = sys.argv[7]
+
     oneAlg.setDistFunc(structDistFunc)
     oneAlg.setMergeFunc(mergeFunc)
     oneAlg.setK(K)
@@ -352,13 +362,21 @@ if __name__ == "__main__":
     structFv = readCSV(structFileName)
     #init CLASSID2NAMEDict and CLASSNAME2IDDict
     initClassDict(structFv)
+    print structFv
     sfv = delAndNormalize(structFv)
 
     #init clusters
     initClusterFromFile(clusterConfigFileName) #init FINALCLUSTERS
 
     WCAClustering(sfv)
+    saveSimValue(SIMVALUE_LIST, saveSimValueFilename)
 
     #outfileName = "wca" + '_' +  structDistFunc + '_' + mergeFunc + '_' + str(K) + '.csv'
     #print "clustering result file: ", outfileName
     #printClustering(outfileName)
+
+    count = 0
+    for clusterID in range(0, len(FINALCLUSTERS)):
+        if len(FINALCLUSTERS[clusterID]) > 1:
+            count += 1
+    print 'clusterSize > 1 clusters count: ', count
