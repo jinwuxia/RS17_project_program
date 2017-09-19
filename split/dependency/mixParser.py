@@ -294,9 +294,12 @@ if __name__ == '__main__':
     if classListFileName != 'null':
         classList = readClassListFile(classListFileName)
 
-    genAllClassDict() #generate CLASSNAME2IDDict, CLASSID2NAMEDict, CLASSIDPAIRDICT
-    getAllDep()  #init  CLASSIDPAIRDICT
-    normCalMixedDep() # normalized and compute mixed value in CLASSIDPAIRDICT
+    #generate CLASSNAME2IDDict, CLASSID2NAMEDict, and empty CLASSIDPAIRDICT
+    genAllClassDict()
+    #set  CLASSIDPAIRDICT with structDep, commitDep, communDep, but mixedDep =0
+    getAllDep()
+    #set mixedDep: normalized and compute mixed value in CLASSIDPAIRDICT
+    normCalMixedDep()
 
     if classListFileName == 'null':
         writeDict2CSV(outfileName)
