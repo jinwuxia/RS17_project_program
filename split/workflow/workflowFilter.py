@@ -269,7 +269,7 @@ if __name__ == '__main__':
     allClassFileName = sys.argv[5]
 
     ReadCSV(workflowFilename)
-    
+
     #print len(METHODDICT)
     ProcessTrace() #split and generate RESULTList
     #NOTICE: this processing order
@@ -277,7 +277,7 @@ if __name__ == '__main__':
     GetPart3() #process RESULTList,  generate PART3Dict
     GetPart2() #process RESULTList,  generate PART2Dict
 
-    #WriteFile(PART1Dict, part1FileName)
-    #WriteFile(PART2Dict, part2FileName)
-    #WriteFile(PART3Dict, part3FileName)
+    WriteFile(PART1Dict, part1FileName)
+    WriteFile(PART2Dict, part2FileName)
+    WriteFile(PART3Dict, part3FileName)
     SaveAllClass(allClassFileName)
