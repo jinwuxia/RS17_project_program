@@ -90,7 +90,7 @@ python ../../split/nocoreprocess/nocoreClassClustering_notAddNew.py   dependency
 #other unprocessed no-ts-cover-class clustering inside using struct dep(beacuse commDep = 0, no-cover)
 python ../../../split/dependency/mixParser.py   jforum219xml.csv   null jforum219com.csv    jforum219_unprocess_class.csv  jforum219_no_ts_unpro_class_dep.csv
 python ../../../split/nocoreprocess/genNocoreClassFv.py  ../dependency/jforum219_no_ts_unpro_class_dep.csv   jforum219_unprocess_class.csv    jforum219_unprocess_class_fv.csv
-python ../../../split/nocoreprocess/nocoreClassClustering.py  jforum219_unprocess_class_fv.csv   coupling AVG  1 null  mixed  jforum219_no_ts_cover_class_cluster_simvalue.csv
+python ../../../split/nocoreprocess/nocoreClassClustering.py  jforum219_unprocess_class_fv.csv   coupling AVG  1 null  mixed  jforum219_unprocess_class_cluster_simvalue.csv
 
 
 
