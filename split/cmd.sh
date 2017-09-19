@@ -68,13 +68,29 @@ in linux: ./batch_analyzeProcessOverlapRes.sh > log.csv
 python coreprocess/getComponentAPI.py   ../testcase_data/jforum219/coreprocess/processOverlap/jforum219_testcase1_clusters_0.17.csv   ../testcase_data/jforum219/coreprocess/testcaseClustering/jforum219_testcase1_jm_AVG_20.csv    ../testcase_data/jforum219/workflow/jforum219_workflow_reduced.csv  ../testcase_data/jforum219/coreprocess/jforum219_testcase1_0.17_clustersAPI.csv
 
 
+#------------------------------------------------
+#get testcase_all_calss.csv
+python workfloFilter.py  workflow.csv  outfile1.csv  outfile2.csv  outfile3.csv allFile.csv
+#get all class(using understrand)
+uperl exportAllClass.pl jforum219.udb  jforum219   net.jforum
+#get no_ts_cover_class(not include dao,view) and testcase_common_class(not include dao,view)
+python classDiff.py  all_class.csv    testcase_all_class.csv   testcase1_class.csv  out_ts_common.csv     out_no-cover.csv
 
 
-#do class clutering for other_non_core_class
-python ../../coreprocess/mixParser.py   dependency/jforum219xml.csv   null  dependency/jforum219com.csv  null  dependency/jforum219TotalDep.csv
+#-------------------------------------------------
+#process testcase_common_class :    or not process:  only one cluster
+python ../../../split/dependency/mixParser.py   jforum219xml.csv   null jforum219com.csv    ../classstatis/jforum219_testcase_common_class.csv   jforum219_testcase_common_class_dep.csv
+python ../../../split/nocoreprocess/genNocoreClassFv.py  ../dependency/jforum219_testcase_common_class_dep.csv   ../classstatis/jforum219_testcase_common_class.csv    jforum219_testcase_common_class_fv.csv
+python ../../../split/nocoreprocess/nocoreClassClustering.py  jforum219_testcase_common_class_fv.csv   coupling AVG  1 null  mixed  jforum219_testase_common_class_cluster_simvalue.csv
 
 
-python  processOtherClass.py    jforum219TotalDep.csv      ../testCaseCluster_1/jforum219_testcase_class_1.csv     ../testCaseCluster_1/jforum219_testcase_class_all.csv   hehe.csv
+#function-core class merged into existing clusters using struct dep
+python ../../split/nocoreprocess/nocoreClassClustering_notAddNew.py   dependency/jforum219xml.csv    coreprocess/processOverlap/jforum219_testcase1_clusters_0.30.csv  classstatis/jforum219_no_ts_cover_class.csv     nocoreprocess/jforum219_clusters.csv   jforum219_unprocess_class.csv
+
+#other unprocessed no-ts-cover-class clustering inside using struct dep(beacuse commDep = 0, no-cover)
+python ../../../split/dependency/mixParser.py   jforum219xml.csv   null jforum219com.csv    jforum219_unprocess_class.csv  jforum219_no_ts_unpro_class_dep.csv
+python ../../../split/nocoreprocess/genNocoreClassFv.py  ../dependency/jforum219_no_ts_unpro_class_dep.csv   jforum219_unprocess_class.csv    jforum219_unprocess_class_fv.csv
+python ../../../split/nocoreprocess/nocoreClassClustering.py  jforum219_unprocess_class_fv.csv   coupling AVG  1 null  mixed  jforum219_no_ts_cover_class_cluster_simvalue.csv
 
 
 
