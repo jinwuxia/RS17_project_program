@@ -244,7 +244,10 @@ def readClassListFile(fileName):
     with open(fileName, 'rb') as fp:
         reader = csv.reader(fp)
         for each in reader:
-            [classID, className] = each
+            if len(each) == 2:
+                [classID, className] = each
+            elif len(each) == 1:
+                [className] = each
             resList.append(className)
     return resList
 
