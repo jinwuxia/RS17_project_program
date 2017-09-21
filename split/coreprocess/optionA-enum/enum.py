@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*
+import sys
+import csv
+
 class EstimationObject:
     def __init__(self, ts, thr, fitness):
         self.ts = ts #core service count
