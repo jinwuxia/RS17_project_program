@@ -82,6 +82,18 @@ def processNextStep(overlap_process_thr, tsclusterFileName, lapFileName, nonlapF
     #oneList.append(fitness)
     return oneList
 
+
+#compare tow list is equal or not
+def isEqualList(list1, list2):
+    if len(list1) != len(list2):
+        return False
+
+    diffList = [ abs(list1[index] - list2[index])    for index in range(0, len(list1)) ]
+    if sum(diffList) <= 0.00001:
+        return True
+
+    return False
+
 if __name__ == '__main__':
     global data_dir
     global project
@@ -132,17 +144,20 @@ if __name__ == '__main__':
             resList.append(oneList)
             print oneList
             continue
+        preList = list()
         for thr in thr_list:
             overlap_process_thr = round(thr, 2)
             outClusterFileName  = data_dir + 'coreprocess/optionA-enum/' + project + '_testcase1_clusters_' + str(service_count) + '_' + str(overlap_process_thr) + '.csv'
             lapResMetricList = processNextStep(overlap_process_thr, tsclusterFileName, lapFileName, nonlapFileName, mergedFvFileName, outClusterFileName)
-            oneList = list()
-            oneList.append(service_count)
-            oneList.append(overlap_process_thr)
-            oneList.extend(clusterMetricList)
-            oneList.extend(lapResMetricList)
-            resList.append(oneList)
-            print oneList
+            if isEqualList(preList, lapResMetricList) == False:
+                oneList = list()
+                oneList.append(service_count)
+                oneList.append(overlap_process_thr)
+                oneList.extend(clusterMetricList)
+                oneList.extend(lapResMetricList)
+                resList.append(oneList)
+                print oneList
+                preList = [copyValue for copyValue in lapResMetricList]
 
     fileName = sys.argv[1]
     writeCSV(resList, fileName)
