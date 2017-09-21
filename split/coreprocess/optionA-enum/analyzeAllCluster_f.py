@@ -168,7 +168,7 @@ def totalMetic(classID2ClusterDict, allOverlapClassID2ClusterDict, highClassID2C
     strstr += (str(high_overlappedAvg) + ',')
     strstr += (str(low_overlappedClassCount) + ',')
     strstr +=  str(low_overlappedAvg)
-    print strstr
+    #print 'analyze cluster metric', strstr
     return nonOverlappedClassCount,  nonOverlappedAvg, overlappedClassCount, overlappedAvg, high_overlappedClassCount, high_overlappedAvg, low_overlappedClassCount, low_overlappedAvg
 
 

@@ -217,7 +217,7 @@ def workflowMetric(interDict):
         interCallCount_avg_f = interCallCount_f / float(len(tmpList))
     else:
         interCallCount_avg_f = 0.0
-
+    #print interComWfCount, withinComWfCount, interCallCount, interCallCount_avg, interCallCount_f, interCallCount_avg_f
     return interComWfCount, withinComWfCount, interCallCount, interCallCount_avg, interCallCount_f, interCallCount_avg_f
 
 
@@ -372,6 +372,20 @@ def analyzeProcessOverlapRes(overlapResFileName,  testcaseClusterFileName, workf
     global CLUSTERID2TSDict
     global TSID2NAMEDict
     global TRACEList
+    global METHODList
+    global EDGEList
+    global EDGEDict
+
+    CLASSNAME2IDDict = dict()
+    CLASSID2NAMEDict = dict()
+    CLASSID2CLUSTERDict = dict()
+    CLUSTERID2CLASSDict = dict()
+    CLUSTERID2TSDict = dict()
+    TSID2NAMEDict = dict()
+    TRACEList = list()
+    METHODList = list()
+    EDGEList = list()
+    EDGEDict = dict()
 
     [CLASSID2NAMEDict, CLASSNAME2IDDict, CLASSID2CLUSTERDict, CLUSTERID2CLASSDict] = readOverlapResFile(overlapResFileName)
     [CLUSTERID2TSDict, TSID2NAMEDict] = readTestCaseClusterFile(testcaseClusterFileName)
@@ -402,5 +416,5 @@ def analyzeProcessOverlapRes(overlapResFileName,  testcaseClusterFileName, workf
 
     resStrList = [str(each) for each in resList]
     strstr = ','.join(resStrList)
-    #print strstr
+    #print 'analyze overlapResult metric:', strstr
     return resList

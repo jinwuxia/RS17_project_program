@@ -267,9 +267,9 @@ def coreProcess(mergedClassList, mergedClusterList, currentClusterIndex):
             depList.append([eachClusterID, finalDep])
 
         #make decision, clusterList = ...
-        print 'before making decision, depList=[clusterID, dep]=', depList
+        #print 'before making decision, depList=[clusterID, dep]=', depList
         decisionClusterList = getClusterDecision(depList)
-        print 'after making decision, resList[clusterID]=', decisionClusterList
+        #print 'after making decision, resList[clusterID]=', decisionClusterList
 
         if len(decisionClusterList) == 0:  #extract a single cluster
             #FINALCLUSTERDict[currentClusterIndex] = [classID]
@@ -300,9 +300,9 @@ def coreProcess1(class2ClusterDict, currentClusterIndex):
             depList.append([eachClusterID, finalDep])
 
         #make decision, clusterList = ...
-        print 'before making decision, depList=[clusterID, dep]=', depList
+        #print 'before making decision, depList=[clusterID, dep]=', depList
         decisionClusterList = getClusterDecision(depList)
-        print 'after making decision, resList[clusterID]=', decisionClusterList
+        #print 'after making decision, resList[clusterID]=', decisionClusterList
 
         if len(decisionClusterList) == 0:  #extract a single cluster
             FINALCLUSTERDict[currentClusterIndex] = [classID]
@@ -353,14 +353,18 @@ def processOverlappedClass(depFileName, traceDepFileName, orignalClusterFileName
     global MIXED_DEP_DICT
     global TRACE_DEP_DICT
     global ASSIGN_THR
+    global CONSIDER_FLAG
     global FINALCLUSTERDict
     global CLASSID2NAMEDict
     global MERGE_FUNC
 
+    FINALCLUSTERDict = dict()
+    CLASSID2NAMEDict = dict()
     ASSIGN_THR = thr
+    CONSIDER_FLAG = 'onlyoverlap'
+    MERGE_FUNC = 'AVG'
     MIXED_DEP_DICT = readMixedDepFile(depFileName)
     TRACE_DEP_DICT = readTraceDepFile(traceDepFileName) #read and normalized
-
 
     #overlappedClassFIle and nonoverlapclassFIle are not including fv=0 clusterID, alloverlapedCLusterID
     FINALCLUSTERDict = readOrignalClusterFile (orignalClusterFileName)   #init FINALCLUSTERS.key
@@ -370,7 +374,7 @@ def processOverlappedClass(depFileName, traceDepFileName, orignalClusterFileName
 
     currentClusterIndex = len(FINALCLUSTERDict) #include fv=0 clustersID
 
-    print 'currentClusterIndex=', currentClusterIndex
+    #print 'currentClusterIndex=', currentClusterIndex
     #print 'intiClusters', FINALCLUSTERDict
 
     [mergedClassList, mergedClusterList]= preProcess(class2ClusterDict)

@@ -63,10 +63,9 @@ def writeCSV(aList, fileName):
         writer.writerows(aList)
     print fileName
 
-def processNextStep(tsclusterFileName, lapFileName, nonlapFileName, mergedFvFileName, outClusterFileName):
+def processNextStep(overlap_process_thr, tsclusterFileName, lapFileName, nonlapFileName, mergedFvFileName, outClusterFileName):
     analyzeCluster(tsclusterFileName, nonlapFileName, lapFileName, mergedFvFileName)  #gen last three files
 
-    overlap_process_thr = round(0.01, 2)
     processOverlap(overlap_process_thr, tsclusterFileName, nonlapFileName, lapFileName, outClusterFileName)  #gen  outClusterFileName
 
     [totalClusterNum, noZeroClusterNum, repeatClassNum, repeatClassAvg, \
@@ -95,11 +94,11 @@ if __name__ == '__main__':
     data_dir              = "../../../testcase_data/jforum219_1/"
     featureVectorFileName = data_dir + 'coreprocess/' + project + '_testcase1_fv.csv'
     classFileName         = data_dir + 'coreprocess/' + project + '_testcase1_class.csv'
-    depFileName          = data_dir + 'dependency/' + project + '_testcase1_mixedDep.csv'
-    traceDepFileName     = data_dir + 'dependency/' + project + '_testcase1_traceDep.csv'
-    workflowFileName     = data_dir + 'workflow/' + project + '_workflow_reduced.csv'
+    depFileName           = data_dir + 'dependency/' + project + '_testcase1_mixedDep.csv'
+    traceDepFileName      = data_dir + 'dependency/' + project + '_testcase1_traceDep.csv'
+    workflowFileName      = data_dir + 'workflow/' + project + '_workflow_reduced.csv'
 
-    serv_list = range(33, 48)
+    serv_list = range(16, 48)
     thr_list = range(1, 101)
     thr_list = [ round(each/float(100), 2) for each in thr_list]
     resList = list() #[0] = [TS, thr]
@@ -109,36 +108,41 @@ if __name__ == '__main__':
         lapFileName       = data_dir + 'coreprocess/optionA-enum/' + project + '_testcase1_' + str(service_count) + '_class_lap.csv'
         nonlapFileName    = data_dir + 'coreprocess/optionA-enum/' + project + '_testcase1_' + str(service_count) + '_class_nolap.csv'
         mergedFvFileName  = data_dir + 'coreprocess/optionA-enum/' + project + '_testcase1_' + str(service_count) + '_classclusterFv.csv'
-
+        '''
         [nonOverlappedClassCount,  nonOverlappedAvg, \
         overlappedClassCount, overlappedAvg, \
         high_overlappedClassCount, high_overlappedAvg,\
         low_overlappedClassCount, low_overlappedAvg]    = metric_analyzeCluster(tsclusterFileName)
-
+        '''
+        clusterMetricList = metric_analyzeCluster(tsclusterFileName)
+        [nonOverlappedClassCount,  nonOverlappedAvg, \
+        overlappedClassCount, overlappedAvg, \
+        high_overlappedClassCount, high_overlappedAvg,\
+        low_overlappedClassCount, low_overlappedAvg] = clusterMetricList
         # has no overlap class, the next processes needed once
         if overlappedClassCount == 0:
             overlap_process_thr = round(0.01, 2)
             outClusterFileName  = data_dir + 'coreprocess/optionA-enum/' + project + '_testcase1_clusters_' + str(service_count) + '_' + str(overlap_process_thr) + '.csv'
-            tmpList = processNextStep(tsclusterFileName, lapFileName, nonlapFileName, mergedFvFileName, outClusterFileName)
+            lapResMetricList = processNextStep(overlap_process_thr, tsclusterFileName, lapFileName, nonlapFileName, mergedFvFileName, outClusterFileName)
             oneList = list()
             oneList.append(service_count)
             oneList.append(overlap_process_thr)
-            oneList.append(nonOverlappedClassCount)
-            oneList.append(overlappedClassCount)
-            oneList.extend(tmpList)
+            oneList.extend(clusterMetricList)
+            oneList.extend(lapResMetricList)
             resList.append(oneList)
+            print oneList
             continue
         for thr in thr_list:
             overlap_process_thr = round(thr, 2)
             outClusterFileName  = data_dir + 'coreprocess/optionA-enum/' + project + '_testcase1_clusters_' + str(service_count) + '_' + str(overlap_process_thr) + '.csv'
-            tmpList = processNextStep(tsclusterFileName, lapFileName, nonlapFileName, mergedFvFileName, outClusterFileName)
+            lapResMetricList = processNextStep(overlap_process_thr, tsclusterFileName, lapFileName, nonlapFileName, mergedFvFileName, outClusterFileName)
             oneList = list()
             oneList.append(service_count)
             oneList.append(overlap_process_thr)
-            oneList.append(nonOverlappedClassCount)
-            oneList.append(overlappedClassCount)
-            oneList.extend(tmpList)
+            oneList.extend(clusterMetricList)
+            oneList.extend(lapResMetricList)
             resList.append(oneList)
+            print oneList
 
     fileName = sys.argv[1]
     writeCSV(resList, fileName)
