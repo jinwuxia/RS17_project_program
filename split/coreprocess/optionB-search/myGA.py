@@ -83,7 +83,10 @@ def SelectPop_SA(new_pop_list, new_fitness_value_list, old_pop_list, old_fitness
 
 
 
-def Crossover(selected_pop_list):
+def Crossover(selected_pop_list, cross_operator):
+    if cross_operator == '':
+    elif cross_operator == '':
+
     return new_pop_list
 
 
@@ -105,8 +108,12 @@ def MainFunc():
     y_s = 1
     y_e = 100
 
+    selected_method = 'PRO'  #PRO or SA
     tem = 100
     cooling_rate = 0.98
+
+    cross_operator = ''
+
 
     pop_list = InitPop(N, x_s, x_e, y_s, y_e)
 
@@ -120,19 +127,19 @@ def MainFunc():
             fitness_value_list[index] = Fitness(indiv)
 
         #step3: select better ones as parents for reproduction
-        if SELECT_METHOD == 'PRO':
+        if selected_method == 'PRO':
             selected_pop_list = SelectPop_Pro(pop_list, fitness_value_list)
-        elif SELECT_METHOD == 'SA':
+        elif selected_method == 'SA':
             if len(old_pop_list) == 0:
                 selected_pop_list = SelectPop_Pro(pop_list, fitness_value_list)
             else:
                 selected_pop_list = SelectPop_SA(pop_list, fitness_value_list, old_pop_list, old_fitness_value_list, tem)
                 tem = tem * cooling_rate
         else:
-            print 'Unknown selecting method: ', SELECT_METHOD
+            print 'Unknown selecting method: ', selected_method
 
         #step4: crossover by using selected_pop, generate new generation
-        new_pop_list = Crossover(selected_pop_list)
+        new_pop_list = Crossover(selected_pop_list, cross_operator)
 
         #step5: muatition in a small probability
         new_pop_list = Mutation(new_pop_list)
