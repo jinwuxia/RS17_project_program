@@ -51,19 +51,41 @@ def SelectPop_Pro(pop_list, fitness_value_list, probability):
         if pro_list[index] >= probability:
             selected_pop_list.append(pop_list[index])
 
-    if len(seleted_pop_list) / 2 == 1:
+    if len(selected_pop_list) / 2 == 1:  #if is even, repeate one randomly
         import random
         rindex = random.randint(0, len(selected_pop_list) - 1)
         selected_pop_list.append(selected_pop_list[rindex])
-    return seleted_pop_list
+    return selected_pop_list
 
 #selected better parents by using simulated annealing
 #pop_list and fitness_value_list are corresponding
-def SelectPop_SA(pop_list, fitness_value_list):
-    return seleted_pop_list
+def SelectPop_SA(new_pop_list, new_fitness_value_list, old_pop_list, old_fitness_value_list, t):
+    #Old and new are same size
+    import math
+    import random
+    selected_pop_list = list()
+    for index in range(0, len(new_pop_list)):
+        e_new = new_fitness_value_list[index]
+        e_old = old_fitness_value_list[index]
+        if e_new < e_old:   #p=1 accepted
+            selected_pop_list.append(new_pop_list[index])
+        else:
+            detE = -(e_new - e_old)
+            accept_bad_pro = min(1, math.exp(detE/float(t)))
+            p = random(0, 1)
+            if p <= accept_bad_pro:  #accept
+                selected_pop_list.append(new_pop_list[index])
+            else:
+                selected_pop_list.append(old_pop_list[index])
+
+    return selected_pop_list
+
+
+
 
 def Crossover(selected_pop_list):
     return new_pop_list
+
 
 def Mutation(new_pop_list):
 
@@ -82,9 +104,14 @@ def MainFunc():
     x_e = 10
     y_s = 1
     y_e = 100
+
+    tem = 100
+    cooling_rate = 0.98
+
     pop_list = InitPop(N, x_s, x_e, y_s, y_e)
 
-    kgen = 0 #generation = K
+    old_pop_list = list()
+    old_fitness_value_list = list()
     while(True):
         #step2: compute finess
         fitness_value_list = list()
@@ -93,7 +120,16 @@ def MainFunc():
             fitness_value_list[index] = Fitness(indiv)
 
         #step3: select better ones as parents for reproduction
-        selected_pop_list = SelectPop(pop_list, fitness_value_list)
+        if SELECT_METHOD == 'PRO':
+            selected_pop_list = SelectPop_Pro(pop_list, fitness_value_list)
+        elif SELECT_METHOD == 'SA':
+            if len(old_pop_list) == 0:
+                selected_pop_list = SelectPop_Pro(pop_list, fitness_value_list)
+            else:
+                selected_pop_list = SelectPop_SA(pop_list, fitness_value_list, old_pop_list, old_fitness_value_list, tem)
+                tem = tem * cooling_rate
+        else:
+            print 'Unknown selecting method: ', SELECT_METHOD
 
         #step4: crossover by using selected_pop, generate new generation
         new_pop_list = Crossover(selected_pop_list)
@@ -102,8 +138,9 @@ def MainFunc():
         new_pop_list = Mutation(new_pop_list)
 
         #record states
-        kgen += 1
-        pop_list = new_pop_list
+        old_pop_list = selected_pop_list  #old, parents
+        pop_list = new_pop_list  #new, children
+        old_fitness_value_list = fitness_value_list  #old
 
         if IsStop() == True:
             break
