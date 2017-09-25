@@ -40,10 +40,27 @@ def InitPop(N, x_s, x_e, y_s, y_e):
 def Fitness(oneIndiv):
     return fitness_value
 
+#selected better parents by using Probility of fitness_function_value
 #pop_list and fitness_value_list are corresponding
-def SelectPop(kgen, pop_list, fitness_value_list):
+def SelectPop_Pro(pop_list, fitness_value_list, probability):
+    selected_pop_list = list()
+
+    fenmu = sum(fitness_value_list)
+    pro_list = [each / float(fenmu) for each in fitness_value_list]
+    for index in len(0, len(pop_list)):
+        if pro_list[index] >= probability:
+            selected_pop_list.append(pop_list[index])
+
+    if len(seleted_pop_list) / 2 == 1:
+        import random
+        rindex = random.randint(0, len(selected_pop_list) - 1)
+        selected_pop_list.append(selected_pop_list[rindex])
     return seleted_pop_list
 
+#selected better parents by using simulated annealing
+#pop_list and fitness_value_list are corresponding
+def SelectPop_SA(pop_list, fitness_value_list):
+    return seleted_pop_list
 
 def Crossover(selected_pop_list):
     return new_pop_list
@@ -76,7 +93,7 @@ def MainFunc():
             fitness_value_list[index] = Fitness(indiv)
 
         #step3: select better ones as parents for reproduction
-        selected_pop_list = SelectPop(kgen, pop_list, fitness_value_list)
+        selected_pop_list = SelectPop(pop_list, fitness_value_list)
 
         #step4: crossover by using selected_pop, generate new generation
         new_pop_list = Crossover(selected_pop_list)
