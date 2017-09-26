@@ -114,6 +114,7 @@ if __name__ == '__main__':
     workflowFileName      = data_dir + 'workflow/' + project + '_workflow_reduced.csv'
 
     serv_list = range(16, 48)
+    #serv_list = range(1, 11)
     thr_list = range(1, 101)
     thr_list = [ round(each/float(100), 2) for each in thr_list]
     resList = list() #[0] = [TS, thr]
@@ -152,6 +153,8 @@ if __name__ == '__main__':
             overlap_process_thr = round(thr, 2)
             outClusterFileName  = data_dir + 'coreprocess/optionA-enum/' + project + '_testcase1_clusters_' + str(service_count) + '_' + str(overlap_process_thr) + '.csv'
             lapResMetricList = processNextStep(overlap_process_thr, tsclusterFileName, lapFileName, nonlapFileName, mergedFvFileName, outClusterFileName)
+
+            '''
             if isEqualList(preList, lapResMetricList) == False:
                 oneList = list()
                 oneList.append(service_count)
@@ -161,6 +164,13 @@ if __name__ == '__main__':
                 resList.append(oneList)
                 print oneList
                 preList = [copyValue for copyValue in lapResMetricList]
+            '''
+            oneList = list()
+            oneList.append(service_count)
+            oneList.append(overlap_process_thr)
+            oneList.extend(clusterMetricList)
+            oneList.extend(lapResMetricList)
+            resList.append(oneList)
 
     fileName = sys.argv[1]
     writeCSV(resList, fileName)
