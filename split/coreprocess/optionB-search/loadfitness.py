@@ -1,7 +1,5 @@
 #compute one ondividual's fitness value.
 
-#compute one ondividual's fitness value.
-
 class ObjectStruct:
     def __init__(self, nonlapClassCount, nonlapClassCount_avg, overlapClassCount, overlapClassCount_avg, \
                     realClusterNum, repeatClassCount, repeatClassCount_avg,\
