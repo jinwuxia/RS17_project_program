@@ -6,14 +6,17 @@ def SelectPop_Pro(pop_list, fitness_value_list, probability):
 
     fenmu = sum(fitness_value_list)
     pro_list = [each / float(fenmu) for each in fitness_value_list]
-    for index in len(0, len(pop_list)):
+    print 'probability: ', pro_list
+    for index in range(0, len(pop_list)):
         if pro_list[index] >= probability:
             selected_pop_list.append(pop_list[index])
 
-    if len(selected_pop_list) / 2 == 1:  #if is even, repeate one randomly
+    if len(selected_pop_list) % 2 == 1:  #if is even, repeate one randomly, generate one for the last element
         import random
-        rindex = random.randint(0, len(selected_pop_list) - 1)
+        rindex = random.randint(0, len(selected_pop_list) - 2)
         selected_pop_list.append(selected_pop_list[rindex])
+
+    #print 'selected_pop_list:', selected_pop_list
     return selected_pop_list
 
 #selected better parents by using simulated annealing
