@@ -60,6 +60,7 @@ def MainFunc():
     FITNESSFILENAME = config.GlobalVar.FITNESSFILENAME
     SELECTED_METHOD = config.GlobalVar.SELECTED_METHOD
     FITNESS_PROBABILITY = config.GlobalVar.FITNESS_PROBABILITY
+    FITNESS_METHOD = config.GlobalVar.FITNESS_METHOD
     TEM = config.GlobalVar.TEM
     COOLING_RATE = config.GlobalVar.COOLING_RATE
     CROSS_OPERATOR = config.GlobalVar.CROSS_OPERATOR
@@ -90,7 +91,7 @@ def MainFunc():
     while(True):
         print 'loop: ', kgen
         #step2: compute finess
-        fitness_value_list = fitness.GetFitnessList(pop_list, BIT_COUNT_X, BIT_COUNT_Y)
+        fitness_value_list = fitness.GetFitnessList(FITNESS_METHOD, pop_list, BIT_COUNT_X, BIT_COUNT_Y)
         print 'fitness_value: ', fitness_value_list
 
         #step3: select better ones as parents for reproduction
@@ -125,7 +126,7 @@ def MainFunc():
         mutation_rd = random.random()
         if mutation_rd < MUTATION_PROBABILITY:
             print 'Mutation...'
-            tmp_fitness_value_list = fitness.GetFitnessList(pop_list, BIT_COUNT_X, BIT_COUNT_Y)
+            tmp_fitness_value_list = fitness.GetFitnessList(FITNESS_METHOD, pop_list, BIT_COUNT_X, BIT_COUNT_Y)
             #make sure the mutation result is valid
             new_pop_list = mutation.Mutation(new_pop_list, tmp_fitness_value_list, MUTATION_OPERATOR,\
                                              X_S, X_E, Y_S, Y_E, BIT_COUNT_X, BIT_COUNT_Y)

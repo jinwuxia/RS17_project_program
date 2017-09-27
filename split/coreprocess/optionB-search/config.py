@@ -22,6 +22,7 @@ class GlobalVar:
     #FITNESSFILENAME = '../../../testcase_data/jpetstore6/coreprocess/jpetstore6-fitness.csv'
     FITNESSFILENAME = '../../../testcase_data/jforum219_1/coreprocess/jforum219-fitness.csv'
     OBJECT_STRUCT_DICT = dict()
+    FITNESS_METHOD = 'withinwf-interwf-repclass'  #or withinwf or withinwf-interwf-repclass
 
     SELECTED_METHOD = 'SA'  #PRO or SA
     FITNESS_PROBABILITY = 0.10

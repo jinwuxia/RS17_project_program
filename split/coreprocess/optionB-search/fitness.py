@@ -50,7 +50,7 @@ def loadFitness(fileName):
     config.set_object_struct(objectStructDict)
 
 
-def GetFitnessList(pop_list, BIT_COUNT_X, BIT_COUNT_Y):
+def GetFitnessList(FITNESS_METHOD, pop_list, BIT_COUNT_X, BIT_COUNT_Y):
     import config
     import initpop
     OBJECT_STRUCT_DICT = config.get_object_struct()
@@ -59,5 +59,12 @@ def GetFitnessList(pop_list, BIT_COUNT_X, BIT_COUNT_Y):
         indiv = pop_list[index]
         [x, y] = initpop.TransCode2Indiv(indiv, BIT_COUNT_X, BIT_COUNT_Y)  #=[x,y]=[serv, thr_int]
         print 'info fit[x][y]:', x, y
-        fitness_value_list.append(OBJECT_STRUCT_DICT[x][y].withinWorkflow)
+        if FITNESS_METHOD == 'withinwf':
+            fitness_value_list.append(OBJECT_STRUCT_DICT[x][y].withinWorkflow)
+        elif FITNESS_METHOD == 'withinwf-interwf-repclass':
+            fitness_value_list.append(OBJECT_STRUCT_DICT[x][y].withinWorkflow \
+                                    - OBJECT_STRUCT_DICT[x][y].interWorklow \
+                                    - OBJECT_STRUCT_DICT[x][y].repeatClassCount)
+        else:
+            print 'Unknown fitness_method:', FITNESS_METHOD
     return fitness_value_list
