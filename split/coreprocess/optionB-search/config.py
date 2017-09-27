@@ -1,14 +1,26 @@
 class GlobalVar:
     #step1: init population
     N = 6 #initial populization size, each generation size = intialSize
+    '''
+    #for jpetstore6
     X_S = 2
     X_E = 10
-    Y_S = 1
-    Y_E = 100
     BIT_COUNT_X = 4
     BIT_COUNT_Y = 7
+    '''
+    #for jforum219_1
+    X_S = 18
+    X_E = 47
+    BIT_COUNT_X = 6
+    BIT_COUNT_Y = 7
 
-    FITNESSFILENAME = '../../../testcase_data/jpetstore6/coreprocess/jpetstore6-fitness.csv'
+    Y_S = 1
+    Y_E = 100
+
+
+    #for jpetstore
+    #FITNESSFILENAME = '../../../testcase_data/jpetstore6/coreprocess/jpetstore6-fitness.csv'
+    FITNESSFILENAME = '../../../testcase_data/jforum219_1/coreprocess/jforum219-fitness.csv'
     OBJECT_STRUCT_DICT = dict()
 
     SELECTED_METHOD = 'SA'  #PRO or SA
