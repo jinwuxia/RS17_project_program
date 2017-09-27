@@ -29,13 +29,15 @@ def SelectPop_SA(new_pop_list, new_fitness_value_list, old_pop_list, old_fitness
     for index in range(0, len(new_pop_list)):
         e_new = new_fitness_value_list[index]
         e_old = old_fitness_value_list[index]
-        if e_new < e_old:   #p=1 accepted
+        if e_new >= e_old:   #p=1 accepted
             selected_pop_list.append(new_pop_list[index])
         else:
-            detE = -(e_new - e_old)
+            detE = (e_new - e_old)
             accept_bad_pro = min(1, math.exp(detE/float(t)))
-            p = random(0, 1)
+            print 'detE=', detE, 'math.exp(detE/float(t))=', math.exp(detE/float(t)), 'accepted_bad_pro=', accept_bad_pro
+            p = random.random()
             if p <= accept_bad_pro:  #accept
+                print 'SA accpted bad, p=', p
                 selected_pop_list.append(new_pop_list[index])
             else:
                 selected_pop_list.append(old_pop_list[index])

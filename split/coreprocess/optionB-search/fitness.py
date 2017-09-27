@@ -24,6 +24,7 @@ class ObjectStruct:
         self.APINum_avg = APINum_avg
 
 def loadFitness(fileName):
+    import config
     objectStructDict = dict()
     import csv
     with open(fileName, 'rb') as fp:
@@ -37,7 +38,7 @@ def loadFitness(fileName):
             if serv == 'servicenumber':
                 continue
             serv = int(serv)
-            thr_int = int(float(thr) * 100)
+            thr_int = int(thr)
             oneObjectStruct = ObjectStruct(int(nonlapClassCount), float(nonlapClassCount_avg), \
                             int(overlapClassCount), float(overlapClassCount_avg), \
                             int(realClusterNum), int(repeatClassCount), float(repeatClassCount_avg),\
@@ -46,4 +47,17 @@ def loadFitness(fileName):
             if serv not in objectStructDict:
                 objectStructDict[serv] = dict()
             objectStructDict[serv][thr_int] = oneObjectStruct
-    return objectStructDict
+    config.set_object_struct(objectStructDict)
+
+
+def GetFitnessList(pop_list, BIT_COUNT_X, BIT_COUNT_Y):
+    import config
+    import initpop
+    OBJECT_STRUCT_DICT = config.get_object_struct()
+    fitness_value_list = list()
+    for index  in range(0, len(pop_list)):
+        indiv = pop_list[index]
+        [x, y] = initpop.TransCode2Indiv(indiv, BIT_COUNT_X, BIT_COUNT_Y)  #=[x,y]=[serv, thr_int]
+        print 'info fit[x][y]:', x, y
+        fitness_value_list.append(OBJECT_STRUCT_DICT[x][y].withinWorkflow)
+    return fitness_value_list

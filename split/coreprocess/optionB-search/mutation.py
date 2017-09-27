@@ -3,10 +3,12 @@ def MutationOnIndiv(indiv):
     import random
     index = random.randint(0, len(indiv) - 1)
     if indiv[index] == '0':
-        indiv[index] = '1'
+        substr = '1'
     else:
-        indiv[index] = '0'
-    return indiv
+        substr = '0'
+    mu_indiv = indiv[0:index] + substr + indiv[index + 1: len(indiv)]
+    print 'mutation index=', index, ' indiv=', indiv, '  mu_indiv=', mu_indiv
+    return mu_indiv
 
 
 def Mutation(pop_list, fitness_value_list, mutation_operator, x_s, x_e, y_s, y_e, bitCount_x, bitCount_y):

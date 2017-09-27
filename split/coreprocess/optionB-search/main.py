@@ -1,45 +1,41 @@
-OBJECT_STRUCT_DICT = dict()
-
-class ObjectStruct:
-    def __init__(self, nonlapClassCount, nonlapClassCount_avg, overlapClassCount, overlapClassCount_avg, \
-                    realClusterNum, repeatClassCount, repeatClassCount_avg,\
-                    interWorklow, withinWorkflow, interCallNum, interCallNum_avg, \
-                    interCallNum_f, interCallNum_avg_f, APINum, APINum_avg):
-        self.nonlapClassCount = nonlapClassCount
-        self.nonlapClassCount_avg = nonlapClassCount_avg
-        self.overlapClassCount = overlapClassCount
-        self.overlapClassCount_avg = overlapClassCount_avg
-        self.realClusterNum = realClusterNum
-        self.repeatClassCount = repeatClassCount
-        self.repeatClassCount_avg  =repeatClassCount_avg
-        self.interWorklow = interWorklow
-        self.withinWorkflow = withinWorkflow
-        self.interCallNum = interCallNum
-        self.interCallNum_avg = interCallNum_avg
-        self.interCallNum_f = interCallNum_f
-        self.interCallNum_avg_f = interCallNum_avg_f
-        self.APINum = APINum
-        self.APINum_avg = APINum_avg
-
-
 #judge the search iteration condition
 def IsStop(kgen, old_pop_list, new_pop_list, old_fitness_value_list, new_fitness_value_list):
-    print 'old_pop_list=           ', old_pop_list
-    print 'new_pop_list=           ', new_pop_list
+    import config
+    import initpop
+    old_pop_num_list = list()
+    for each in old_pop_list:
+        [x, y] = initpop.TransCode2Indiv(each, config.GlobalVar.BIT_COUNT_X,  config.GlobalVar.BIT_COUNT_Y)
+        old_pop_num_list.append(str(x) + ',' + str(y))
+    new_pop_num_list = list()
+    for each in new_pop_list:
+        [x, y] = initpop.TransCode2Indiv(each, config.GlobalVar.BIT_COUNT_X,  config.GlobalVar.BIT_COUNT_Y)
+        new_pop_num_list.append(str(x) + ',' + str(y))
+    print 'old_pop_list=           ', old_pop_list, '; ', old_pop_num_list
+    print 'new_pop_list=           ', new_pop_list, '; ', new_pop_num_list
     print 'old_fitness_value_list= ', old_fitness_value_list
     print 'new_fitness_value_list= ', new_fitness_value_list
-    if kgen > 10000:
+
+    if kgen > config.GlobalVar.MAX_ITERATION_LOOP:
         return True
     if len(new_pop_list) == 1:
         return True
-
+    if len(old_pop_list) == 0:
+        return False
     old_avg = sum(old_fitness_value_list) / len(old_fitness_value_list)
     new_avg = sum(new_fitness_value_list) / len(new_fitness_value_list)
     print 'old fitness avg=        ', old_avg
     print 'new fitness avg=        ', new_avg
-    
-    if kgen > 5000 and abs(old_avg - new_avg) <= 0.00001:
+    print 'old max_fitness avg=        ', max(old_fitness_value_list)
+    print 'new max_fitness avg=        ', max(new_fitness_value_list)
+
+    #is stable
+    if abs(old_avg - new_avg) <= 0.00001:  #on line
+        config.add_continue_best_loop()  #crrrent + 1
+    else:
+        config.reset_continue_best_loop()#reset current = 0
+    if config.get_continue_best_loop() > config.GlobalVar.CONTINUE_BEST_LOOP:
         return True
+
     return False
 
 def CheckChildrenValid(new_pop_list, x_s, x_e, y_s, y_e, bitCount_x, bitCount_y):
@@ -51,44 +47,32 @@ def CheckChildrenValid(new_pop_list, x_s, x_e, y_s, y_e, bitCount_x, bitCount_y)
     return invalidLen
 
 
-def GetFitnessList(pop_list, BIT_COUNT_X,  BIT_COUNT_Y):
-    global OBJECT_STRUCT_DICT
-    import initpop
-    fitness_value_list = list()
-    for index  in range(0, len(pop_list)):
-        indiv = pop_list[index]
-        [x, y] = initpop.TransCode2Indiv(indiv, BIT_COUNT_X, BIT_COUNT_Y)  #=[x,y]=[serv, thr_int]
-        fitness_value_list.append(OBJECT_STRUCT_DICT[x][y].withinWorkflow)
-    return fitness_value_list
 
 def MainFunc():
-    global OBJECT_STRUCT_DICT
-    OBJECT_STRUCT_DICT = dict()
+    import config
+    N = config.GlobalVar.N #initial populization size, each generation size = intialSize
+    X_S = config.GlobalVar.X_S
+    X_E = config.GlobalVar.X_E
+    Y_S = config.GlobalVar.Y_S
+    Y_E = config.GlobalVar.Y_E
+    BIT_COUNT_X = config.GlobalVar.BIT_COUNT_X
+    BIT_COUNT_Y = config.GlobalVar.BIT_COUNT_Y
+    FITNESSFILENAME = config.GlobalVar.FITNESSFILENAME
+    SELECTED_METHOD = config.GlobalVar.SELECTED_METHOD
+    FITNESS_PROBABILITY = config.GlobalVar.FITNESS_PROBABILITY
+    TEM = config.GlobalVar.TEM
+    COOLING_RATE = config.GlobalVar.COOLING_RATE
+    CROSS_OPERATOR = config.GlobalVar.CROSS_OPERATOR
+    MUTATION_PROBABILITY = config.GlobalVar.MUTATION_PROBABILITY
+    MUTATION_OPERATOR = config.GlobalVar.MUTATION_OPERATOR
 
-    #step1: init population
-    N = 6 #initial populization size, each generation size = intialSize
-    X_S = 2
-    X_E = 10
-    Y_S = 1
-    Y_E = 100
-    BIT_COUNT_X = 4
-    BIT_COUNT_Y = 7
-
-    FITNESSFILENAME = '../../../testcase_data/jpetstore6/coreprocess/jpetstore6-fitness.csv'
-
-    SELECTED_METHOD = 'SA'  #PRO or SA
-    FITNESS_PROBABILITY = 0.10
-    TEM = 100
-    COOLING_RATE = 0.98
-
-    CROSS_OPERATOR = '2P2C'
-    #CHILDREN_NUM = 4
-
-    MUTATION_PROBABILITY = 0.02
-    MUTATION_OPERATOR = 'random' #random  or worse
-
+    import initpop
+    import selectpop
     import fitness
-    OBJECT_STRUCT_DICT = fitness.loadFitness(FITNESSFILENAME)
+    import crossover
+    import mutation
+    fitness.loadFitness(FITNESSFILENAME) #set OBJECT_STRUCT_DICT
+    OBJECT_STRUCT_DICT = config.get_object_struct()
     for serv in OBJECT_STRUCT_DICT:
         for thr_int in OBJECT_STRUCT_DICT[serv]:
             one = OBJECT_STRUCT_DICT[serv][thr_int]
@@ -96,7 +80,6 @@ def MainFunc():
     print 'loadFitness finished....\n'
 
     #step 1
-    import initpop
     pop_list = initpop.InitPop(N, X_S, X_E, Y_S, Y_E, BIT_COUNT_X, BIT_COUNT_Y)
     print 'init pop: ', pop_list
     print 'population initialization finished....\n'
@@ -107,17 +90,17 @@ def MainFunc():
     while(True):
         print 'loop: ', kgen
         #step2: compute finess
-        fitness_value_list = GetFitnessList(pop_list, BIT_COUNT_X, BIT_COUNT_Y)
+        fitness_value_list = fitness.GetFitnessList(pop_list, BIT_COUNT_X, BIT_COUNT_Y)
         print 'fitness_value: ', fitness_value_list
 
         #step3: select better ones as parents for reproduction
-        import selectpop
         if SELECTED_METHOD == 'PRO':
             selected_pop_list = selectpop.SelectPop_Pro(pop_list, fitness_value_list, FITNESS_PROBABILITY)
         elif SELECTED_METHOD == 'SA':
             if len(old_pop_list) == 0:
                 selected_pop_list = selectpop.SelectPop_Pro(pop_list, fitness_value_list, FITNESS_PROBABILITY)
             else:
+                print 'current temperature: ', TEM
                 selected_pop_list = selectpop.SelectPop_SA(pop_list, fitness_value_list, old_pop_list, old_fitness_value_list, TEM)
                 TEM = TEM * COOLING_RATE
         else:
@@ -126,7 +109,6 @@ def MainFunc():
         print 'selected population end.....'
 
         #step4: crossover by using selected_pop, generate new generation
-        import crossover
         print 'Crossover.....'
         while True:
             new_pop_list = crossover.Crossover([BIT_COUNT_X, BIT_COUNT_Y], selected_pop_list, CROSS_OPERATOR)
@@ -139,12 +121,11 @@ def MainFunc():
 
 
         #step5: mutation in a small probability
-        import mutation
         import random
         mutation_rd = random.random()
         if mutation_rd < MUTATION_PROBABILITY:
             print 'Mutation...'
-            tmp_fitness_value_list = GetFitnessList(pop_list, BIT_COUNT_X, BIT_COUNT_Y)
+            tmp_fitness_value_list = fitness.GetFitnessList(pop_list, BIT_COUNT_X, BIT_COUNT_Y)
             #make sure the mutation result is valid
             new_pop_list = mutation.Mutation(new_pop_list, tmp_fitness_value_list, MUTATION_OPERATOR,\
                                              X_S, X_E, Y_S, Y_E, BIT_COUNT_X, BIT_COUNT_Y)
