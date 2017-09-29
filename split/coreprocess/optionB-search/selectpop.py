@@ -43,3 +43,6 @@ def SelectPop_SA(new_pop_list, new_fitness_value_list, old_pop_list, old_fitness
                 selected_pop_list.append(old_pop_list[index])
 
     return selected_pop_list
+
+def SelectPop_Jinbiao(pop_list, fitness_value_list, N):
+    return parentA_list, parentB_list
