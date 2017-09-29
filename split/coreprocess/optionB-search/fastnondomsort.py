@@ -39,7 +39,7 @@ def InitDominate(pop_list):
     return dominateSetDict, isDominatedDict
 
 #return layerList , and indiv's rank/layer number
-def QuickNondomSort(pop_list):
+def FastNondomSort(pop_list):
     [dominateSetDict, isDominatedDict] = InitDominate(pop_list)
     layerList = list() #list[1] = [indiv1. ....]
     indivRankDict = dict() #[indiv] = rank
