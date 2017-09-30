@@ -49,22 +49,53 @@ def loadFitness(fileName):
             objectStructDict[serv][thr_int] = oneObjectStruct
     config.set_object_struct(objectStructDict)
 
-
-def GetFitnessList(FITNESS_METHOD, pop_list, BIT_COUNT_X, BIT_COUNT_Y):
+#make min to max. All the object should be maximized
+def GetFitnessList(fitness_method, pop_list):
     import config
     import initpop
     OBJECT_STRUCT_DICT = config.get_object_struct()
+    BIT_COUNT_X = config.BIT_COUNT_X
+    BIT_COUNT_Y = config.BIT_COUNT_Y
+
     fitness_value_list = list()
     for index  in range(0, len(pop_list)):
         indiv = pop_list[index]
         [x, y] = initpop.TransCode2Indiv(indiv, BIT_COUNT_X, BIT_COUNT_Y)  #=[x,y]=[serv, thr_int]
         print 'info fit[x][y]:', x, y
-        if FITNESS_METHOD == 'withinwf':
+        if fitness_method == 'withinwf':
             fitness_value_list.append(OBJECT_STRUCT_DICT[x][y].withinWorkflow)
-        elif FITNESS_METHOD == 'withinwf-interwf-repclass':
+        elif fitness_method == 'clusternum':
+            fitness_value_list.append(OBJECT_STRUCT_DICT[x][y].realClusterNum)
+        elif fitness_method == 'repclassnum':
+            fitness_value_list.append(-OBJECT_STRUCT_DICT[x][y].repeatClassCount)
+        elif fitness_method == 'withinwf-interwf-repclass':
             fitness_value_list.append(OBJECT_STRUCT_DICT[x][y].withinWorkflow \
                                     - OBJECT_STRUCT_DICT[x][y].interWorklow \
                                     - OBJECT_STRUCT_DICT[x][y].repeatClassCount)
         else:
-            print 'Unknown fitness_method:', FITNESS_METHOD
+            print 'Unknown fitness_method:', fitness_method
     return fitness_value_list
+
+def GetFitness(fitness_method, indiv):
+    import config
+    import initpop
+    OBJECT_STRUCT_DICT = config.get_object_struct()
+    BIT_COUNT_X = config.GlobalVar.BIT_COUNT_X
+    BIT_COUNT_Y = config.GlobalVar.BIT_COUNT_Y
+
+
+    [x, y] = initpop.TransCode2Indiv(indiv, BIT_COUNT_X, BIT_COUNT_Y)  #=[x,y]=[serv, thr_int]
+    #print 'info fit[x][y]:', x, y
+    if fitness_method == 'withinwf':
+        fitness_value = OBJECT_STRUCT_DICT[x][y].withinWorkflow
+    elif fitness_method == 'clusternum':
+        fitness_value = OBJECT_STRUCT_DICT[x][y].realClusterNum
+    elif fitness_method == 'repclassnum':
+        fitness_value = (-OBJECT_STRUCT_DICT[x][y].repeatClassCount)
+    elif fitness_method == 'withinwf-interwf-repclass':
+        fitness_value = OBJECT_STRUCT_DICT[x][y].withinWorkflow \
+                                    - OBJECT_STRUCT_DICT[x][y].interWorklow \
+                                    - OBJECT_STRUCT_DICT[x][y].repeatClassCount
+    else:
+        print 'Unknown fitness_method:', fitness_method
+    return fitness_value
