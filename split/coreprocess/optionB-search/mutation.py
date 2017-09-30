@@ -11,6 +11,7 @@ def MutationOnIndiv(indiv):
     return mu_indiv
 
 
+#if mutation = random, then fitness_value_list no use
 def Mutation(pop_list, fitness_value_list, mutation_operator, x_s, x_e, y_s, y_e, bitCount_x, bitCount_y):
     mutation_indiv_index = -1
     if mutation_operator == 'random': #randomly choose one indiv to mutate
