@@ -1,18 +1,20 @@
 #quicky non dominate sort for polulation
 
-#if indi_2 all better, return True.  indiv1 is dominated by indiv2
+#if indi_2 all better(strongly), return True.  indiv1 is dominated by indiv2
 def IsDominated(indiv_1, indiv_2):
-    if fitness1(indiv_2) >= fitness1(indiv_1) and fitness2(indiv_2) >= fitness2(indiv_1):
-        return True
-    else:
-        return False
+    import fitness
+    import config
+    fitness_method_list = config.GlobalVar.FITNESS_METHOD_LIST
+    for fitness_method in fitness_method_list:
+        if fitness.GetFitness(fitness_method, indiv_2) <= fitness.GetFitness(fitness_method, indiv_1):
+            return False
+
+    return True
+
 
 #if indiv_1 dominate(all better than ) indiv_2, return True
 def Dominate(indiv_1, indiv_2):
-    if fitness1(indiv_1) >= fitness1(indiv_2) and fitness2(indiv_1) >= fitness2(indiv_2):
-        return True
-    else:
-        return False
+    return IsDominated(indiv_2, indiv_1)
 
 
 #for each indiv, compute the worseSet which is dominated by it. dominatedDict[indiv] = set
@@ -22,6 +24,9 @@ def Dominate(indiv_1, indiv_2):
 def InitDominate(pop_list):
     dominateSetDict = dict()
     isDominatedDict = dict()
+    for indiv in pop_list:
+        dominateSetDict[indiv] = set()
+        isDominatedDict[indiv] = 0
     for i in range(0, len(pop_list)):
         indiv_i = pop_list[i]
         for j in range(0, len(pop_list)):
@@ -34,13 +39,15 @@ def InitDominate(pop_list):
                         isDominatedDict[indiv_i] += 1
                 if Dominate(indiv_i, indiv_j):
                     if indiv_i not in dominateSetDict:
-                        dominateSetDict[indiv_1] = set()
-                    dominateSetDict[indiv_1].add(indiv_j)
+                        dominateSetDict[indiv_i] = set()
+                    dominateSetDict[indiv_i].add(indiv_j)
     return dominateSetDict, isDominatedDict
 
 #return layerList , and indiv's rank/layer number
 def FastNondomSort(pop_list):
     [dominateSetDict, isDominatedDict] = InitDominate(pop_list)
+    print 'dominateSetDict=', dominateSetDict
+    print 'isDominatedDict=', isDominatedDict
     layerList = list() #list[1] = [indiv1. ....]
     indivRankDict = dict() #[indiv] = rank
     #init F_list
@@ -51,6 +58,7 @@ def FastNondomSort(pop_list):
 
     layer = 0
     while len(F_list) != 0:
+        new_F_list = list()
         for indiv_i in F_list:
             oneset = dominateSetDict[indiv_i]
             for indiv_j in oneset:
@@ -62,7 +70,7 @@ def FastNondomSort(pop_list):
         F_list = new_F_list
         print 'layer: ', layer, '=', layerList[layer]
         layer += 1
-    print 'qcuick nondoninate sort end..........'
+    print 'quick nondoninate sort end..........\n'
 
     for rank in range(0, len(layerList)):
         for indiv in layerList[rank]:
