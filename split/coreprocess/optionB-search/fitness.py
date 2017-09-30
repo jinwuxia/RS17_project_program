@@ -54,14 +54,14 @@ def GetFitnessList(fitness_method, pop_list):
     import config
     import initpop
     OBJECT_STRUCT_DICT = config.get_object_struct()
-    BIT_COUNT_X = config.BIT_COUNT_X
-    BIT_COUNT_Y = config.BIT_COUNT_Y
+    BIT_COUNT_X = config.GlobalVar.BIT_COUNT_X
+    BIT_COUNT_Y = config.GlobalVar.BIT_COUNT_Y
 
     fitness_value_list = list()
     for index  in range(0, len(pop_list)):
         indiv = pop_list[index]
         [x, y] = initpop.TransCode2Indiv(indiv, BIT_COUNT_X, BIT_COUNT_Y)  #=[x,y]=[serv, thr_int]
-        print 'info fit[x][y]:', x, y
+        #print 'info fit[x][y]:', x, y
         if fitness_method == 'withinwf':
             fitness_value_list.append(OBJECT_STRUCT_DICT[x][y].withinWorkflow)
         elif fitness_method == 'clusternum':
