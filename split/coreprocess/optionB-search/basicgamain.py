@@ -91,7 +91,7 @@ def MainFunc():
     while(True):
         print 'loop: ', kgen
         #step2: compute finess
-        fitness_value_list = fitness.GetFitnessList(FITNESS_METHOD, pop_list, BIT_COUNT_X, BIT_COUNT_Y)
+        fitness_value_list = fitness.GetFitnessList(FITNESS_METHOD, pop_list)
         print 'fitness_value: ', fitness_value_list
 
         #step3: select better ones as parents for reproduction
@@ -126,7 +126,7 @@ def MainFunc():
         mutation_rd = random.random()
         if mutation_rd < MUTATION_PROBABILITY:
             print 'Mutation...'
-            tmp_fitness_value_list = fitness.GetFitnessList(FITNESS_METHOD, pop_list, BIT_COUNT_X, BIT_COUNT_Y)
+            tmp_fitness_value_list = fitness.GetFitnessList(FITNESS_METHOD, pop_list)
             #make sure the mutation result is valid
             new_pop_list = mutation.Mutation(new_pop_list, tmp_fitness_value_list, MUTATION_OPERATOR,\
                                              X_S, X_E, Y_S, Y_E, BIT_COUNT_X, BIT_COUNT_Y)
