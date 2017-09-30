@@ -16,7 +16,6 @@ def MakePair(selected_pop_list):
     pairList = list(combinations(selected_pop_list, 2))
     return pairList
 
-
 #parentPair,  N is the children needed
 def RandomChooseParentPairs(parentPairList, N):
     if 2 * len(parentPairList) < N:
