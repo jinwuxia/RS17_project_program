@@ -44,5 +44,43 @@ def SelectPop_SA(new_pop_list, new_fitness_value_list, old_pop_list, old_fitness
 
     return selected_pop_list
 
-def SelectPop_Jinbiao(pop_list, fitness_value_list, N):
+#randomly choose n from m, then select the top k from m.
+#M >= N
+def RandomChoose(m, n, k):
+    resList = list()
+    if n> m or k > n:
+        print 'Not enough m,n,k.....'
+        return resList
+
+    import random
+    aList = list()
+    for index in range(0, n):
+        number = random.randint(0, m-1)
+        aList.append(number)
+    #sort aList
+    aList.sort() #from small to big
+    for index in range(0, k):
+        resList.append(aList[index])
+    return resList
+
+
+#according to the sorted Pop_listm select parentA_list and parentB_list
+#2 * N <= pop_list_number
+# each time randomly choose M from len(layerList), then choose top N from M
+def SelectPop_Jinbiao(layerList, M, N):
+    parentA_list = list()
+    parentB_list = list()
+    flatList = list()
+    for layer in range(0, len(layerList)):
+        flatList.extend(layerList[layer])
+    if len(flatList) < 2* N:
+        print 'not enough pop_list to generate ', N, 'pairs parents....'
+    else:
+        parentA_index_list = RandomChoose(len(flatList), M, N)
+        for index in parentA_index_list:
+            parentA_list.append(flatList[index])
+        parentB_index_list = RandomChoose(len(flatList), M, N)
+        for index in parentB_index_list:
+            parentB_list.append(flatList[index])
+
     return parentA_list, parentB_list
