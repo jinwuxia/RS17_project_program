@@ -7,7 +7,7 @@ def MutationOnIndiv(indiv):
     else:
         substr = '0'
     mu_indiv = indiv[0:index] + substr + indiv[index + 1: len(indiv)]
-    print 'mutation index=', index, ' indiv=', indiv, '  mu_indiv=', mu_indiv
+    #print 'mutation index=', index, ' indiv=', indiv, '  mu_indiv=', mu_indiv
     return mu_indiv
 
 

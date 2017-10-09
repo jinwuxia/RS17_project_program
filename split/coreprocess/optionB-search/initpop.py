@@ -34,7 +34,7 @@ def InitPop(N, x_s, x_e, y_s, y_e, bitCount_x, bitCount_y):
         yibit = Dec2bit(yi, bitCount_y)
         oneStr = xibit + yibit
         pop_list.append(oneStr)
-        print xi, xibit, yi, yibit, oneStr
+        #print xi, xibit, yi, yibit, oneStr
     return  pop_list
 
 #

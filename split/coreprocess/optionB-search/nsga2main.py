@@ -44,8 +44,8 @@ def CheckChildrenValid(new_pop_list, x_s, x_e, y_s, y_e, bitCount_x, bitCount_y)
 def GenFirstGeneration(pop_list):
     [layerList, indivRankDict] = fastnondomsort.FastNondomSort(pop_list)
     [parentA_list, parentB_list] = selectpop.SelectPop_Jinbiao(layerList, M, K) #K pairs
-    print 'parentA:', parentA_list
-    print 'parentB:', parentB_list
+    #print 'parentA:', parentA_list
+    #print 'parentB:', parentB_list
 
     while True:
         children_list = list()
@@ -56,15 +56,16 @@ def GenFirstGeneration(pop_list):
         children_list = list(set(children_list))
         invalidLen = CheckChildrenValid(children_list, X_S, X_E, Y_S, Y_E, BIT_COUNT_X, BIT_COUNT_Y)
         if invalidLen == 0:
-            print 'After crossover, new_pop_list=', children_list
+            #print 'After crossover, new_pop_list=', children_list
             break
         else:
-            print 'invalidLen = ', invalidLen, ';    continue crossover...'
+            #print 'invalidLen = ', invalidLen, ';    continue crossover...'
+            print ''
 
 
     mutation_rd = random.random()
     if mutation_rd < MUTATION_PROBABILITY:
-        print 'Mutation...'
+        #print 'Mutation...'
         #make sure the mutation result is valid
         children_list = mutation.Mutation(children_list, list(), 'random', X_S, X_E, Y_S, Y_E, BIT_COUNT_X, BIT_COUNT_Y)
     pop_list.extend(parentA_list)
@@ -91,28 +92,29 @@ def GenOtherGeneration(pop_list, selectedSize):
     parents_list = list()
     for index in range(0, selectedSize):
         parents_list.append(pop_object_list[index].indiv)
-    print 'elicit selected over: ', parents_list
+    #print 'elicit selected over: ', parents_list
 
     #step4: crossover by using selected_pop, generate new generation
-    print 'Crossover.until all children are valid....'
+    #print 'Crossover.until all children are valid....'
     while True:
         children_list = crossover.Crossover([BIT_COUNT_X, BIT_COUNT_Y], parents_list, CROSS_OPERATOR)
         invalidLen = CheckChildrenValid(children_list, X_S, X_E, Y_S, Y_E, BIT_COUNT_X, BIT_COUNT_Y)
         if invalidLen == 0:
-            print 'After crossover, children_list=', children_list
+            #print 'After crossover, children_list=', children_list
             break
         else:
-            print 'invalidLen = ', invalidLen, ';    continue crossover...'
+            print ''
+            #print 'invalidLen = ', invalidLen, ';    continue crossover...'
 
 
     #step5: mutation in a small probability
     mutation_rd = random.random()
     if mutation_rd < MUTATION_PROBABILITY:
-        print 'Mutation...'
+        #print 'Mutation...'
         #make sure the mutation result is valid
         children_list = mutation.Mutation(children_list, list(), MUTATION_OPERATOR,\
                                              X_S, X_E, Y_S, Y_E, BIT_COUNT_X, BIT_COUNT_Y)
-        print 'after Mutation, children_list: ', children_list
+        #print 'after Mutation, children_list: ', children_list
 
 
     #merge parents and children
@@ -134,8 +136,8 @@ def IsStop(kgen, old_pop_list, new_pop_list):
     for each in new_pop_list:
         [x, y] = initpop.TransCode2Indiv(each, BIT_COUNT_X, BIT_COUNT_Y)
         new_pop_num_list.append(str(x) + ',' + str(y))
-    print 'old_pop_list=           ', old_pop_list, '; ', old_pop_num_list
-    print 'new_pop_list=           ', new_pop_list, '; ', new_pop_num_list
+    #print 'old_pop_list=           ', old_pop_list, '; ', old_pop_num_list
+    #print 'new_pop_list=           ', new_pop_list, '; ', new_pop_num_list
 
     if kgen > config.GlobalVar.MAX_ITERATION_LOOP:
         return True
@@ -154,8 +156,8 @@ def IsStop(kgen, old_pop_list, new_pop_list):
     old_avg3 = sum(old_fitness_value_list3) / len(old_fitness_value_list3)
     new_avg3 = sum(new_fitness_value_list3) / len(new_fitness_value_list3)
 
-    print 'old fitness avg=  withinwf, clusternum, repclassnum = ', old_avg1, old_avg2, old_avg3
-    print 'new fitness avg=  withinwf, clusternum, repclassnum = ', new_avg1, new_avg2, new_avg3
+    #print 'old fitness avg=  withinwf, clusternum, repclassnum = ', old_avg1, old_avg2, old_avg3
+    #print 'new fitness avg=  withinwf, clusternum, repclassnum = ', new_avg1, new_avg2, new_avg3
 
     #is stable
     if abs(old_avg1 - new_avg1) <= 0.00001 and abs(old_avg2 - new_avg2) <= 0.00001 and abs(old_avg3 - new_avg3) <= 0.00001:  #on line
@@ -174,25 +176,38 @@ if __name__ == '__main__':
     for serv in OBJECT_STRUCT_DICT:
         for thr_int in OBJECT_STRUCT_DICT[serv]:
             one = OBJECT_STRUCT_DICT[serv][thr_int]
-            print serv, thr_int, one.nonlapClassCount, one.nonlapClassCount_avg, one.withinWorkflow, one.interWorklow, one.APINum, one.APINum_avg
-    print 'loadFitness finished....\n'
+            #print serv, thr_int, one.nonlapClassCount, one.nonlapClassCount_avg, one.withinWorkflow, one.interWorklow, one.APINum, one.APINum_avg
+    #print 'loadFitness finished....\n'
 
     #step 1
     pop_list = initpop.InitPop(N, X_S, X_E, Y_S, Y_E, BIT_COUNT_X, BIT_COUNT_Y)
-    print 'init pop: ', pop_list
-    print 'population initialization finished....\n'
+    #print 'init pop: ', pop_list
+    #print 'population initialization finished....\n'
 
 
     kgen = 1
     while(True):
         if kgen == 1:
             new_pop_list = GenFirstGeneration(pop_list)
-            print 'generate 1 st = ', new_pop_list, '\n'
+            #print 'generate 1 st = ', new_pop_list, '\n'
         else:
             new_pop_list = GenOtherGeneration(pop_list, selectedSize=config.GlobalVar.K)
-            print 'generate', kgen, 'st =', new_pop_list, '\n'
+            #print 'generate', kgen, 'st =', new_pop_list, '\n'
         if IsStop(kgen, pop_list, new_pop_list):
             break
         else:
             pop_list = new_pop_list
             kgen += 1
+
+    #print final result
+    #print '\n\nFinal result:'
+    for indiv in new_pop_list:
+        [xi, yi] = initpop.TransCode2Indiv(indiv, BIT_COUNT_X, BIT_COUNT_Y)
+        one = OBJECT_STRUCT_DICT[xi][yi]
+        print str(xi) + ',' + str(yi) + ',' \
+        + str(one.overlapClassCount) + ',' \
+        + str(one.withinWorkflow) + ',' \
+        + str(one.interWorklow) + ',' \
+        + str(one.interCallNum) + ',' \
+        + str(one.repeatClassCount) + ',' \
+        + str(one.APINum)

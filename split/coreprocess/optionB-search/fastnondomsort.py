@@ -46,8 +46,8 @@ def InitDominate(pop_list):
 #return layerList , and indiv's rank/layer number
 def FastNondomSort(pop_list):
     [dominateSetDict, isDominatedDict] = InitDominate(pop_list)
-    print 'dominateSetDict=', dominateSetDict
-    print 'isDominatedDict=', isDominatedDict
+    #print 'dominateSetDict=', dominateSetDict
+    #print 'isDominatedDict=', isDominatedDict
     layerList = list() #list[1] = [indiv1. ....]
     indivRankDict = dict() #[indiv] = rank
     #init F_list
@@ -68,9 +68,9 @@ def FastNondomSort(pop_list):
         #current layer save, and use a new layer
         layerList.append(F_list)
         F_list = new_F_list
-        print 'layer: ', layer, '=', layerList[layer]
+        #print 'layer: ', layer, '=', layerList[layer]
         layer += 1
-    print 'quick nondoninate sort end..........\n'
+    #print 'quick nondoninate sort end..........\n'
 
     for rank in range(0, len(layerList)):
         for indiv in layerList[rank]:

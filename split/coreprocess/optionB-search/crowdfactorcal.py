@@ -44,8 +44,8 @@ def ComputeCrowd(layerList, fitnessMethodList):
         for fitnessMethod in fitnessMethodList:
             fitness_list = fitness.GetFitnessList(fitnessMethod, pop_list)
             [fitness_min, fitness_max, sortedObjectList] = SortThisLayer(pop_list, fitness_list)
-            print 'compute crowd: pop_list=', pop_list
-            print 'compute crowd: fitness_list=', fitness_list
+            #print 'compute crowd: pop_list=', pop_list
+            #print 'compute crowd: fitness_list=', fitness_list
             #marin_left indiv
             crowdDict[sortedObjectList[0].indiv] = MAX_VALUE
             #margin_right indiv
