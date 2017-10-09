@@ -1,3 +1,6 @@
+'''
+multi-object optimzation using NSGAII
+'''
 import config
 import fitness
 import fastnondomsort
@@ -19,7 +22,7 @@ BIT_COUNT_X = config.GlobalVar.BIT_COUNT_X
 BIT_COUNT_Y = config.GlobalVar.BIT_COUNT_Y
 CROSS_OPERATOR = config.GlobalVar.CROSS_OPERATOR
 MUTATION_PROBABILITY = config.GlobalVar.MUTATION_PROBABILITY
-MUTATION_OPERATOR = 'random'
+MUTATION_OPERATOR = config.GlobalVar.MUTATION_OPERATOR
 FITNESSFILENAME = config.GlobalVar.FITNESSFILENAME
 FITNESS_METHOD_LIST = config.GlobalVar.FITNESS_METHOD_LIST
 

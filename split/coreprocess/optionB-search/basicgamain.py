@@ -1,3 +1,8 @@
+'''
+single pbject optimzation
+'''
+
+
 #judge the search iteration condition
 def IsStop(kgen, old_pop_list, new_pop_list, old_fitness_value_list, new_fitness_value_list):
     import config

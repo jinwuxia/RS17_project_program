@@ -3,6 +3,7 @@ class GlobalVar:
     N = 14 #initial populization size, each generation size = intialSize
     M = 8 #silect base
     K = 6 #elict parents
+    
     #for jpetstore6
     X_S = 2
     X_E = 10
@@ -36,7 +37,7 @@ class GlobalVar:
     #CHILDREN_NUM = 4
 
     MUTATION_PROBABILITY = 0.02
-    MUTATION_OPERATOR = 'worse' #random  or worse
+    MUTATION_OPERATOR = 'random' #random  or worse
 
 def set_object_struct(oneDict):
     GlobalVar.OBJECT_STRUCT_DICT = oneDict
