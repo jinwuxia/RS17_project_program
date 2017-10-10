@@ -38,3 +38,41 @@ python ../../coreprocess/traceParser.py  coreprocess/jforum219_testcase1_20_clas
 
 in linux:   ./batch_processOverlap.sh
 in linux: ./batch_analyzeProcessOverlapRes.sh > log.csv
+
+
+#enum lapclass, nonlap class, all thr and servers' custer result
+cd coreprocess/optionA-enum
+python enum.py project_fitness.csv
+#generate above componentAPI
+in linux: ./batch_getcomponentAPI.sh
+
+
+
+#coreprocess automaticlaly decide the servernum and thr using NSGAII
+cd coreprocess/optionB-search
+python nsga2main.py  > jpetstore6_nsga.csv #set parameter in config.py
+#munal analyze the jpetstore6_nsga.csv
+
+
+
+
+
+-------------------------------------------------------------------REFER TO CMD.SH
+
+#------------------------------------------------
+#get testcase_all_calss.csv
+
+#get all class(using understrand)
+
+#get no_ts_cover_class(not include dao,view) and testcase_common_class(not include dao,view)
+
+
+
+#-------------------------------------------------
+#process testcase_common_class :    or not process:  only one cluster
+
+
+#function-core class merged into existing clusters using struct dep
+
+
+#other unprocessed no-ts-cover-class clustering inside using struct dep(beacuse commDep = 0, no-cover)
