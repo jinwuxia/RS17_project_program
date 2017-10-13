@@ -50,8 +50,8 @@ def ReadAPIFile(fileName):
             apiDict[apiID] = oneObejct
             clusterID2Interf2ApiDict[clusterID][interface].append(apiID)
             apiID += 1
-    print clusterID2Interf2ApiDict
-    print apiDict
+    #print clusterID2Interf2ApiDict
+    #print apiDict
     return clusterID2Interf2ApiDict, apiDict
 
 
@@ -77,7 +77,7 @@ def GetEdge_half(interSet, unionSet):
     if len(interSet) != 0:
         edge_unwei = 1
         edge_wei = len(interSet) / float(len(unionSet))
-    print edge_unwei, edge_wei
+    #print edge_unwei, edge_wei
     return edge_unwei, edge_wei
 
 
@@ -129,12 +129,16 @@ if __name__ == '__main__':
     [g_clusterID2Interf2APIDict, g_apiDict] = ReadAPIFile(apiFileName)
     msg_cohesion_wei_list = list()
     msg_cohesion_unwei_list = list()
-    for clusterID in g_clusterID2Interf2APIDict:
-        for interface in g_clusterID2Interf2APIDict[clusterID]:
-            [msg_cohesion_wei, msg_cohesion_unwei] = Metric_msg_cohesion(clusterID, interface)
-            print str(clusterID) + ',' + interface + ',' + str(msg_cohesion_wei) + ',' +  str(msg_cohesion_unwei)
-            msg_cohesion_wei_list.append(msg_cohesion_wei)
-            msg_cohesion_unwei_list.append(msg_cohesion_unwei)
-    msg_avg_wei = sum(msg_cohesion_wei_list) / float(len(msg_cohesion_wei_list))
-    msg_avg_unwei = sum(msg_cohesion_unwei_list) / float(len(msg_cohesion_unwei_list))
-    print 'msg_avg_wei=', msg_avg_wei, 'msg_avg_unwei', msg_avg_unwei
+
+    if len(g_clusterID2Interf2APIDict) == 0:
+        print  'msg_avg_wei=', 1, 'msg_avg_unwei', 1
+    else:
+        for clusterID in g_clusterID2Interf2APIDict:
+            for interface in g_clusterID2Interf2APIDict[clusterID]:
+                [msg_cohesion_wei, msg_cohesion_unwei] = Metric_msg_cohesion(clusterID, interface)
+                #print str(clusterID) + ',' + interface + ',' + str(msg_cohesion_wei) + ',' +  str(msg_cohesion_unwei)
+                msg_cohesion_wei_list.append(msg_cohesion_wei)
+                msg_cohesion_unwei_list.append(msg_cohesion_unwei)
+        msg_avg_wei = sum(msg_cohesion_wei_list) / float(len(msg_cohesion_wei_list))
+        msg_avg_unwei = sum(msg_cohesion_unwei_list) / float(len(msg_cohesion_unwei_list))
+        print 'msg_avg_wei=', msg_avg_wei, 'msg_avg_unwei', msg_avg_unwei
