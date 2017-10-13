@@ -173,3 +173,8 @@ if __name__ == '__main__':
         avg_dom_cohesion_wei = sum(dom_cohesion_wei_list) / float(len(dom_cohesion_wei_list))
         avg_dom_cohesion_unwei = sum(dom_cohesion_unwei_list) / float(len(dom_cohesion_unwei_list))
         print 'avg_dom_cohesion_wei=', avg_dom_cohesion_wei, 'avg_dom_cohesion_unwei=', avg_dom_cohesion_unwei
+
+        interface_number = 0
+        for clusterID in g_clusterID2Interf2APIDict:
+            interface_number += len(g_clusterID2Interf2APIDict[clusterID])
+        print 'interface number=', interface_number

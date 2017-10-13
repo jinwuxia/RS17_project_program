@@ -142,3 +142,8 @@ if __name__ == '__main__':
         msg_avg_wei = sum(msg_cohesion_wei_list) / float(len(msg_cohesion_wei_list))
         msg_avg_unwei = sum(msg_cohesion_unwei_list) / float(len(msg_cohesion_unwei_list))
         print 'msg_avg_wei=', msg_avg_wei, 'msg_avg_unwei', msg_avg_unwei
+
+        interface_number = 0
+        for clusterID in g_clusterID2Interf2APIDict:
+            interface_number += len(g_clusterID2Interf2APIDict[clusterID])
+        print 'interface number=', interface_number
