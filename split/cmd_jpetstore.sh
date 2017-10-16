@@ -50,10 +50,20 @@ in linux: ./batch_getcomponentAPI.sh
 
 #coreprocess automaticlaly decide the servernum and thr using NSGAII
 cd coreprocess/optionB-search
-python nsga2main.py  > jpetstore6_nsga.csv #set parameter in config.py
-#munal analyze the jpetstore6_nsga.csv
+python nsga2main.py   jpetstore6_nsga.csv   jpetstore6_nsga_best.csv #set parameter in config.py
+
+#compare with random
+python randmaim.py jpetstore6_randall.csv
 
 
+#use the nsga average as the result, then analsis jpetstore6_nsga.csv
+#interface, api,peravg
+
+
+#measurement cohesion and coupling         public vs private
+python tosc-interd-msg-cohesion.py   servnum-thr-clusterAPI.csv
+python tosc-interd-dom-cohesion.py   servnum-thr-clusterAPI.csv
+python tosc-interd-dom-cohesion-public .py   testcasecluster.csv
 
 
 
