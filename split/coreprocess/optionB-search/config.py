@@ -3,23 +3,23 @@ class GlobalVar:
     N = 14 #initial populization size, each generation size = intialSize
     M = 8 #silect base
     K = 6 #elict parents
-
+    '''
     #for jpetstore6
-    X_S = 3 #2
-    X_E = 4 #10
+    X_S = 2#3 #2
+    X_E = 10#4 #10
     BIT_COUNT_X = 4
     BIT_COUNT_Y = 7
     FITNESSFILENAME = '../../../testcase_data/jpetstore6/coreprocess/jpetstore6-fitness.csv'
     '''
     #for jforum219_1
-    X_S = 20 #18
-    X_E = 30 #47
+    X_S =18 #20 #18
+    X_E = 47#30 #47
     BIT_COUNT_X = 6
     BIT_COUNT_Y = 7
     FITNESSFILENAME = '../../../testcase_data/jforum219_1/coreprocess/jforum219-fitness.csv'
-    '''
+
     Y_S = 10
-    Y_E = 50
+    Y_E = 100 #50
 
     OBJECT_STRUCT_DICT = dict()
     FITNESS_METHOD = 'withinwf-interwf-repclass'  #or withinwf or withinwf-interwf-repclass

@@ -8,15 +8,41 @@ import config
 import initpop
 import fitness
 
-N = 12 #initial populization size, each generation size = intialSize
-X_S = config.GlobalVar.X_S
-X_E = config.GlobalVar.X_E
-Y_S = config.GlobalVar.Y_S
-Y_E = config.GlobalVar.Y_E
-BIT_COUNT_X = config.GlobalVar.BIT_COUNT_X
-BIT_COUNT_Y = config.GlobalVar.BIT_COUNT_Y
-FITNESSFILENAME = config.GlobalVar.FITNESSFILENAME
-FITNESS_METHOD_LIST = config.GlobalVar.FITNESS_METHOD_LIST
+#for jpetstore6
+X_S = 2#3 #2
+X_E = 10 #4 #10
+BIT_COUNT_X = 4
+BIT_COUNT_Y = 7
+FITNESSFILENAME = '../../../testcase_data/jpetstore6/coreprocess/jpetstore6-fitness.csv'
+'''
+#for jforum219_1
+X_S = 18 #20 #18
+X_E = 47 #30 #47
+BIT_COUNT_X = 6
+BIT_COUNT_Y = 7
+FITNESSFILENAME = '../../../testcase_data/jforum219_1/coreprocess/jforum219-fitness.csv'
+'''
+Y_S = 10
+Y_E = 100 #50
+
+
+
+def InitPop(N, x_s, x_e, y_s, y_e, bitCount_x, bitCount_y):
+    pop_list = list()
+    import random
+
+    while len(pop_list) < N:
+        #x=[1,1,2,...,10]
+        xi = random.randint(x_s, x_e)
+        #y=[1,2,...,100]
+        yi = random.randint(y_s, y_e)
+
+        xibit = initpop.Dec2bit(xi, bitCount_x)
+        yibit = initpop.Dec2bit(yi, bitCount_y)
+        oneStr = xibit + yibit
+        pop_list.append(oneStr)
+        #print xi, xibit, yi, yibit, oneStr
+    return  pop_list
 
 
 def Write2CSV(listlist, fileName):
@@ -27,7 +53,6 @@ def Write2CSV(listlist, fileName):
 
 if __name__ == '__main__':
     allFileName =  sys.argv[1]
-    bestFileName = sys.argv[2]
 
     fitness.loadFitness(FITNESSFILENAME) #set OBJECT_STRUCT_DICT
     OBJECT_STRUCT_DICT = config.get_object_struct()
@@ -38,37 +63,13 @@ if __name__ == '__main__':
     #print 'loadFitness finished....\n'
 
     all_result_list = list()
-    best_fitness_list = list() #[]= [withinWorkflow , -repeat, clusternum] 30times
-    for i in range (0, 30):
-        pop_list = initpop.InitPop(N, X_S, X_E, Y_S, Y_E, BIT_COUNT_X, BIT_COUNT_Y)
+    all_result_list.append(['servnum', 'thr', 'overlapClassCount', 'interWorklow', 'interCallNum', 'APINum', 'withinWorkflow', 'repeatClassCount', 'realClusterNum'])
 
-        best_cluster_tmp = list()
-        best_repeat_tmp = list()
-        best_within_tmp = list()
-        for indiv in pop_list:
-            [xi, yi] = initpop.TransCode2Indiv(indiv, BIT_COUNT_X, BIT_COUNT_Y)
-            one = OBJECT_STRUCT_DICT[xi][yi]
-            '''
-            strstr = str(xi) + ',' + str(yi) + ',' \
-            + str(one.overlapClassCount) + ',' \
-            + str(one.withinWorkflow) + ',' \
-            + str(one.interWorklow) + ',' \
-            + str(one.interCallNum) + ',' \
-            + str(one.repeatClassCount) + ',' \
-            + str(one.APINum)
-            '''
-
-            all_result_list.append([xi, yi, one.overlapClassCount, one.withinWorkflow, one.interWorklow, one.interCallNum, one.repeatClassCount, one.APINum])
-
-            best_within_tmp.append(one.withinWorkflow)
-            best_repeat_tmp.append(-one.repeatClassCount)
-            best_cluster_tmp.append(one.realClusterNum)
-
-        within = sum(best_within_tmp) / len(best_within_tmp)
-        repeat = sum(best_repeat_tmp) / len(best_repeat_tmp)
-        cluster = sum(best_cluster_tmp) / len(best_cluster_tmp)
-        best_fitness_list.append([within, repeat, cluster])
+    pop_list = InitPop(30, X_S, X_E, Y_S, Y_E, BIT_COUNT_X, BIT_COUNT_Y)
+    for indiv in pop_list:
+        [xi, yi] = initpop.TransCode2Indiv(indiv, BIT_COUNT_X, BIT_COUNT_Y)
+        one = OBJECT_STRUCT_DICT[xi][yi]
+        all_result_list.append([xi, yi, one.overlapClassCount, one.interWorklow, one.interCallNum, one.APINum, one.withinWorkflow, -one.repeatClassCount, one.realClusterNum])
 
     #save to csv
     Write2CSV(all_result_list, allFileName)
-    Write2CSV(best_fitness_list, bestFileName)

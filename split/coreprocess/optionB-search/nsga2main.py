@@ -1,6 +1,8 @@
 '''
 multi-object optimzation using NSGAII
 '''
+import sys
+import csv
 import config
 import fitness
 import fastnondomsort
@@ -169,45 +171,72 @@ def IsStop(kgen, old_pop_list, new_pop_list):
 
     return False
 
-
-if __name__ == '__main__':
-    fitness.loadFitness(FITNESSFILENAME) #set OBJECT_STRUCT_DICT
-    OBJECT_STRUCT_DICT = config.get_object_struct()
-    for serv in OBJECT_STRUCT_DICT:
-        for thr_int in OBJECT_STRUCT_DICT[serv]:
-            one = OBJECT_STRUCT_DICT[serv][thr_int]
-            #print serv, thr_int, one.nonlapClassCount, one.nonlapClassCount_avg, one.withinWorkflow, one.interWorklow, one.APINum, one.APINum_avg
-    #print 'loadFitness finished....\n'
-
+def Mainloop():
     #step 1
     pop_list = initpop.InitPop(N, X_S, X_E, Y_S, Y_E, BIT_COUNT_X, BIT_COUNT_Y)
-    #print 'init pop: ', pop_list
-    #print 'population initialization finished....\n'
-
+    print 'init pop: ', pop_list
+    print 'population initialization finished....\n'
 
     kgen = 1
     while(True):
         if kgen == 1:
             new_pop_list = GenFirstGeneration(pop_list)
-            #print 'generate 1 st = ', new_pop_list, '\n'
+            print 'generate 1 st = ', new_pop_list, '\n'
         else:
             new_pop_list = GenOtherGeneration(pop_list, selectedSize=config.GlobalVar.K)
-            #print 'generate', kgen, 'st =', new_pop_list, '\n'
+            print 'generate', kgen, 'st =', new_pop_list, '\n'
         if IsStop(kgen, pop_list, new_pop_list):
             break
         else:
             pop_list = new_pop_list
             kgen += 1
 
-    #print final result
-    #print '\n\nFinal result:'
-    for indiv in new_pop_list:
-        [xi, yi] = initpop.TransCode2Indiv(indiv, BIT_COUNT_X, BIT_COUNT_Y)
-        one = OBJECT_STRUCT_DICT[xi][yi]
-        print str(xi) + ',' + str(yi) + ',' \
-        + str(one.overlapClassCount) + ',' \
-        + str(one.withinWorkflow) + ',' \
-        + str(one.interWorklow) + ',' \
-        + str(one.interCallNum) + ',' \
-        + str(one.repeatClassCount) + ',' \
-        + str(one.APINum)
+    return new_pop_list
+
+
+def Write2CSV(listlist, fileName):
+    with open(fileName, 'wb') as fp:
+        writer = csv.writer(fp)
+        writer.writerows(listlist)
+    print fileName
+
+if __name__ == '__main__':
+    allFitnessFileName = sys.argv[1]
+    bestFitnessFileName = sys.argv[2]
+
+    fitness.loadFitness(FITNESSFILENAME) #set OBJECT_STRUCT_DICT
+    OBJECT_STRUCT_DICT = config.get_object_struct()
+    for serv in OBJECT_STRUCT_DICT:
+        for thr_int in OBJECT_STRUCT_DICT[serv]:
+            one = OBJECT_STRUCT_DICT[serv][thr_int]
+            print serv, thr_int, one.nonlapClassCount, one.nonlapClassCount_avg, one.withinWorkflow, one.interWorklow, one.APINum, one.APINum_avg
+    print 'loadFitness finished....\n'
+
+    best_fitness_list = list()
+    best_fitness_list.append(['withinWorkflow', '-repeatClassCount', 'realClusterNum'])
+    all_fitness_list = list()
+    all_fitness_list.append(['servnum', 'thr', 'overlapClassCount', 'interWorklow', 'interCallNum', 'APINum', 'withinWorkflow', '-repeatClassCount', 'realClusterNum'])
+    for times in range(0, 30):
+        new_pop_list = Mainloop()
+        for indiv in new_pop_list:
+            [xi, yi] = initpop.TransCode2Indiv(indiv, BIT_COUNT_X, BIT_COUNT_Y)
+            one = OBJECT_STRUCT_DICT[xi][yi]
+            all_fitness_list.append([xi, yi, one.overlapClassCount, one.interWorklow,\
+                one.interCallNum, one.APINum, one.withinWorkflow, -one.repeatClassCount, one.realClusterNum])
+
+        withinWorkflow_tmp = list()
+        repeatClassCount_tmp = list()
+        realClusterNum_tmp = list()
+        for indiv in new_pop_list:
+            [xi, yi] = initpop.TransCode2Indiv(indiv, BIT_COUNT_X, BIT_COUNT_Y)
+            one = OBJECT_STRUCT_DICT[xi][yi]
+            withinWorkflow_tmp.append(one.withinWorkflow)
+            repeatClassCount_tmp.append(-one.repeatClassCount)
+            realClusterNum_tmp.append(one.realClusterNum)
+        withinWorkflow_best = max(withinWorkflow_tmp)
+        repeatClassCount_best = max(repeatClassCount_tmp)
+        realClusterNum_best = max(realClusterNum_tmp)
+        best_fitness_list.append([withinWorkflow_best, repeatClassCount_best, realClusterNum_best])
+
+    Write2CSV(all_fitness_list, allFitnessFileName)
+    Write2CSV(best_fitness_list ,bestFitnessFileName)
