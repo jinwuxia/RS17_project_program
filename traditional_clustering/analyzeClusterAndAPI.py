@@ -6,14 +6,9 @@ CLASSID2NAMEDict = dict() #[classID] = className
 CLASSID2CLUSTERDict = dict() #[classID] = list[clusterID]
 CLUSTERID2CLASSDict = dict() #[clusterID] = list[classID]
 
-CLUSTERID2TSDict = dict() #[clusterID] = [testcaseID1, id2, ..]
-TSID2NAMEDict = dict()   #[testcaseID] = testcaseName
-
-
 TRACEList = list()  #[traceID] = list()=[ edgeID1, edgeID2 ...]
 METHODList = list()  #[methodID] = METHOD()
 EDGEList = list()   #[edgeID] = EDGE()
-EDGEDict = dict()  #dict[methodID1][methodID2] = edgeID
 
 class MethodNode:
     def __init__(self, ID, justname, longname, shortname, className, parameter, returnType):
@@ -69,13 +64,13 @@ def getShortName(methodName, para):
 
 
 #return TRACEList
-# methodNodeList,    methodEdgeList. egdeDict
+# methodNodeList,    methodEdgeList
 def readWorkflowFile(filename):
     methodIndex = 0
     edgeIndex = 0
     tmpMethodDict = dict() #dict(methodname) = ID
     tmpClassDict = dict()  #dict(className) = ID
-
+    tmpEdgeDict = dict()  #dict[startID][endID] = edgeIndex
     with open(filename, "rb") as fp:
         reader = csv.reader(fp)
         for each in reader:
@@ -100,15 +95,15 @@ def readWorkflowFile(filename):
 
             startID = tmpMethodDict[startLongName]
             endID = tmpMethodDict[endLongName]
-            if startID not in EDGEDict:
-                EDGEDict[startID] = dict()
-            if endID not in EDGEDict[startID]:
-                EDGEDict[startID][endID] = edgeIndex
+            if startID not in tmpEdgeDict:
+                tmpEdgeDict[startID] = dict()
+            if endID not in tmpEdgeDict[startID]:
+                tmpEdgeDict[startID][endID] = edgeIndex
                 oneEdge = MethodEdge(startID, endID)
                 EDGEList.append(oneEdge)
                 edgeIndex += 1
 
-            edgeID = EDGEDict[startID][endID]
+            edgeID = tmpEdgeDict[startID][endID]
             currentLen = len(TRACEList)
             if int(traceID) == currentLen:
                 TRACEList.append(list())
@@ -118,38 +113,32 @@ def readWorkflowFile(filename):
 def isInterEdge(startID, endID):
     className1 = METHODList[startID].className
     className2 = METHODList[endID].className
-    #print 'methodName1=',METHODList[startID].justname, 'methodName2=',METHODList[endID].justname
-    #print 'className1=',className1, 'className2=',className2
     classID1 = -1
     classID2 = -1
-    clusterIDList1 = list()
-    clusterIDList2 = list()
+
     if className1 in CLASSNAME2IDDict:
         classID1 = CLASSNAME2IDDict[className1]
     if className2 in CLASSNAME2IDDict:
         classID2 = CLASSNAME2IDDict[className2]
     if classID1 != -1:
-        clusterIDList1 = CLASSID2CLUSTERDict[classID1]
+        clusterID1 = CLASSID2CLUSTERDict[classID1]
+    else:
+        clusterID = -1
     if classID2 != -1:
-        clusterIDList2 = CLASSID2CLUSTERDict[classID2]
-    '''
-    if classID1 != -1:
-        print 'classID1=', classID1
-    if classID2 != -1:
-        print 'classID2=', classID2
-    '''
+        clusterID2 = CLASSID2CLUSTERDict[classID2]
+    else:
+        clusterID = -1
+    #print classID1,classID2,
+    #print className1, className2
+    #print clusterID1, clusterID2
     if classID1 == -1:
         return False
     if classID2 == -1:
         return False
     if classID1 != -1 and classID2 != -1:
-        set1 = set(clusterIDList1)
-        set2 = set(clusterIDList2)
-        if len(set1 & set2) != 0:
+        if clusterID1 == clusterID2:
             return False
     return True
-
-
 
 #operate TRACEList[traceID]=[edgeID1, edgeID2]
 #generate res[traceID][interedgeID] = count
@@ -176,14 +165,12 @@ def filterOutInterEdge():
 #generate res[traceID][interedgeID] = count
 def workflowMetric(interDict):
     interComWfCount = 0 # workflow number which need inter-omponent communication
-    withinComWfCount = 0 #  ..............which not need inter-omponent communication
     interCallCount = 0   #sum up interCallCount in allworkflow
     interCallCount_avg = 0 #interCallCount per allworkflow
     interCallCount_f = 0
     interCallCount_avg_f = 0
 
     interComWfCount = len(interDict)
-    withinComWfCount = len(TSID2NAMEDict) - interComWfCount
     tmpList = list()
     for traceID in interDict:
         keyList = interDict[traceID].keys()  #interEdgeIDList
@@ -204,16 +191,8 @@ def workflowMetric(interDict):
     else:
         interCallCount_avg_f = 0.0
 
-    return interComWfCount, withinComWfCount, interCallCount, interCallCount_avg, interCallCount_f, interCallCount_avg_f
+    return interComWfCount, interCallCount, interCallCount_avg, interCallCount_f, interCallCount_avg_f
 
-
-def getClustersofClass(classID):
-    resList = list()
-    for clusterID in CLUSTERID2CLASSDict:
-        classIDList = CLUSTERID2CLASSDict[clusterID]
-        if classID in classIDList:
-            resList.append(clusterID)
-    return resList
 
 def isInitMethod(methodID):
     methodName = METHODList[methodID].justname
@@ -239,15 +218,32 @@ def extractAPI(interDict):
             if className2 in CLASSNAME2IDDict:
                 classID2 = CLASSNAME2IDDict[className2]
                 #print 'classID=',classID2,
-                itsClusterIDList = getClustersofClass(classID2)
-
-                for eachClusterID in itsClusterIDList:
-                    if eachClusterID not in clusterAPIDict:
-                        clusterAPIDict[eachClusterID] = dict()
-                    if isInitMethod(oneEdge.endID) == False and (oneEdge.endID not in clusterAPIDict[eachClusterID]):
-                        clusterAPIDict[eachClusterID][oneEdge.endID] = 1
-
+                itsClusterID = CLASSID2CLUSTERDict[classID2]
+                if itsClusterID not in clusterAPIDict:
+                    clusterAPIDict[itsClusterID] = dict()
+                if isInitMethod(oneEdge.endID) == False and (oneEdge.endID not in clusterAPIDict[itsClusterID]):
+                    clusterAPIDict[itsClusterID][oneEdge.endID] = 1
     return clusterAPIDict
+
+#clusterAPIDict[clusterID][apiID] = 1
+def writeAPI(clusterAPIDict, fileName):
+    resList = list()
+    resList.append(['clusterID', 'api', 'parameter', 'return'])
+    for clusterID in clusterAPIDict:
+        for methodID in clusterAPIDict[clusterID]:
+            tmpList = list()
+            tmpList.append(clusterID)
+            oneMethod = METHODList[methodID]
+            tmpList.append(oneMethod.justname)
+            tmpList.append(oneMethod.parameter)
+            tmpList.append(oneMethod.returnType)
+            resList.append(tmpList)
+
+    with open(fileName, 'wb') as fp:
+        writer = csv.writer(fp)
+        writer.writerows(resList)
+    print fileName
+
 
 # clusterAPIDict[clusterID][apiID] = 1
 def APIMetric(clusterAPIDict):
@@ -263,28 +259,27 @@ def APIMetric(clusterAPIDict):
         APICount_avg = 0
     return APICount, APICount_avg
 
-
-def readOverlapResFile(fileName):
+def readClusterFile(fileName):
     classID2NameDict = dict()
     className2IDDict = dict()
     classID2ClusterDict = dict()
     clusterID2ClassDict = dict()
+    classIndex = 0
     with open(fileName, 'rb') as fp:
         reader = csv.reader(fp)
         for each in reader:
-            [classID, className, clusterID] = each
-            if classID == 'classID':
+            [containes, clusterID, className] = each
+            if containes == 'containes':
                 continue
-            classID = int(classID)
             clusterID = int(clusterID)
-            if classID not in classID2NameDict:
-                classID2NameDict[classID] = className
-                className2IDDict[className] = classID
 
-            if classID not in classID2ClusterDict:
-                classID2ClusterDict[classID] = list()
-            classID2ClusterDict[classID].append(clusterID)
+            if className not in className2IDDict:
+                className2IDDict[className] = classIndex
+                classID2NameDict[classIndex] = className
+                classIndex += 1
 
+            classID = className2IDDict[className]
+            classID2ClusterDict[classID] = clusterID
             if clusterID not in clusterID2ClassDict:
                 clusterID2ClassDict[clusterID] = list()
             clusterID2ClassDict[clusterID].append(classID)
@@ -294,80 +289,32 @@ def readOverlapResFile(fileName):
     return classID2NameDict, className2IDDict, classID2ClusterDict, clusterID2ClassDict
 
 
-def readTestCaseClusterFile(fileName):
-    clusterID2TsDict = dict()
-    tsID2NameDict = dict()
-    with open(fileName, 'rb') as fp:
-        reader = csv.reader(fp)
-        for each in reader:
-            [clusterID, testcaseID, testcaseName] = each
-            clusterID = int(clusterID)
-            testcaseID = int(testcaseID)
-            if clusterID not in clusterID2TsDict:
-                clusterID2TsDict[clusterID] = list()
-            clusterID2TsDict[clusterID].append(testcaseID)
-
-            if testcaseID not in tsID2NameDict:
-                tsID2NameDict[testcaseID] = testcaseName
-    return clusterID2TsDict, tsID2NameDict
-
-
-#return clusterNum, noZeroFvClusterNum,  repeatClassNum,  repeatCount/repeatClassNum
-def basicMetric():
-    totalClusterNum = max(CLUSTERID2CLASSDict.keys()) + 1
-    noZeroClusterNum = len(CLUSTERID2CLASSDict)
-
-    repeatClassDict = dict()  #classID, repeatCount
-    for classID in CLASSID2CLUSTERDict:
-        clusterIDList = CLASSID2CLUSTERDict[classID]
-        if len(clusterIDList) > 1:
-            repeatClassDict[classID] = len(clusterIDList)
-    if len(repeatClassDict) == 0:
-        repeatAvg = 0
-    else:
-        repeatAvg = round(sum(repeatClassDict.values()) / float(len(repeatClassDict)), 5)
-    repeatNum = len(repeatClassDict)
-
-    return totalClusterNum, noZeroClusterNum, repeatNum, repeatAvg
-
 
 #python pro.py
-#coreprocess/processOverlap/jforum219Testcase1_clusters_0.03csv
 #coreprocess/testcaseClusteirng/jforum219Testcase1_jm_AVG_20.csv
 #workflow/jforum219_workflow_reduced.csv
-
+#apiFileName.csv
 if __name__ == '__main__':
-    overlapResFileName = sys.argv[1]  #[classID, className, clusterID ]
-    testcaseClusterFileName = sys.argv[2] #[clusterID, testcaseID, testcaseName]
-    workflowFileName = sys.argv[3]
-    #apiFileName = sys.argv[4]
-    [CLASSID2NAMEDict, CLASSNAME2IDDict, CLASSID2CLUSTERDict, CLUSTERID2CLASSDict] = readOverlapResFile(overlapResFileName)
-    [CLUSTERID2TSDict, TSID2NAMEDict] = readTestCaseClusterFile(testcaseClusterFileName)
-    #print CLUSTERID2TSDict
-    #print TSID2NAMEDict
-
-    #return TRACEList
-    # methodNodeList,    methodEdgeList. egdeDict
-    readWorkflowFile(workflowFileName)
+    clusterFileName = sys.argv[1]  #[classID, className, clusterID ]
+    workflowFileName = sys.argv[2]
+    apiFileName = sys.argv[3]
+    [CLASSID2NAMEDict, CLASSNAME2IDDict, CLASSID2CLUSTERDict, CLUSTERID2CLASSDict] = readClusterFile(clusterFileName)
+    readWorkflowFile(workflowFileName) #return TRACEList, methodNodeList,    methodEdgeList.
     #print 'TRACEList', TRACEList
     #print 'METHODList', METHODList
-    #print 'EDGEDict', EDGEDict
-    [totalClusterNum, noZeroClusterNum, repeatClassNum, repeatClassAvg] = basicMetric()
 
-    #operate TRACEList[traceID]=[edgeID1, edgeID2]
-    #generate res[traceID][interedgeID] = count
+    #operate TRACEList[traceID]=[edgeID1, edgeID2], generate res[traceID][interedgeID] = count
     interTsEdgeDict = filterOutInterEdge()
-    #print 'interTsEdgeDict=',interTsEdgeDict
-    [interComWfCount, withinComWfCount, interCallCount, interCallCount_avg, interCallCount_f, interCallCount_avg_f] = workflowMetric(interTsEdgeDict)
+    ##print 'interTsEdgeDict=',interTsEdgeDict
+
+    [interComWfCount, interCallCount, interCallCount_avg, interCallCount_f, interCallCount_avg_f] = workflowMetric(interTsEdgeDict)
     clusterAPIDict = extractAPI(interTsEdgeDict)
+    writeAPI(clusterAPIDict, apiFileName)
     (APICount, APICount_avg) = APIMetric(clusterAPIDict)
 
-
     resList = list()
-    resList.extend([totalClusterNum, noZeroClusterNum, repeatClassNum, repeatClassAvg])
-    resList.extend([interComWfCount, withinComWfCount, interCallCount, interCallCount_avg, interCallCount_f, interCallCount_avg_f])
+    resList.extend([interComWfCount, interCallCount, interCallCount_avg, interCallCount_f, interCallCount_avg_f])
     resList.extend([APICount, APICount_avg])
-
     resStrList = [str(each) for each in resList]
     strstr = ','.join(resStrList)
     print strstr
