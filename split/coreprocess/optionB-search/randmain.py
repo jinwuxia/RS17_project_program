@@ -67,7 +67,7 @@ if __name__ == '__main__':
 
     pop_list = InitPop(30, X_S, X_E, Y_S, Y_E, BIT_COUNT_X, BIT_COUNT_Y)
     for indiv in pop_list:
-        [xi, yi] = initpop.TransCode2Indiv(indiv, BIT_COUNT_X, BIT_COUNT_Y)
+        [xi, yi] = initpop.TransCode2Indiv(indiv, X_S, X_E, Y_S, Y_E,BIT_COUNT_X, BIT_COUNT_Y)
         one = OBJECT_STRUCT_DICT[xi][yi]
         all_result_list.append([xi, yi, one.overlapClassCount, one.interWorklow, one.interCallNum, one.APINum, one.withinWorkflow, -one.repeatClassCount, one.realClusterNum])
 

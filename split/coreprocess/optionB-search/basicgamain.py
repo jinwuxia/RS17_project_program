@@ -9,11 +9,11 @@ def IsStop(kgen, old_pop_list, new_pop_list, old_fitness_value_list, new_fitness
     import initpop
     old_pop_num_list = list()
     for each in old_pop_list:
-        [x, y] = initpop.TransCode2Indiv(each, config.GlobalVar.BIT_COUNT_X,  config.GlobalVar.BIT_COUNT_Y)
+        [x, y] = initpop.TransCode2Indiv(each, config.GlobalVar.X_S, config.GlobalVar.X_E, config.GlobalVar.Y_S, config.GlobalVar.Y_E, config.GlobalVar.BIT_COUNT_X,  config.GlobalVar.BIT_COUNT_Y)
         old_pop_num_list.append(str(x) + ',' + str(y))
     new_pop_num_list = list()
     for each in new_pop_list:
-        [x, y] = initpop.TransCode2Indiv(each, config.GlobalVar.BIT_COUNT_X,  config.GlobalVar.BIT_COUNT_Y)
+        [x, y] = initpop.TransCode2Indiv(each, config.GlobalVar.X_S, config.GlobalVar.X_E, config.GlobalVar.Y_S, config.GlobalVar.Y_E, config.GlobalVar.BIT_COUNT_X,  config.GlobalVar.BIT_COUNT_Y)
         new_pop_num_list.append(str(x) + ',' + str(y))
     print 'old_pop_list=           ', old_pop_list, '; ', old_pop_num_list
     print 'new_pop_list=           ', new_pop_list, '; ', new_pop_num_list

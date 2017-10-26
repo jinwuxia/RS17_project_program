@@ -132,11 +132,11 @@ def IsStop(kgen, old_pop_list, new_pop_list):
     import initpop
     old_pop_num_list = list()
     for each in old_pop_list:
-        [x, y] = initpop.TransCode2Indiv(each, BIT_COUNT_X, BIT_COUNT_Y)
+        [x, y] = initpop.TransCode2Indiv(each, X_S, X_E, Y_S, Y_E, BIT_COUNT_X, BIT_COUNT_Y)
         old_pop_num_list.append(str(x) + ',' + str(y))
     new_pop_num_list = list()
     for each in new_pop_list:
-        [x, y] = initpop.TransCode2Indiv(each, BIT_COUNT_X, BIT_COUNT_Y)
+        [x, y] = initpop.TransCode2Indiv(each, X_S, X_E, Y_S, Y_E, BIT_COUNT_X, BIT_COUNT_Y)
         new_pop_num_list.append(str(x) + ',' + str(y))
     #print 'old_pop_list=           ', old_pop_list, '; ', old_pop_num_list
     #print 'new_pop_list=           ', new_pop_list, '; ', new_pop_num_list
@@ -219,7 +219,7 @@ if __name__ == '__main__':
     for times in range(0, 30):
         new_pop_list = Mainloop()
         for indiv in new_pop_list:
-            [xi, yi] = initpop.TransCode2Indiv(indiv, BIT_COUNT_X, BIT_COUNT_Y)
+            [xi, yi] = initpop.TransCode2Indiv(indiv, X_S, X_E, Y_S, Y_E, BIT_COUNT_X, BIT_COUNT_Y)
             one = OBJECT_STRUCT_DICT[xi][yi]
             all_fitness_list.append([xi, yi, one.overlapClassCount, one.interWorklow,\
                 one.interCallNum, one.APINum, one.withinWorkflow, -one.repeatClassCount, one.realClusterNum])
@@ -228,7 +228,7 @@ if __name__ == '__main__':
         repeatClassCount_tmp = list()
         realClusterNum_tmp = list()
         for indiv in new_pop_list:
-            [xi, yi] = initpop.TransCode2Indiv(indiv, BIT_COUNT_X, BIT_COUNT_Y)
+            [xi, yi] = initpop.TransCode2Indiv(indiv, X_S, X_E, Y_S, Y_E, BIT_COUNT_X, BIT_COUNT_Y)
             one = OBJECT_STRUCT_DICT[xi][yi]
             withinWorkflow_tmp.append(one.withinWorkflow)
             repeatClassCount_tmp.append(-one.repeatClassCount)

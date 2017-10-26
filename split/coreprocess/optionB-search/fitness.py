@@ -56,11 +56,15 @@ def GetFitnessList(fitness_method, pop_list):
     OBJECT_STRUCT_DICT = config.get_object_struct()
     BIT_COUNT_X = config.GlobalVar.BIT_COUNT_X
     BIT_COUNT_Y = config.GlobalVar.BIT_COUNT_Y
+    X_S = config.GlobalVar.X_S
+    X_E = config.GlobalVar.X_E
+    Y_S = config.GlobalVar.Y_S
+    Y_E = config.GlobalVar.Y_E
 
     fitness_value_list = list()
     for index  in range(0, len(pop_list)):
         indiv = pop_list[index]
-        [x, y] = initpop.TransCode2Indiv(indiv, BIT_COUNT_X, BIT_COUNT_Y)  #=[x,y]=[serv, thr_int]
+        [x, y] = initpop.TransCode2Indiv(indiv, X_S, X_E, Y_S, Y_E, BIT_COUNT_X, BIT_COUNT_Y)  #=[x,y]=[serv, thr_int]
         #print 'info fit[x][y]:', x, y
         if fitness_method == 'withinwf':
             fitness_value_list.append(OBJECT_STRUCT_DICT[x][y].withinWorkflow)
@@ -82,9 +86,12 @@ def GetFitness(fitness_method, indiv):
     OBJECT_STRUCT_DICT = config.get_object_struct()
     BIT_COUNT_X = config.GlobalVar.BIT_COUNT_X
     BIT_COUNT_Y = config.GlobalVar.BIT_COUNT_Y
+    X_S = config.GlobalVar.X_S
+    X_E = config.GlobalVar.X_E
+    Y_S = config.GlobalVar.Y_S
+    Y_E = config.GlobalVar.Y_E
 
-
-    [x, y] = initpop.TransCode2Indiv(indiv, BIT_COUNT_X, BIT_COUNT_Y)  #=[x,y]=[serv, thr_int]
+    [x, y] = initpop.TransCode2Indiv(indiv, X_S, X_E, Y_S, Y_E, BIT_COUNT_X, BIT_COUNT_Y)  #=[x,y]=[serv, thr_int]
     #print 'info fit[x][y]:', x, y
     if fitness_method == 'withinwf':
         fitness_value = OBJECT_STRUCT_DICT[x][y].withinWorkflow
