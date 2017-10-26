@@ -200,6 +200,8 @@ def Write2CSV(listlist, fileName):
         writer.writerows(listlist)
     print fileName
 
+
+#rum msga 30 times , output a group result
 if __name__ == '__main__':
     allFitnessFileName = sys.argv[1]
     bestFitnessFileName = sys.argv[2]
