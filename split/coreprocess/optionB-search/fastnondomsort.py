@@ -5,16 +5,30 @@ def IsDominated(indiv_1, indiv_2):
     import fitness
     import config
     fitness_method_list = config.GlobalVar.FITNESS_METHOD_LIST
+    counter = 0
     for fitness_method in fitness_method_list:
-        if fitness.GetFitness(fitness_method, indiv_2) <= fitness.GetFitness(fitness_method, indiv_1):
-            return False
+        if fitness.GetFitness(fitness_method, indiv_2) > fitness.GetFitness(fitness_method, indiv_1):
+            counter += 1
+    if counter == len(fitness_method_list):
+        return True
+    else:
+        return False
 
-    return True
 
 
 #if indiv_1 dominate(all better than ) indiv_2, return True
 def Dominate(indiv_1, indiv_2):
-    return IsDominated(indiv_2, indiv_1)
+    import fitness
+    import config
+    fitness_method_list = config.GlobalVar.FITNESS_METHOD_LIST
+    counter = 0
+    for fitness_method in fitness_method_list:
+        if fitness.GetFitness(fitness_method, indiv_1) > fitness.GetFitness(fitness_method, indiv_2):
+            counter += 1
+    if counter == len(fitness_method_list):
+        return True
+    else:
+        return False
 
 
 #for each indiv, compute the worseSet which is dominated by it. dominatedDict[indiv] = set

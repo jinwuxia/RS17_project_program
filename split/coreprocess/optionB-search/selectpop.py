@@ -68,6 +68,7 @@ def RandomChoose(m, n, k):
 #2 * N <= pop_list_number
 # each time randomly choose M from len(layerList), then choose top N from M
 def SelectPop_Jinbiao(layerList, M, N):
+    print layerList
     parentA_list = list()
     parentB_list = list()
     flatList = list()

@@ -6,7 +6,7 @@ if __name__ == '__main__':
     data_dir = sys.argv[1]
     project = sys.argv[2]
 
-    for M in range(2,3):  #M is variable TS cluster number
+    for M in range(4,5):  #M is variable TS cluster number
 
         #modify config
         fp = open("config.py", "r+")
@@ -18,7 +18,7 @@ if __name__ == '__main__':
         fp = open("config.py", "w+")
         fp.writelines(flist)
         fp.close()
-        
+
         # run nsgamain
         allfile = ('../../../testcase_data/' + data_dir \
                   + '/coreprocess/optionB-search/givenM/' \
