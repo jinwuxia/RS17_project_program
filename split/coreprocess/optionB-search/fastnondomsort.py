@@ -1,15 +1,33 @@
 #quicky non dominate sort for polulation
 
+
+def IsEqualandBig(value1, value2):
+    if value1 >= value2:
+        return True
+    else:
+        return False
+
+def IsBig(value1, value2):
+    if value1 > value2:
+        return True
+    else:
+        return False
+
+
 #if indi_2 all better(strongly), return True.  indiv1 is dominated by indiv2
 def IsDominated(indiv_1, indiv_2):
     import fitness
     import config
     fitness_method_list = config.GlobalVar.FITNESS_METHOD_LIST
-    counter = 0
+    counter_equalbig = 0
+    counter_big = 0
     for fitness_method in fitness_method_list:
-        if fitness.GetFitness(fitness_method, indiv_2) > fitness.GetFitness(fitness_method, indiv_1):
-            counter += 1
-    if counter == len(fitness_method_list):
+        if IsEqualandBig(fitness.GetFitness(fitness_method, indiv_2), fitness.GetFitness(fitness_method, indiv_1)):
+            counter_equalbig += 1
+        if IsBig(fitness.GetFitness(fitness_method, indiv_2), fitness.GetFitness(fitness_method, indiv_1)):
+            counter_big += 1
+
+    if counter_equalbig == len(fitness_method_list) and counter_big > 0:
         return True
     else:
         return False
@@ -21,11 +39,15 @@ def Dominate(indiv_1, indiv_2):
     import fitness
     import config
     fitness_method_list = config.GlobalVar.FITNESS_METHOD_LIST
-    counter = 0
+    counter_big = 0
+    counter_equalbig = 0
     for fitness_method in fitness_method_list:
-        if fitness.GetFitness(fitness_method, indiv_1) > fitness.GetFitness(fitness_method, indiv_2):
-            counter += 1
-    if counter == len(fitness_method_list):
+        if IsEqualandBig(fitness.GetFitness(fitness_method, indiv_1), fitness.GetFitness(fitness_method, indiv_2)):
+            counter_equalbig += 1
+        if IsBig(fitness.GetFitness(fitness_method, indiv_1), fitness.GetFitness(fitness_method, indiv_2)):
+            counter_big += 1
+
+    if counter_equalbig == len(fitness_method_list) and counter_big > 0:
         return True
     else:
         return False
