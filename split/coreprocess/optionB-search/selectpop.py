@@ -74,8 +74,10 @@ def SelectPop_Jinbiao(layerList, M, N):
     flatList = list()
     for layer in range(0, len(layerList)):
         flatList.extend(layerList[layer])
-    if len(flatList) < 2* N:
+    while len(flatList) < 2* N:
         print 'not enough pop_list to generate ', N, 'pairs parents....'
+        N=  len(flatList) / 2
+        M = N - 2
     else:
         parentA_index_list = RandomChoose(len(flatList), M, N)
         for index in parentA_index_list:
