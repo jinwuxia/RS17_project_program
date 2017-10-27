@@ -67,6 +67,12 @@ python tosc-interd-dom-cohesion-public .py   testcasecluster.csv
 
 
 
+
+
+RQ2:
+pareto anaysis all possible answers
+python paretoanalysis.py    ../../../testcase_data/jpetstore6/coreprocess/jpetstore6_pareto_analysis_allbest.csv
+
 -------------------------------------------------------------------REFER TO CMD.SH
 
 #------------------------------------------------
