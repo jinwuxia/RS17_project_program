@@ -3,10 +3,11 @@
 #compute one ondividual's fitness value.
 
 class ObjectStruct:
-    def __init__(self, nonlapClassCount, nonlapClassCount_avg, overlapClassCount, overlapClassCount_avg, \
+    def __init__(self, servnum, nonlapClassCount, nonlapClassCount_avg, overlapClassCount, overlapClassCount_avg, \
                     realClusterNum, repeatClassCount, repeatClassCount_avg,\
                     interWorklow, withinWorkflow, interCallNum, interCallNum_avg, \
                     interCallNum_f, interCallNum_avg_f, APINum, APINum_avg):
+        self.servnum = servnum
         self.nonlapClassCount = nonlapClassCount
         self.nonlapClassCount_avg = nonlapClassCount_avg
         self.overlapClassCount = overlapClassCount
@@ -39,7 +40,7 @@ def loadFitness(fileName):
                 continue
             serv = int(serv)
             thr_int = int(thr)
-            oneObjectStruct = ObjectStruct(int(nonlapClassCount), float(nonlapClassCount_avg), \
+            oneObjectStruct = ObjectStruct(serv, int(nonlapClassCount), float(nonlapClassCount_avg), \
                             int(overlapClassCount), float(overlapClassCount_avg), \
                             int(realClusterNum), int(repeatClassCount), float(repeatClassCount_avg),\
                             int(interWorklow), int(withinWorkflow), int(interCallNum), float(interCallNum_avg), \
@@ -66,7 +67,9 @@ def GetFitnessList(fitness_method, pop_list):
         indiv = pop_list[index]
         [x, y] = initpop.TransCode2Indiv(indiv, X_S, X_E, Y_S, Y_E, BIT_COUNT_X, BIT_COUNT_Y)  #=[x,y]=[serv, thr_int]
         #print 'info fit[x][y]:', x, y
-        if fitness_method == 'withinwf':
+        if fitness_method == 'servnum':
+            fitness_value_list.append(OBJECT_STRUCT_DICT[x][y].servnum)
+        elif fitness_method == 'withinwf':
             fitness_value_list.append(OBJECT_STRUCT_DICT[x][y].withinWorkflow)
         elif fitness_method == 'clusternum':
             fitness_value_list.append(OBJECT_STRUCT_DICT[x][y].realClusterNum)
@@ -93,7 +96,9 @@ def GetFitness(fitness_method, indiv):
 
     [x, y] = initpop.TransCode2Indiv(indiv, X_S, X_E, Y_S, Y_E, BIT_COUNT_X, BIT_COUNT_Y)  #=[x,y]=[serv, thr_int]
     #print 'info fit[x][y]:', x, y
-    if fitness_method == 'withinwf':
+    if fitness_method == 'servnum':
+        fitness_value = OBJECT_STRUCT_DICT[x][y].servnum
+    elif fitness_method == 'withinwf':
         fitness_value = OBJECT_STRUCT_DICT[x][y].withinWorkflow
     elif fitness_method == 'clusternum':
         fitness_value = OBJECT_STRUCT_DICT[x][y].realClusterNum
