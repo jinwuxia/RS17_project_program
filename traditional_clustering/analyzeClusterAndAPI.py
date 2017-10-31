@@ -242,7 +242,7 @@ def writeAPI(clusterAPIDict, fileName):
     with open(fileName, 'wb') as fp:
         writer = csv.writer(fp)
         writer.writerows(resList)
-    print fileName
+    #print fileName
 
 
 # clusterAPIDict[clusterID][apiID] = 1

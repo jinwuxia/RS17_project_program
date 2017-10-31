@@ -1,5 +1,5 @@
 #analyze cluster metric and extract api
- python analyzeCluster.py  traditional_clustering/jwx_wca_uem_WCA_preselected_uem_27_clusters.rsf.csv   workflow/jforum219_workflow_reduced.csv   traditional_clustering/wca_uem_27_clusterAPI.csv
+python analyzeCluster.py  traditional_clustering/jwx_wca_uem_WCA_preselected_uem_27_clusters.rsf.csv   workflow/jforum219_workflow_reduced.csv   traditional_clustering/wca_uem_27_clusterAPI.csv
 #private cohesion metric
 python tosc-interf-dom-cohesion.py
 python tosc-interf-msg-cohesion.py

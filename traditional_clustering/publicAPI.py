@@ -3,8 +3,8 @@ import csv
 
 ACTION2APIDict = dict() #[actionClass] = [api1 api2....]
 CLUSTER2CLASSDict = dict() #[clusterID] =[actionclass ]
-#PRE = 'org.mybatis.jpetstore.web.actions'
-PRE = 'net.jforum.view.forum'
+PRE = 'org.mybatis.jpetstore.web.actions'
+#PRE = 'net.jforum.view.forum'
 def GetAction(api):
     #interface name
     apiList = api.split('.')
@@ -37,11 +37,13 @@ def ReadClusterFile(fileName):
         reader = csv.reader(fp)
         for each in reader:
             [containes, clusterID, className] = each
+            print each
             clusterID = int(clusterID)
             if clusterID not in cluster2ClassDict:
                 cluster2ClassDict[clusterID] = list()
             if IsActionClass(className):
                 cluster2ClassDict[clusterID].append(className)
+    print cluster2ClassDict
     return cluster2ClassDict
 
 
@@ -67,7 +69,11 @@ if __name__ == '__main__':
     apiFileName = sys.argv[3]
 
     ACTION2APIDict = ReadTsFile(tsFileName)
+    #print ACTION2APIDict
+
     CLUSTER2CLASSDict = ReadClusterFile(clusterFileName)
+    #print CLUSTER2CLASSDict
 
     apiList = ExtractAPI()
+    print apiList
     WriteCSV(apiList, apiFileName)
