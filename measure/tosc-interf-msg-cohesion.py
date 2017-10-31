@@ -131,7 +131,7 @@ if __name__ == '__main__':
     msg_cohesion_unwei_list = list()
 
     if len(g_clusterID2Interf2APIDict) == 0:
-        print  'msg_avg_wei=', 1, 'msg_avg_unwei', 1
+        print  'msg_avg_wei=', 1, 'msg_avg_unwei', 1,
     else:
         for clusterID in g_clusterID2Interf2APIDict:
             for interface in g_clusterID2Interf2APIDict[clusterID]:
@@ -141,7 +141,7 @@ if __name__ == '__main__':
                 msg_cohesion_unwei_list.append(msg_cohesion_unwei)
         msg_avg_wei = sum(msg_cohesion_wei_list) / float(len(msg_cohesion_wei_list))
         msg_avg_unwei = sum(msg_cohesion_unwei_list) / float(len(msg_cohesion_unwei_list))
-        print 'msg_avg_wei=', msg_avg_wei, 'msg_avg_unwei', msg_avg_unwei
+        print 'msg_avg_wei=', msg_avg_wei, 'msg_avg_unwei', msg_avg_unwei,
 
         interface_number = 0
         for clusterID in g_clusterID2Interf2APIDict:

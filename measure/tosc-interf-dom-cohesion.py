@@ -93,7 +93,7 @@ def ReadAPIFile(fileName):
             itemSet = GetItems(nameSet)
             oneObejct = APIObject(clusterID, interface, apiName, itemSet)
             #print nameSet
-            print oneObejct.itemSet
+            #print oneObejct.itemSet
             apiDict[apiID] = oneObejct
             clusterID2Interf2ApiDict[clusterID][interface].append(apiID)
             apiID += 1
@@ -160,7 +160,7 @@ if __name__ == '__main__':
     [g_clusterID2Interf2APIDict, g_apiDict] = ReadAPIFile(apiFileName)
 
     if len(g_clusterID2Interf2APIDict) == 0:
-        print 'avg_dom_cohesion_wei=', 1.0, 'avg_dom_cohesion_unwei=', 1.0
+        print 'avg_dom_cohesion_wei=', 1.0, 'avg_dom_cohesion_unwei=', 1.0, 'interface number=', 0
     else:
         dom_cohesion_wei_list = list()
         dom_cohesion_unwei_list = list()
@@ -169,10 +169,10 @@ if __name__ == '__main__':
                 [dom_cohesion_wei, dom_cohesion_unwei] = Metric_dom_cohesion(clusterID, interface)
                 dom_cohesion_wei_list.append(dom_cohesion_wei)
                 dom_cohesion_unwei_list.append(dom_cohesion_unwei)
-                print clusterID, interface, dom_cohesion_wei, dom_cohesion_unwei
+                #print clusterID, interface, dom_cohesion_wei, dom_cohesion_unwei
         avg_dom_cohesion_wei = sum(dom_cohesion_wei_list) / float(len(dom_cohesion_wei_list))
         avg_dom_cohesion_unwei = sum(dom_cohesion_unwei_list) / float(len(dom_cohesion_unwei_list))
-        print 'avg_dom_cohesion_wei=', avg_dom_cohesion_wei, 'avg_dom_cohesion_unwei=', avg_dom_cohesion_unwei
+        print 'avg_dom_cohesion_wei=', avg_dom_cohesion_wei, 'avg_dom_cohesion_unwei=', avg_dom_cohesion_unwei,
 
         interface_number = 0
         for clusterID in g_clusterID2Interf2APIDict:
