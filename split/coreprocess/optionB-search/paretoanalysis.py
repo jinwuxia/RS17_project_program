@@ -80,10 +80,11 @@ def GenBestAns(firstLayerList,real_dict, reduced_object_struct_dict):
                        one.APINum, one.realClusterNum])
     return bestAnsList
 
-def AllServnumBestAns(layerList, reduced_object_struct_dict):
-    print reduced_object_struct_dict.keys()
-    resDict = dict()  #[servnum] = [thrlist]
-
+#search eachservnum's thr list
+def FindServnumBestThr(layerList, real_dict):
+    serv2ThrDict = dict()  #[servnum] = [thr list]
+    serv2RankDict = dict() #[servnum] = rank  this servnum is in ehich layre
+    #change indiv to [xi, yi]
     realLayerList = list() #[0] = [[x,y], []]
     for index in range(0, len(layerList)):
         realLayerList.append(list())
@@ -91,17 +92,33 @@ def AllServnumBestAns(layerList, reduced_object_struct_dict):
             xi = real_dict[indiv][0]
             yi = real_dict[indiv][1]
             realLayerList[index].append([xi,yi])
-
-    for index in realLayerList:
+    for index in range(0, len(realLayerList)):
         for [serv, thr_int] in realLayerList[index]:
-            if serv in resDict:
-                continue #continue next
-            if serv not in resDict:
-                resDict[serv] = list()
-            resDict[serv].append(thr_int)
+            if serv not in serv2ThrDict:
+                serv2ThrDict[serv] = list()
+                serv2ThrDict[serv].append(thr_int)
+                serv2RankDict[serv] = index
+            else:
+                if serv2RankDict[serv] == index:
+                    serv2ThrDict[serv].append(thr_int)
+    print 'serv2ThrDict:'
+    print  serv2ThrDict
+    return serv2ThrDict, serv2RankDict
 
-
-
+def GetServnumBestAns(serv2ThrDict, serv2RankDict, reduced_object_struct_dict):
+    resultList = list()
+    resultList.append(['servnum', 'thr', 'within-service-function counter', \
+                    '-repeated-class counter', 'overlapClassCount', \
+                    'inter-service-function counter', 'interCallNum',\
+                     'APINum',  'realClusterNum', 'pareto-rank'])
+    for serv in serv2ThrDict:
+        for thr_int in serv2ThrDict[serv]:
+            one = reduced_object_struct_dict[serv][thr_int]
+            resultList.append([one.servnum, thr_int, one.withinWorkflow, \
+                               -one.repeatClassCount, one.overlapClassCount,\
+                               one.interWorklow, one.interCallNum, \
+                               one.APINum, one.realClusterNum, serv2RankDict[serv]])
+    return resultList
 
 
 def Write2CSV(bestAnsList, outputFileName):
@@ -134,11 +151,13 @@ if __name__ == '__main__':
     print 'pop= ', len(pop_list)
     print 'layer= ', len(layerList)
     for layerIndex in range(0, len(layerList)):
-        print 'layer', layerIndex, 'th length: ', len(layerList[layerIndex])
+        print 'layer', layerIndex, 'th length: ', len(layerList[layerIndex]), 'ndiv:', layerList[layerIndex]
 
     #only the first layer
-    bestAnsList = GenBestAns(layerList[0], real_dict, reduced_object_struct_dict)
-    Write2CSV(bestAnsList, outputFileName)
+    #bestAnsList = GenBestAns(layerList[0], real_dict, reduced_object_struct_dict)
+    #Write2CSV(bestAnsList, outputFileName)
 
     # for each serv, find its non-dominated(best) answer set
-    allServnumBestAns(layerList, reduced_object_struct_dict)
+    [bestServ2ThrDict, serv2RankDict] = FindServnumBestThr(layerList, real_dict)
+    resultList = GetServnumBestAns(bestServ2ThrDict, serv2RankDict, reduced_object_struct_dict)
+    Write2CSV(resultList, outputFileName)
