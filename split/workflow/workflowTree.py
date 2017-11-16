@@ -130,6 +130,10 @@ def GenWorkflowTree(edgeList):
         startID = eachEdge.startID
         endID = eachEdge.endID
 
+        #many be A.A call A.A, one is both callee and caller.
+        if startID == endID:
+            continue
+
         #process the root of the tree
         if root == True:
             onetree = Tree()
