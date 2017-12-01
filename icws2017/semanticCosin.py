@@ -30,14 +30,16 @@ def cosin(v1, v2, n):
     return value
 
 def computeAllSim(class2VectorDict):
+    classList = class2VectorDict.keys()
+    from itertools import combinations
+    pairList = list(combinations(classList, 2))
+
     listList = list()
-    for class1 in class2VectorDict.keys():
-        for class2 in class2VectorDict.keys():
-            if class1 != class2:
-                v1 = class2VectorDict[class1]
-                v2 = class2VectorDict[class2]
-                value = cosin(v1,v2, len(v1))
-                listList.append([class1, class2, value])
+    for [class1, class2] in pairList:
+        v1 = class2VectorDict[class1]
+        v2 = class2VectorDict[class2]
+        value = cosin(v1,v2, len(v1))
+        listList.append([class1, class2, value])
     return listList
 
 def writeCSV(listList, fileName):
