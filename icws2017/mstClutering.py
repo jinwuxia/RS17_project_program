@@ -2,6 +2,7 @@ import sys
 import csv
 import networkx as nx
 
+MAX_SIM_VALUE = 999999
 def readAndInverseGraph(fileName):
     G = nx.read_weighted_edgelist(fileName, delimiter=",")
     #print G.nodes()
@@ -12,9 +13,12 @@ def readAndInverseGraph(fileName):
     #invert weight as a new inverse_weight attribute
     originalWeight = nx.get_edge_attributes(G, 'weight')
     for (c1, c2) in originalWeight:
-        #print c1,c2, originalWeight[(c1,c2)]
-        originalWeight[(c1,c2)] = 1 / originalWeight[(c1,c2)]
-        #print c1,c2, originalWeight[(c1,c2)]
+        print c1,c2, originalWeight[(c1,c2)]
+        if (originalWeight[(c1,c2)] - 0.0000) < 0.00001:
+            originalWeight[(c1,c2)] = MAX_SIM_VALUE
+        else:
+            originalWeight[(c1,c2)] = 1 / originalWeight[(c1,c2)]
+        print c1,c2, originalWeight[(c1,c2)]
     nx.set_edge_attributes(G, 'inverse_weight', originalWeight)
     #print G.edges(data=True)
 
@@ -80,7 +84,7 @@ def writeCSV(listList, fileName):
 if __name__ == '__main__':
     graphFileName = sys.argv[1]
     clusterFileName = sys.argv[2]
-    service_number = 4
+    service_number = int(sys.argv[3])
     G = readAndInverseGraph(graphFileName)
     [node_list, edge_list] = mstClustering(G, service_number)
     listList = getServices(node_list, edge_list)
