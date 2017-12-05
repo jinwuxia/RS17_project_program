@@ -5,3 +5,8 @@ python semanticParser.py  jpetstore6_words.txt   jpetstore6syn.csv   0.9
 python semanticCosin.py  jpetstore6syn.csv   jpetstore6synsim.csv
 
 python mstClustering.py  jpetstore6synsim.csv   jpetstore6clusters.csv  6
+
+
+python batch_mstClustering.py
+python batch_analyzeClusterAndAPI.py  #private
+python batch_publicAPI.py  #public
