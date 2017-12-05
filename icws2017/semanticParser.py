@@ -12,9 +12,10 @@ Keyword_set = set()  # by using td-idf
 Java_stop_words = ['public', 'private','protected','static', 'null', 'class', 'system','out', 'in', 'print', 'println', 'debug',\
                     'int','string', 'this', 'return', 'double', 'throw', 'exception', 'void', 'try', 'catch', 'final', 'main', \
                     'vector', 'execute', 'long', 'if', 'else', 'continue', 'break', 'while', 'do', 'for','size', 'is', 'new', \
-                    'null', 'package', 'import', 'hashmap', 'integer', 'decimal', 'get', 'set', 'boolean','first', \
+                    'null', 'package', 'import', 'hashmap', 'integer', 'decimal', 'get', 'set', 'boolean','first', 'byte', 'char',\
                     'org', 'mybatis', 'jpetstore', 'domain', 'mapper', 'action', 'action', 'web', 'bean', 'service', 'abstract',\
-                    'list', 'map', 'lang', 'type', 'add','sub', 'next']
+                    'list', 'map', 'lang', 'type', 'add','sub', 'next', \
+                    'net', 'jforum', 'is','dao','entities', 'util','api', 'cache', 'context', 'exception', 'search', 'repository', 'admin', 'legacy']
 
 
 
@@ -26,7 +27,7 @@ def splitByHump(name):
     for index in range(0, len(name)):
         if name[index].isupper():
             upperIndexList.append(index)
-    upperIndexList.append(index + 1) #last index + 1
+    upperIndexList.append(len(name)) #last index + 1
 
     for i in range(0, len(upperIndexList) - 1):
         index_s = upperIndexList[i]
@@ -81,6 +82,14 @@ def removeNumFushu(word):
         #print word
     return word
 
+def isAllBigLetter(word):
+    if re.match(r'[A-Z_0-9]+', word):  #all big letter
+        m = re.match(r'[A-Z_0-9]+', word)
+        if len(m.group()) == len(word):
+            return True
+    return False
+
+
 def processIdentifierFile(fileName):
     #stopWords
     import nltk
@@ -95,10 +104,15 @@ def processIdentifierFile(fileName):
             className = tmpList[0]
             rawwordList = tmpList[1:len(tmpList)]
 
+            #if words are all captain letter
+            for i in range(0, len(rawwordList)):
+                if isAllBigLetter(rawwordList[i]):
+                    rawwordList[i] = rawwordList[i].lower()
+
             #split by . or  _
             wordList = list()
             for word in rawwordList:
-                tmpList = re.split( r'[._]', word)
+                tmpList = re.split( r'[._\[\]]', word)
                 #print 'raw: ', word
                 #print 'split by ._:', ','.join(tmpList)
                 wordList.extend(tmpList)
