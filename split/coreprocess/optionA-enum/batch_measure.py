@@ -49,6 +49,6 @@ for [servnum, thr_int] in servnum_thr_pair_list:
         this_api_file = (api_file + str(servnum) + '.csv')
 
     this_cmd =  cmd + this_api_file
-    print this_cmd
+    #print this_cmd
     #returncode  = subprocess.call(cmd)
     os.system(this_cmd)
