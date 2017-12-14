@@ -5,7 +5,7 @@ import csv
 '''
 normalized tarcedep using  testcase1_20_classclusterFv
 '''
-FENWEI_THR = 0.9
+
 #fileName = 'testcase1_20_classclusterFv'
 def readTraceDepFile(fileName):
     trace_dep_dict = dict()  #dict[classNAme][clusterID] = dep
@@ -22,7 +22,7 @@ def readTraceDepFile(fileName):
             trace_dep_dict[className][clusterID] = count
     return trace_dep_dict
 
-def normalized(dep_dict):
+def normalized(dep_dict, FENWEI_THR):
     tmpList =list()
     for className in dep_dict:
         for clusterID in dep_dict[className]:
@@ -53,11 +53,13 @@ def writeCSV(dep_dict, outfileName):
         writer.writerows(resList)
     print outfileName
 
-
 if __name__ == '__main__':
     fileName = sys.argv[1]
     outfileName = sys.argv[2]
-
+    #fileName is classclusterFv.csv
+    #outfilename is tracedep
+    #def traceParser(fileName, outfileName):
+    FENWEI_THR = 0.9
     dep_dict = readTraceDepFile(fileName)
-    dep_dict = normalized(dep_dict)
+    dep_dict = normalized(dep_dict, FENWEI_THR)
     writeCSV(dep_dict, outfileName)

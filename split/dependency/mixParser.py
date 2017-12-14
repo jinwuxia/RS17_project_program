@@ -11,10 +11,10 @@ STRUCT_MASK = '0101000110'  #Extend,Typed,Import,Call,cast,create,Implement,set,
 COMMUNICATION_TYPE = 'total_freq' #call, para_num, ret_num, call_freq, para_num_freq, ret_num_freq, total, total_freq
 MERGE_FUNC = 'AVG'   #class-cluster depvalue = min,max,avg
 
-FENWEI_THR = 0.9
-STRUCT_W = 0.5
-COMMUN_W = 0.5
-COMMIT_W = 0.0
+FENWEI_THR = 0.99  #0.9
+STRUCT_W = 0.35
+COMMUN_W = 0.33
+COMMIT_W = 0.32
 
 STRUCT_DEP_DICT = dict() #dict[classname1][classname2] = depbitStr
 COMMIT_DEP_DICT = dict() #dict[classname1][classname2] = commitDep
@@ -147,9 +147,12 @@ def getStructDepBetClass(classID1, classID2):
     if className1 in STRUCT_DEP_DICT:
         if className2 in STRUCT_DEP_DICT[className1]:
             structBitStr = STRUCT_DEP_DICT[className1][className2]
+            #print structBitStr
             for index in range(0, len(structBitStr)):
                 if STRUCT_MASK[index] == '1' and structBitStr[index] == '1':
                     structValue += 1
+                    #print 'cccc',structValue
+    #print structValue
     return structValue
 
 #compute CLASSIDPAIRDICT
@@ -170,6 +173,7 @@ def normalizedMinMax(oneList):
     sortedList = sorted(oneList)
     maxValue= sortedList[fenweiIndex]
     minValue = min(oneList)
+    print minValue, maxValue
     for each in oneList:
         if each > maxValue:
             each = maxValue
@@ -202,14 +206,17 @@ def normCalMixedDep():
             structList.append(CLASSIDPAIRDICT[classID1][classID2][0])
             commitList.append(CLASSIDPAIRDICT[classID1][classID2][1])
             communList.append(CLASSIDPAIRDICT[classID1][classID2][2])
-    #print structList,'\n'
-    #print commitList,'\n'
-    #print communList,'\n'
+    print structList,'\n'
+    print commitList,'\n'
+    print communList,'\n'
     if sum(structList) > 0.00001:
+        print "normalizedMinMax ", 'structList'
         structList = normalizedMinMax(structList)
     if sum(commitList) > 0.00001:
-         commitList= normalizedMinMax(commitList)
+        print "normalizedMinMax ", 'commitList'
+        commitList= normalizedMinMax(commitList)
     if sum(communList) > 0.00001:
+        print "normalizedMinMax ", 'communList'
         communList = normalizedMinMax(communList)
     #print structList,'\n'
     #print commitList,'\n'
