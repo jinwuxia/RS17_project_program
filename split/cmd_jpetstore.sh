@@ -12,6 +12,8 @@ python  ${code_workflow_dir}workflowTree.py   ${project}_workflow_reduced.csv   
 
 cd testcase_data/${project}/dependency
 code_depend_dir='../../../split/dependency/'
+git bracn -a # view all branchs
+git checkout -b BRACHNAME   origin/BRACNNAME # switch to this branch
 git log --name-status > ../testcase_data/jforum219/dependency/jforum219.gitlog
 #manual: delete update.init commit log
 und export -dependencies class cytoscape ${project}.xml  ${project}.udb
@@ -31,13 +33,14 @@ mkdir testCaseClustering
 mv ${project}_testcase1_jm_AVG_*   testCaseClustering/
 
 ./coreprocess/batch_analyzeCluster.sh  > log.csv
-python  ${code_core_dir}analyzeOneCluster.py  testcaseClustering/${project}_testcase1_jm_AVG_4.csv   ${project}_testcase1_fv.csv   ${project}_testcase1_class.csv   ${project}_testcase1_4_class_nolap.csv  ${project}_testcase1_4_class_lap.csv     ${project}_testcase1_4_classclusterFv.csv
-
 python ../../../split/dependency/mixParser.py    ${project}xml.csv   null ${project}com.csv   ../coreprocess/${project}_testcase1_class.csv   ${project}_testcase1_mixedDep.csv
-python ../../coreprocess/traceParser.py  coreprocess/jforum219_testcase1_20_classclusterFv.csv    dependency/jforum219_testcase1_traceDep.csv
 
-in linux:   ./batch_processOverlap.sh
-in linux: ./batch_analyzeProcessOverlapRes.sh > log.csv
+
+
+#python  ${code_core_dir}analyzeOneCluster.py  testcaseClustering/${project}_testcase1_jm_AVG_4.csv   ${project}_testcase1_fv.csv   ${project}_testcase1_class.csv   ${project}_testcase1_4_class_nolap.csv  ${project}_testcase1_4_class_lap.csv     ${project}_testcase1_4_classclusterFv.csv
+#python ../../coreprocess/traceParser.py  coreprocess/jforum219_testcase1_20_classclusterFv.csv    dependency/jforum219_testcase1_traceDep.csv
+#in linux:   ./batch_processOverlap.sh
+#in linux: ./batch_analyzeProcessOverlapRes.sh > log.csv
 
 
 #enum lapclass, nonlap class, all thr and servers' custer result
