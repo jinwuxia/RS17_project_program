@@ -56,7 +56,7 @@ cd coreprocess/optionB-search
 python nsga2main.py   jpetstore6_nsga.csv   jpetstore6_nsga_best.csv #set parameter in config.py
 
 #compare with random
-python randmaim.py jpetstore6_randall.csv
+#python randmaim.py jpetstore6_randall.csv
 
 
 #use the nsga average as the result, then analsis jpetstore6_nsga.csv
@@ -68,16 +68,11 @@ python tosc-interd-msg-cohesion.py   servnum-thr-clusterAPI.csv
 python tosc-interd-dom-cohesion.py   servnum-thr-clusterAPI.csv
 python tosc-interd-dom-cohesion-public .py   testcasecluster.csv
 
-
-
-
-
 RQ2:
 pareto anaysis all possible answers
 python paretoanalysis.py    ../../../testcase_data/jpetstore6/coreprocess/jpetstore6_pareto_analysis_allbest.csv
 
 -------------------------------------------------------------------REFER TO CMD.SH
-
 #------------------------------------------------
 #get testcase_all_calss.csv
 
