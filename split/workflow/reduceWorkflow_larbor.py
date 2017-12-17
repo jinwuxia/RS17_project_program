@@ -15,6 +15,7 @@ def readMapFile(fileName):
     return idDict
 
 def filterCSV(idDict, fileName):
+    resDict = dict()#[traceID] = onelineList
     resList = list()
     with open(fileName, "rb") as fp:
         reader = csv.reader(fp)
@@ -26,7 +27,13 @@ def filterCSV(idDict, fileName):
             if int(oldTraceID) in idDict:
                 newTraceID = idDict[int(oldTraceID)]
                 oneList = [newTraceID, order, structtype, method1, method2, m1_para, m2_para, className1, className2, m1_return, m2_return]
-                resList.append(oneList)
+                if newTraceID not in resDict:
+                    resDict[newTraceID] = list()
+                resDict[newTraceID].append(oneList)
+
+    for traceID in resDict:
+        for oneList in resDict[traceID]:
+            resList.append(oneList)
     return resList
 
 def writeCSV(fileName, listList):
