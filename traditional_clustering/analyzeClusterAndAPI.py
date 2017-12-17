@@ -78,6 +78,8 @@ def readWorkflowFile(filename):
             [traceID, order, structtype, startMethodName, endMethodName, m1_para, m2_para, class1, class2, m1_return, m2_return] = each
             if traceID == 'traceID':
                 continue
+            #print traceID, order, structtype, startMethodName
+
             startLongName = getLongName(startMethodName, m1_para)
             endLongName = getLongName(endMethodName, m2_para)
             startShortName = getShortName(startMethodName, m1_para)
@@ -107,6 +109,7 @@ def readWorkflowFile(filename):
             currentLen = len(TRACEList)
             if int(traceID) == currentLen:
                 TRACEList.append(list())
+            #print int(traceID), currentLen, len(TRACEList)
             TRACEList[int(traceID)].append(edgeID)
 
 

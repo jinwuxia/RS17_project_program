@@ -17,6 +17,9 @@ if __name__ == '__main__':
     elif project == 'jpetstore6':
         servnum_start = 1
         servnum_end = 23
+    elif project == 'roller520':
+        servnum_start = 2
+        servnum_end = 72
 
 
     if project == 'jforum219' and alg == 'wca':
@@ -43,6 +46,13 @@ if __name__ == '__main__':
         elif interface == 'private':
             api_file_name =     '../testcase_data/jpetstore6/traditional_clustering/jpetstore6-limbo/limbo_'
 
+    elif project == 'roller520' and alg == 'limbo':
+        if interface == 'private':
+            api_file_name =     '../testcase_data/roller520/traditional_clustering/limbo/clusterAPI/roller520_limbo_'
+    elif project == 'roller520' and alg == 'wca':
+        if interface == 'private':
+            api_file_name =     '../testcase_data/roller520/traditional_clustering/wca/clusterAPI/roller520_wca_'
+
     if metric == 'private-dom':
         cmd = 'python ../measure/tosc-interf-dom-cohesion.py '
     elif metric == 'private-msg':
@@ -53,4 +63,4 @@ if __name__ == '__main__':
     for servnum in range(servnum_start, servnum_end + 1):
         this_api_file_name = (api_file_name + str(servnum) + '_clusterAPI.csv')
         this_cmd = (cmd + this_api_file_name)
-        returncode  = subprocess.call(this_cmd)
+        returncode  = subprocess.call(this_cmd, shell=True)
