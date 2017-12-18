@@ -36,6 +36,7 @@ def loadFitness(fileName):
             realClusterNum, repeatClassCount, repeatClassCount_avg,\
             interWorklow, withinWorkflow, interCallNum, interCallNum_avg, \
             interCallNum_f, interCallNum_avg_f, APINum, APINum_avg]     = each
+            #print each
             if serv == 'servicenumber':
                 continue
             serv = int(serv)
@@ -48,6 +49,34 @@ def loadFitness(fileName):
             if serv not in objectStructDict:
                 objectStructDict[serv] = dict()
             objectStructDict[serv][thr_int] = oneObjectStruct
+    config.set_object_struct(objectStructDict)
+
+def loadFitness_noRepeat(fileName):
+    import config
+    objectStructDict = dict()
+    import csv
+    with open(fileName, 'rb') as fp:
+        reader = csv.reader(fp)
+        for each in reader:
+            [serv, thr, nonlapClassCount, nonlapClassCount_avg, overlapClassCount, overlapClassCount_avg, \
+            highLap, highLap_avg, lowLap, lowLap_avg, \
+            realClusterNum, repeatClassCount, repeatClassCount_avg,\
+            interWorklow, withinWorkflow, interCallNum, interCallNum_avg, \
+            interCallNum_f, interCallNum_avg_f, APINum, APINum_avg]     = each
+            #print each
+            if serv == 'servicenumber':
+                continue
+            serv = int(serv)
+            thr_int = int(thr)
+            if int(repeatClassCount) == 0:
+                oneObjectStruct = ObjectStruct(serv, int(nonlapClassCount), float(nonlapClassCount_avg), \
+                            int(overlapClassCount), float(overlapClassCount_avg), \
+                            int(realClusterNum), int(repeatClassCount), float(repeatClassCount_avg),\
+                            int(interWorklow), int(withinWorkflow), int(interCallNum), float(interCallNum_avg), \
+                            int(interCallNum_f), float(interCallNum_avg_f), int(APINum), float(APINum_avg))
+                if serv not in objectStructDict:
+                    objectStructDict[serv] = dict()
+                objectStructDict[serv][thr_int] = oneObjectStruct
     config.set_object_struct(objectStructDict)
 
 #make min to max. All the object should be maximized

@@ -3,13 +3,15 @@ class GlobalVar:
     N = 12 #initial populization size, each generation size = intialSize
     M = 8 #silect base
     K = 6 #elict parents
-    '''
+
     #for jpetstore6
     X_S = 2
     X_E = 10
     BIT_COUNT_X = 6
     BIT_COUNT_Y = 7
     FITNESSFILENAME = '../../../testcase_data/jpetstore6/coreprocess/jpetstore6-fitness.csv'
+
+
     '''
     #for jforum219_1
     X_S = 16 #20 #18
@@ -17,7 +19,15 @@ class GlobalVar:
     BIT_COUNT_X = 6
     BIT_COUNT_Y = 7
     FITNESSFILENAME = '../../../testcase_data/jforum219_1/coreprocess/jforum219-fitness.csv'
-
+    '''
+    '''
+    #for roller520
+    X_S = 2
+    X_E = 72
+    BIT_COUNT_X = 7
+    BIT_COUNT_Y = 7
+    FITNESSFILENAME = '../../../testcase_data/roller520/coreprocess/roller520-fitness.csv'
+    '''
     Y_S = 1
     Y_E = 100 #50
 
