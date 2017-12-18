@@ -26,6 +26,11 @@ if __name__ == '__main__':
         elif interface == 'private':
             api_file_name =     'data/jpetstore6/jpetstore6_'
 
+    elif project == 'roller520':
+        servnum_start = 2
+        servnum_end = 72
+        if interface == 'private':
+            api_file_name =     'data/roller520/clustersAPI/roller520_'
 
     if metric == 'private-dom':
         cmd = 'python ../measure/tosc-interf-dom-cohesion.py '
@@ -37,4 +42,4 @@ if __name__ == '__main__':
     for servnum in range(servnum_start, servnum_end + 1):
         this_api_file_name = (api_file_name + str(servnum) + '_clusterAPI.csv')
         this_cmd = (cmd + this_api_file_name)
-        returncode  = subprocess.call(this_cmd)
+        returncode  = subprocess.call(this_cmd, shell=True)

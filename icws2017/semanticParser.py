@@ -15,7 +15,9 @@ Java_stop_words = ['public', 'private','protected','static', 'null', 'class', 's
                     'null', 'package', 'import', 'hashmap', 'integer', 'decimal', 'get', 'set', 'boolean','first', 'byte', 'char',\
                     'org', 'mybatis', 'jpetstore', 'domain', 'mapper', 'action', 'action', 'web', 'bean', 'service', 'abstract',\
                     'list', 'map', 'lang', 'type', 'add','sub', 'next', \
-                    'net', 'jforum', 'is','dao','entities', 'util','api', 'cache', 'context', 'exception', 'search', 'repository', 'admin', 'legacy']
+                    'net', 'jforum', 'is','dao','entities', 'util','api', 'cache', 'context', 'exception', 'search', 'repository', 'admin', 'legacy',\
+                    'weblogger', 'pojo', 'business', 'util', 'planet', 'roller', 'apache', 'org', 'core', 'config', 'rendering', 'ajax', 'admin', 'editor',\
+                    'tag', 'webservice']
 
 
 

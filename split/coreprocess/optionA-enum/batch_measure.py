@@ -1,6 +1,7 @@
 import sys
 import os
 import subprocess
+import csv
 
 '''
 for given_m best ans and its clusterAPI file,
@@ -41,6 +42,20 @@ elif project == 'jpetstore6': #for jpetstore6
         api_file = '../../../testcase_data/jpetstore6/coreprocess/optionA-enum/jpetstore6_testcase1_'
     elif interface == 'public':
         api_file = '../../../testcase_data/jpetstore6/coreprocess/testcaseClustering/jpetstore6_testcase1_jm_AVG_'
+
+elif project == 'roller520': # for roller520
+    fileName = '../../../testcase_data/roller520/coreprocess/optionB-search/roller520_pareto_analysis_servnum_best_norepeat.csv'
+    servnum_thr_pair_list = list()
+    with open(fileName, 'rb') as fp:
+        reader = csv.reader(fp)
+        for each in reader:
+            if each[0] == 'servnum':
+                continue
+            servnum = int(each[0])
+            thr = round(int(each[1]) / float(100), 2)
+            servnum_thr_pair_list.append([servnum, thr])
+    if interface == 'private':
+        api_file = '../../../testcase_data/roller520/coreprocess/optionA-enum/roller520_testcase1_'
 
 for [servnum, thr_int] in servnum_thr_pair_list:
     if interface == 'private':

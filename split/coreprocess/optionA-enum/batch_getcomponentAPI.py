@@ -2,7 +2,7 @@ import sys
 import os
 import subprocess
 
-'''
+''' no usage , because of natch_getcomponentAPI.sh has extract all clusters'  api
 for given_m best ans,
 extract api for serv_thr clusterfile
 python pro.py project
