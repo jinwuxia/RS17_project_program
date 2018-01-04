@@ -27,5 +27,15 @@ foreach $class ($db->ents("Class"))
     push @tmpList, $oneLineStr;
 	}
 }
+
+foreach $class ($db->ents("Interface"))
+{
+	if ($class->metric("CountLineCode") != 0  && index($class->longname(1), $packageName) == 0)
+	{
+    $oneLineStr = $class->longname(1) . "\n";
+    push @tmpList, $oneLineStr;
+	}
+}
+
 printFile(@tmpList);
 print $outfileName . "\n";
