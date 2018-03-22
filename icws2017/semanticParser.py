@@ -17,7 +17,7 @@ Java_stop_words = ['public', 'private','protected','static', 'null', 'class', 's
                     'list', 'map', 'lang', 'type', 'add','sub', 'next', \
                     'net', 'jforum', 'is','dao','entities', 'util','api', 'cache', 'context', 'exception', 'search', 'repository', 'admin', 'legacy',\
                     'weblogger', 'pojo', 'business', 'util', 'planet', 'roller', 'apache', 'org', 'core', 'config', 'rendering', 'ajax', 'admin', 'editor',\
-                    'tag', 'webservice']
+                    'tag', 'webservice', 'model', 'repository', 'service', 'controller']
 
 
 
