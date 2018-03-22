@@ -21,7 +21,7 @@ def writersf(fileName, depsList):
         writer.writerows(depsList)
     fp.close()
 
-#input und.csv; output  class_dep.rsf  class_dep.csv 
+#python pro.py   und.csv   class_dep.rsf  packagename
 if __name__ == "__main__":
     undDepName = sys.argv[1]
     rsfName = sys.argv[2]

@@ -14,6 +14,11 @@ python tosc-interf-dom-cohesion-public.py ...
 #######################batch
 #get rsf file
 getRSF.py
+
+
+#arcade
+cd arcade_0.1.0
+java -jar arcade.jar DriverEngine -projfile jwx-cfg/jwx-wca-uem.cfg
 # limbo clustering
 arcade
 # wca clustering
