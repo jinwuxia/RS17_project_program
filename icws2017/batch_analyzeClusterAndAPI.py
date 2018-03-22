@@ -6,6 +6,15 @@ import sys
 if __name__ == '__main__':
     project = sys.argv[1]
 
+    if project == 'bvn13blog':
+        #bvn13blog
+        cluster_file_name =  'data/blog-bvn13/clusters/afterFilter/bvn13_'
+        workflow_file_name = 'data/blog-bvn13/bvn13_workflow_reduced.csv'
+        api_file_name =      'data/blog-bvn13/clusters/afterFilter/bvn13_'
+        start = 3
+        end = 21
+
+
     if project == 'jforum219':
         #jforum219
         cluster_file_name = 'data/jforum219/jforum219_'

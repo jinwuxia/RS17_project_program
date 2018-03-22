@@ -4,6 +4,7 @@ python semanticParser.py  jpetstore6_words.txt   jpetstore6syn.csv   0.8
 
 python semanticCosin.py  jpetstore6syn.csv   jpetstore6synsim.csv
 
+python semanticFilter.py classFile   jpetstore6synsim.csv  after_filter_jpetstore6synsim.csv
 python mstClustering.py  jpetstore6synsim.csv   jpetstore6clusters.csv  6
 
 

@@ -10,7 +10,16 @@ if __name__ == '__main__':
     interface = sys.argv[2]
     metric = sys.argv[3]
 
-    if project == 'jforum219':
+    if project == 'bvn13':
+        servnum_start = 3
+        servnum_end = 20
+        if interface == 'public':
+            api_file_name = ''
+        elif interface == 'private':
+            api_file_name =     'data/blog-bvn13/clusters/afterFilter/bvn13_'
+
+
+    elif project == 'jforum219':
         servnum_start = 16
         servnum_end = 47
         if interface == 'public':
