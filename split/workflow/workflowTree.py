@@ -129,7 +129,7 @@ def GenWorkflowTree(edgeList):
     for eachEdge in edgeList:
         startID = eachEdge.startID
         endID = eachEdge.endID
-
+        print METHODList[startID].longname, METHODList[endID].longname
         #many be A.A call A.A, one is both callee and caller.
         if startID == endID:
             continue
@@ -161,8 +161,9 @@ def GenWorkflowTree(edgeList):
             #print METHODList[startID].currtag, "X", METHODList[startID].shortname, '----->', METHODList[endID].currtag, "X", METHODList[endID].shortname, "\n"
             onetree.create_node(METHODList[endID].currtag, METHODList[endID].currtag, parent = METHODList[startID].currtag, data = METHODList[endID])
 
-    #onetree.show(data_property = 'shortname')
-    treeList.append(onetree)
+    if 'onetree' in locals().keys():  #judge the variable 'onetree' is defined or not
+        #onetree.show(data_property = 'shortname')
+        treeList.append(onetree)
     return treeList
 
 
@@ -170,6 +171,7 @@ def GenWorkflowTree(edgeList):
 def GenMultiTree():
     treeList = list()
     for traceID in range(0, len(TRACEList)):
+        print 'traceID', traceID
         edgeList = TRACEList[traceID]
         ClearMethodTag()
         oneList = GenWorkflowTree(edgeList)
