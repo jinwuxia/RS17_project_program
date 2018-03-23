@@ -3,6 +3,7 @@ generate workflow.csv  from keker-log files
 '''
 import string
 import csv
+import re
 
 
 def isclassIncode(className, prepackage):
@@ -10,6 +11,8 @@ def isclassIncode(className, prepackage):
         return True
     else:
         return False
+
+
 
 # return methodStr(paralist), this is dynamic and use methodnameDict, so use para to differentiate overload methods
 #note the order: delete the paralist first, then split into return type and methosname
@@ -20,11 +23,27 @@ def getMethodName(fullStr):
     splitArr = fullStr.split(' ')
     methodStr = splitArr[len(splitArr) - 1]
 
+    if "_$$_jvstd" in methodStr:  # mainly for solo270, eg: org.xx.xx_$$_jvstd69xxx.get , org.xx.xx_$$_jvstd69xxx._3get
+        tmp = methodStr.split('.')
+        onlyMethodName = tmp[len(tmp) - 1]
+        if onlyMethodName.startswith('_'): # delete the pre number
+            realIndex = re.search(r'[0-9][a-zA-Z]', onlyMethodName).span()[1] - 1
+            onlyMethodName = onlyMethodName[realIndex : len(onlyMethodName)]
+
+        tmp.pop(-1) # delete onlyMethodName
+        onlyClassName = '.'.join(tmp)
+        if "_$$_jvstd" in onlyClassName:
+            index = onlyClassName.index('_$$_jvstd')
+            onlyClassName = onlyClassName[0 : index]
+        methodStr = (onlyClassName + '.' + onlyMethodName)
+
+
     paraStr = getParaType(paraFullStr)
     if paraStr == '':
         methodStr = methodStr + '()'
     else:
         methodStr = methodStr + '(' + paraStr + ')'
+    print 'XXXX  Fullstr:', fullStr, '  MethodStr:', methodStr
     return methodStr
 
 #modifier returntype class.method
@@ -55,14 +74,23 @@ def getClassName(fullStr):
     methodArr = methodStr.split(' ')
     methodStr = methodArr[len(methodArr) - 1]
 
-    if methodStr.find('$') == -1 or methodStr.find('class$') != -1: #not include inner class (classname$innnerclassname) or className.class$methodname(0)
-        classArr = methodStr.split('.')
-        del (classArr[len(classArr) - 1]) #delete  the last ele, that is method name
-    elif methodStr.find('$') != -1: #include inneer class ($)
-        classArr = methodStr.split('$')
-        del (classArr[len(classArr) - 1]) #delete the last ele, that is innerclass.methodname
+    if methodStr.find('_$$_jvstd') == -1: #is not solo270
+        if methodStr.find('$') == -1 or methodStr.find('class$') != -1: #not include inner class (classname$innnerclassname) or className.class$methodname(0)
+            classArr = methodStr.split('.')
+            del (classArr[len(classArr) - 1]) #delete  the last ele, that is method name
+        elif methodStr.find('$') != -1: #include inneer class ($)
+            classArr = methodStr.split('$')
+            del (classArr[len(classArr) - 1]) #delete the last ele, that is innerclass.methodname
 
-    className = '.'.join(classArr)
+        className = '.'.join(classArr)
+
+    else: #is  solo270
+        tmp = methodStr.split('.')
+        tmp.pop(-1) # delete onlyMethodName
+        onlyClassName = '.'.join(tmp)
+        index = onlyClassName.index('_$$_jvstd')
+        className = onlyClassName[0 : index]
+    print 'XXXXX   Fullstr:', fullStr, 'className', className
     return className
 
 
