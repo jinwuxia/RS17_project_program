@@ -23,7 +23,7 @@ def getMethodName(fullStr):
     splitArr = fullStr.split(' ')
     methodStr = splitArr[len(splitArr) - 1]
 
-    if "_$$_jvstd" in methodStr:  # mainly for solo270, eg: org.xx.xx_$$_jvstd69xxx.get , org.xx.xx_$$_jvstd69xxx._3get
+    if "_$$_jvst" in methodStr:  # mainly for solo270, eg: org.xx.xx_$$_jvst69xxx.get , org.xx.xx_$$_jvst69xxx._3get
         tmp = methodStr.split('.')
         onlyMethodName = tmp[len(tmp) - 1]
         if onlyMethodName.startswith('_'): # delete the pre number
@@ -32,8 +32,8 @@ def getMethodName(fullStr):
 
         tmp.pop(-1) # delete onlyMethodName
         onlyClassName = '.'.join(tmp)
-        if "_$$_jvstd" in onlyClassName:
-            index = onlyClassName.index('_$$_jvstd')
+        if "_$$_jvst" in onlyClassName:
+            index = onlyClassName.index('_$$_jvst')
             onlyClassName = onlyClassName[0 : index]
         methodStr = (onlyClassName + '.' + onlyMethodName)
 
@@ -74,7 +74,7 @@ def getClassName(fullStr):
     methodArr = methodStr.split(' ')
     methodStr = methodArr[len(methodArr) - 1]
 
-    if methodStr.find('_$$_jvstd') == -1: #is not solo270
+    if methodStr.find('_$$_jvst') == -1: #is not solo270
         if methodStr.find('$') == -1 or methodStr.find('class$') != -1: #not include inner class (classname$innnerclassname) or className.class$methodname(0)
             classArr = methodStr.split('.')
             del (classArr[len(classArr) - 1]) #delete  the last ele, that is method name
@@ -88,7 +88,7 @@ def getClassName(fullStr):
         tmp = methodStr.split('.')
         tmp.pop(-1) # delete onlyMethodName
         onlyClassName = '.'.join(tmp)
-        index = onlyClassName.index('_$$_jvstd')
+        index = onlyClassName.index('_$$_jvst')
         className = onlyClassName[0 : index]
     print 'XXXXX   Fullstr:', fullStr, 'className', className
     return className
