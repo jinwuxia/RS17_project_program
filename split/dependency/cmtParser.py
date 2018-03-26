@@ -5,26 +5,26 @@ import sys
 import csv
 import re
 
-JPETSTORE_COMMIT_LOG_PRE_NAME = 'src/main/java/'
+#COMMIT_LOG_PRE_NAME = 'src/main/java/'  #jpetstore, bvn13_springblog
+#COMMIT_LOG_PRE_NAME = 'app/src/main/java/' #roller
+COMMIT_LOG_PRE_NAME = 'src/main/java/' #solor270
 ID2NAMEDict = dict()
 NAME2IDDict = dict()
 
 #fileName = 'dir1/dir2/filename'
 def getSimpleName(fileName):
-    if JPETSTORE_COMMIT_LOG_PRE_NAME == '':
+    if COMMIT_LOG_PRE_NAME == '':
         return fileName
-
+    if fileName.startswith(COMMIT_LOG_PRE_NAME) == False:
+        fileName = ''
     else:
-        if JPETSTORE_COMMIT_LOG_PRE_NAME in fileName:
-            tmp = fileName.split('.java')[0]
-            preLen = len(JPETSTORE_COMMIT_LOG_PRE_NAME)
-            tmp = tmp[preLen: len(tmp)]
-            tmp = tmp.split('/')
-            fileName = '.'.join(tmp)
-            print fileName
-        else:
-            fileName = ''
-        return fileName
+        tmp = fileName.split('.java')[0]
+        preLen = len(COMMIT_LOG_PRE_NAME)
+        tmp = tmp[preLen: len(tmp)]
+        tmp = tmp.split('/')
+        fileName = '.'.join(tmp)
+        print fileName
+    return fileName
 
 
 
