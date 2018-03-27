@@ -2,7 +2,8 @@ import sys
 import os
 import subprocess
 
-''' no usage , because of natch_getcomponentAPI.sh has extract all clusters'  api
+''' batch_getcomponentAPI.sh extract all clusters api
+But this file is for extracting api of the specified clusters
 for given_m best ans,
 extract api for serv_thr clusterfile
 python pro.py project
@@ -10,7 +11,23 @@ python pro.py project
 
 project = sys.argv[1]
 
-if project == 'jforum219': #for jpetstore219
+if project == 'solo270':
+    servnum_thr_pair_list = [[8,0.2],  [6,0.4],   [7,0.3],   [7,0.4],   [7,0.5]]
+    thr_cluster_file = '../../../testcase_data/solo270/coreprocess/optionA-enum/solo270_testcase1_clusters_'
+    serv_cluster_file = '../../../testcase_data/solo270/coreprocess/testcaseClustering/solo270_testcase1_jm_AVG_'
+    workflow_file = '../../../testcase_data/solo270/workflow/solo270_workflow_reduced.csv'
+    api_file = '../../../testcase_data/solo270/coreprocess/optionA-enum/solo270_testcase1_'
+
+
+elif project == 'bvn13': #for
+    servnum_thr_pair_list = [[4,0.2],  [5,1.0],   [5,0.3],   [7,0.3],   [6,0.3]]
+    thr_cluster_file = '../../../testcase_data/bvn13/coreprocess/optionA-enum/bvn13_testcase1_clusters_'
+    serv_cluster_file = '../../../testcase_data/bvn13/coreprocess/testcaseClustering/bvn13_testcase1_jm_AVG_'
+    workflow_file = '../../../testcase_data/bvn13/workflow/bvn13_workflow_reduced0.csv'
+    api_file = '../../../testcase_data/bvn13/coreprocess/optionA-enum/bvn13_testcase1_'
+
+
+elif project == 'jforum219': #for jpetstore219
     servnum_thr_pair_list = [[16,0.01],[17,0.01],[18,0.01],[19,0.01],[20,0.01],[21,0.01],\
     [22,0.01],[22,0.02],[22,0.03],[23,0.01],[23,0.05],[23,0.06],[23,1.00],[24,0.06],[25,0.08],\
     [26,0.08],[26,0.06],[26,0.10],[27,0.08],[27,0.10],[28,0.02],[29,0.02],[30,0.02],[31,0.02],[32,0.01],[32,0.02],[33,0.02],\

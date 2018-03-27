@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# generate all component API. 
 :<<eof
 thrclusterdir=../../../testcase_data/jpetstore6/coreprocess/optionA-enum/
 servclusterdir=../../../testcase_data/jpetstore6/coreprocess/testcaseClustering/
