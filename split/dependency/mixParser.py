@@ -11,7 +11,7 @@ STRUCT_MASK = '0101000110'  #Extend,Typed,Import,Call,cast,create,Implement,set,
 COMMUNICATION_TYPE = 'total_freq' #call, para_num, ret_num, call_freq, para_num_freq, ret_num_freq, total, total_freq
 MERGE_FUNC = 'AVG'   #class-cluster depvalue = min,max,avg
 
-FENWEI_THR = 0.99  #0.9
+FENWEI_THR = 0.95 #0.9
 STRUCT_W = 0.35
 COMMUN_W = 0.33
 COMMIT_W = 0.32

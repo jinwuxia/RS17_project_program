@@ -95,7 +95,7 @@ def genMethodEdge(initList):
                 methodEdgeIndex += 1
     return methodEdgeDict, methodEdgeList
 
-
+# include method1 from method method2 within a same class
 def process(initList):
     classEdgeDict = dict()    #dict[c1ID][c2ID] = [MethodEdge1: freq1, MethodEdge2:freq2, ...]
     for each in initList:
@@ -120,10 +120,13 @@ def process(initList):
 
 
 #dict[c1ID][c2ID] = [MethodEdge1: freq1, MethodEdge2:freq2, ...]
+#NOTICE:  exclude class to class within itself
 def formatProcess(classEdgeDict):
     resList = list()
     for classID1 in classEdgeDict:
         for classID2 in classEdgeDict[classID1]:
+            if classID2 == classID1:  #NOTICE:  exclude class to class within itself
+                continue
             sum_call = 0
             sum_call_freq = 0
             sum_para_num = 0
