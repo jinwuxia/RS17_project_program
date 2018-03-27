@@ -4,7 +4,7 @@ import csv
 
 '''
 处理重叠的class， 得出最终的非重叠+重叠 class 聚类结果。
-使用的特征包括mixedDep(struct+comn+commit), 也包含traceDep.
+使用的特征包括mixedDep(struct+comn), 也包含traceDep.
 traceDep是class 在某个cluster（根据test case聚类的结果）中出现的次数。
 之所以使用traceDep 是因为在假设1的情况下，存在cluster不具有单独拥有的class，所以为空，
 导致不存在class-cluster的mixeddep.

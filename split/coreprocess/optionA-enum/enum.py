@@ -104,19 +104,21 @@ if __name__ == '__main__':
     global depFileName
     #global traceDepFileName
     global workflowFileName
-    project               = 'roller520'
-    data_dir              = "../../../testcase_data/roller520/"
+    project               = 'solo270'
+    data_dir              = "../../../testcase_data/solo270/"
     featureVectorFileName = data_dir + 'coreprocess/' + project + '_testcase1_fv.csv'
     classFileName         = data_dir + 'coreprocess/' + project + '_testcase1_class.csv'
     depFileName           = data_dir + 'dependency/' + project + '_testcase1_mixedDep.csv'
     #traceDepFileName      = data_dir + 'dependency/' + project + '_testcase1_traceDep.csv'
     workflowFileName      = data_dir + 'workflow/' + project + '_workflow_reduced.csv'
 
-    serv_list = range(7, 73)  #roler520
+    serv_list = range(2,71)#solo270
+    #serv_list = range(1,27) #bvn13
+    #serv_list = range(7, 73)  #roler520
     #serv_list = range(16, 48) #jforum219
     #serv_list = range(1, 11)  #jpetstore
-    thr_list = range(1, 101)
-    thr_list = [ round(each/float(100), 2) for each in thr_list]
+    thr_list = range(1, 11)
+    thr_list = [ round(each/float(10), 1) for each in thr_list]
     resList = list() #[0] = [TS, thr]
 
     for service_count in serv_list:
@@ -139,7 +141,7 @@ if __name__ == '__main__':
         low_overlappedClassCount, low_overlappedAvg] = clusterMetricList
         # has no overlap class, the next processes needed once
         if overlappedClassCount == 0:
-            overlap_process_thr = round(0.01, 2)
+            overlap_process_thr = round(0.1, 1)
             outClusterFileName  = data_dir + 'coreprocess/optionA-enum/' + project + '_testcase1_clusters_' + str(service_count) + '_' + str(overlap_process_thr) + '.csv'
             lapResMetricList = processNextStep(overlap_process_thr, tsclusterFileName, lapFileName, nonlapFileName, mergedFvFileName, traceDepFileName, outClusterFileName)
             oneList = list()
@@ -152,7 +154,7 @@ if __name__ == '__main__':
             continue
         preList = list()
         for thr in thr_list:
-            overlap_process_thr = round(thr, 2)
+            overlap_process_thr = round(thr, 1)
             outClusterFileName  = data_dir + 'coreprocess/optionA-enum/' + project + '_testcase1_clusters_' + str(service_count) + '_' + str(overlap_process_thr) + '.csv'
             lapResMetricList = processNextStep(overlap_process_thr, tsclusterFileName, lapFileName, nonlapFileName, mergedFvFileName, traceDepFileName, outClusterFileName)
 
