@@ -3,7 +3,7 @@ import sys
 import csv
 
 CLASSID2NAMEDict = dict()
-SMOOTH_THR = 10
+SMOOTH_THR = 5
 
 def readCSV(fileName):
     resList = list()
