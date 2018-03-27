@@ -130,9 +130,13 @@ def Write2CSV(bestAnsList, outputFileName):
 #python pro.py best_ans_file_name
 if __name__ == '__main__':
     outputFileName = sys.argv[1]
-    #load all fitness value
-    #fitness.loadFitness(FITNESSFILENAME) #set object_struct_dict
-    fitness.loadFitness_noRepeat(FITNESSFILENAME)
+    repeatFlag = sys.argv[2] # 'no', 'yes'
+    if repeatFlag == 'yes':
+        #load all fitness value
+        fitness.loadFitness(FITNESSFILENAME) #set object_struct_dict
+    elif repeatFlag == 'no':
+        fitness.loadFitness_noRepeat(FITNESSFILENAME)
+        
     object_struct_dict = config.get_object_struct()
     for serv in object_struct_dict:
         for thr_int in object_struct_dict[serv]:
