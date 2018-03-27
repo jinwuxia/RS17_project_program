@@ -46,8 +46,21 @@ python ../../../split/dependency/mixParser.py    ${project}xml.csv   null ${proj
 #enum lapclass, nonlap class, all thr and servers' custer result
 cd coreprocess/optionA-enum
 python enum.py project_fitness.csv
-#generate above componentAPI
-in linux: ./batch_getcomponentAPI.sh
+
+#pareto anaysis all possible answers, fitness.loadFitness_noRepeat
+cd optionB-search
+#use loadFitness_noRepeat
+python paretoanalysis.py    ../../../testcase_data/jpetstore6/coreprocess/jpetstore6_pareto_analysis_servnum_best_norepeat.csv  no
+#use loadFitness()
+python paretoanalysis.py    ../../../testcase_data/jpetstore6/coreprocess/jpetstore6_pareto_analysis_servnum_best.csv    yes
+
+#choose a real service number, then produce its api
+#modify batch_getcomponentAPI.py
+python batch_getcomponentAPI.py
+
+#-----------------------------------------------
+#generate all  componentAPI
+#in linux: ./batch_getcomponentAPI.sh
 
 
 

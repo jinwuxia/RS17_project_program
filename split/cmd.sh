@@ -22,7 +22,7 @@ cd ../../RS17_project_program/dependency
 git log --name-status > ../testcase_data/jforum219/dependency/jforum219.gitlog   #显示新增、修改、删除的文件清单
 python xmlParser.py  ../testcase_data/jforum219/dependency/jforum219.xml     ../testcase_data/jforum219/dependency/jforum219xml.csv
 python cmtParser.py  ../testcase_data/jforum219/dependency/jforum219.gitlog     ../testcase_data/jforum219/dependency/jforum219cmt.csv  java
-python comParser.py ../testcase_data/jforum219/workflow/jforum219_workflow_reduced.csv   ../testcase_data/jforum219/dependency/jforum219com.csv
+python comParser.py  ../testcase_data/jforum219/workflow/jforum219_workflow_reduced.csv   ../testcase_data/jforum219/dependency/jforum219com.csv
 
 
 #do testcase clutering by core_function_entity (entity class in part2)
