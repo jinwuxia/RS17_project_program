@@ -4,13 +4,14 @@ class GlobalVar:
     M = 8 #silect base
     K = 6 #elict parents
 
+    '''
     #for jpetstore6
     X_S = 2
     X_E = 10
     BIT_COUNT_X = 6
     BIT_COUNT_Y = 7
     FITNESSFILENAME = '../../../testcase_data/jpetstore6/coreprocess/jpetstore6-fitness.csv'
-
+    '''
 
     '''
     #for jforum219_1
@@ -28,8 +29,25 @@ class GlobalVar:
     BIT_COUNT_Y = 7
     FITNESSFILENAME = '../../../testcase_data/roller520/coreprocess/roller520-fitness.csv'
     '''
+    '''
+    #for bvn13
+    X_S = 1
+    X_E = 26
+    BIT_COUNT_X = 5
+    BIT_COUNT_Y = 4
+    FITNESSFILENAME = '../../../testcase_data/bvn13/coreprocess/bvn13_fitness.csv'
+    '''
+    #for solo270
+    X_S = 2
+    X_E = 70
+    BIT_COUNT_X = 7
+    BIT_COUNT_Y = 4
+    FITNESSFILENAME = '../../../testcase_data/solo270/coreprocess/solo270_fitness.csv'
+
     Y_S = 1
-    Y_E = 100 #50
+    Y_E = 10
+    #Y_E = 100
+
 
     OBJECT_STRUCT_DICT = dict()
     #FITNESS_METHOD = 'withinwf-interwf-repclass'  #or withinwf or withinwf-interwf-repclass
