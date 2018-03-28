@@ -1,11 +1,15 @@
 uperl identifierParser.pl jpetstore6.udb  org.mybatis.jpetstore   jpetstore6_words.txt
 
-python semanticParser.py  jpetstore6_words.txt   jpetstore6syn.csv   0.8
+python semanticParser.py  jpetstore6_words.txt   jpetstore6syn.csv   0.8 #(0.8no usage)
 
 python semanticCosin.py  jpetstore6syn.csv   jpetstore6synsim.csv
 
+#count the coverage when use different   sim threshold
+python classstatis.py   jpetstore6_all_class.csv   jpetstore6synsim.csv
+
+#use class benchmark to filter the sim file
 python semanticFilter.py classFile   jpetstore6synsim.csv  after_filter_jpetstore6synsim.csv
-python mstClustering.py  jpetstore6synsim.csv   jpetstore6clusters.csv  6
+python mstClustering.py  after_filter_jpetstore6synsim.csv   jpetstore6clusters.csv  6
 
 
 python batch_mstClustering.py

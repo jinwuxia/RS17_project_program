@@ -6,6 +6,14 @@ import sys
 if __name__ == '__main__':
     project = sys.argv[1]
 
+    if project == 'solo270':
+        #solo270
+        cluster_file_name =  'data/solo270/clusters/afterFilter/solo270_'
+        workflow_file_name = 'data/solo270/solo270_workflow_reduced.csv'
+        api_file_name =      'data/solo270/clusters/afterFilter/solo270_'
+        start = 7
+        end = 11
+
     if project == 'bvn13blog':
         #bvn13blog
         cluster_file_name =  'data/blog-bvn13/clusters/afterFilter/bvn13_'
