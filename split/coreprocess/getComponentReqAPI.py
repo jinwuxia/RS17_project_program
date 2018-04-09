@@ -1,7 +1,7 @@
 '''
 according to the process_overlap_threshold,
 use the prcessOverlap/jforum219_testcase1_clusters_${threshold}.csv cluster file
-to extract the component's provided API and save to file.
+to extract the component's required API and save to file.
 '''
 
 import sys
@@ -199,19 +199,19 @@ def isInitMethod(methodID):
 # other-> -1 is your provided private API
 # other-> your is your provided PrivateAPI
 #generate res[clusterID][apiID] = 1 in case the api is repetitive
-def extractAPI(interDict):
+def extractReqAPI(interDict):
     clusterAPIDict = dict()  #dict[cluserID] = [uniqueCalleeMethodID1, 2, ...]
     for traceID in interDict:
         #print 'traceID=', traceID,
         for interEdgeID in interDict[traceID]:
             #print 'interEdgeID=', interEdgeID,
             oneEdge = EDGEList[interEdgeID]
-            className2 = METHODList[oneEdge.endID].className
-            #print 'className2=',className2,
-            if className2 in CLASSNAME2IDDict:
-                classID2 = CLASSNAME2IDDict[className2]
-                #print 'classID=',classID2,
-                itsClusterIDList = getClustersofClass(classID2)
+            className1 = METHODList[oneEdge.startID].className
+            #print 'className1=',className1,
+            if className1 in CLASSNAME2IDDict:
+                classID1 = CLASSNAME2IDDict[className1]
+                #print 'classID=',classID1,
+                itsClusterIDList = getClustersofClass(classID1)
 
                 for eachClusterID in itsClusterIDList:
                     if eachClusterID not in clusterAPIDict:
@@ -224,7 +224,7 @@ def extractAPI(interDict):
 #clusterAPIDict[clusterID][apiID] = 1
 def writeAPI(clusterAPIDict, fileName):
     resList = list()
-    resList.append(['clusterID', 'apiClass','apiMethod', 'parameter', 'return'])
+    resList.append(['clusterID', 'apiClass', 'apiMethod', 'parameter', 'return'])
     for clusterID in clusterAPIDict:
         for methodID in clusterAPIDict[clusterID]:
             tmpList = list()
@@ -310,6 +310,6 @@ if __name__ == '__main__':
     #operate TRACEList[traceID]=[edgeID1, edgeID2], generate interTsEdgeDict[traceID][interedgeID] = count
     interTsEdgeDict = filterOutInterEdge()
     #extrace API
-    clusterAPIDict = extractAPI(interTsEdgeDict)
+    clusterAPIDict = extractReqAPI(interTsEdgeDict)
     #save to file
     writeAPI(clusterAPIDict, apiFileName)
