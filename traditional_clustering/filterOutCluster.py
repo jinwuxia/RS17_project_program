@@ -54,6 +54,9 @@ def writeCSV(fileName, newClusterDict):
         writer.writerows(listlist)
     print fileName
 
+'''
+python filterOutCluster.py classbenchmark.csv  oldCluter.csv newCluter.csv
+'''
 if __name__ == '__main__':
     classFileName = sys.argv[1]
     oldClusterFileName = sys.argv[2]
