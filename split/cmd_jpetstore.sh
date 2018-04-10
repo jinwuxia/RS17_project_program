@@ -54,16 +54,23 @@ python paretoanalysis.py    ../../../testcase_data/jpetstore6/coreprocess/jpetst
 #use loadFitness()
 python paretoanalysis.py    ../../../testcase_data/jpetstore6/coreprocess/jpetstore6_pareto_analysis_servnum_best.csv    yes
 
-#choose a real service number, then produce its api
-#modify batch_getcomponentAPI.py
+#according to above pareto analysis result, choose a proper real service number, then produce its api
+#modify batch_getcomponentAPI.py, get compoennt API.
 python batch_getcomponentAPI.py
+
+#or extract ProReqAPI
+#for icws, limbo, wca
+python ../../icws2017/getComponentProReqAPI.py  \
+jpetstore6/limbo/jwx_limbo_ilm_LIMBO_preselected_ilm_4_clusters.rsf.csv  \
+../jpetstore6/workflow/jpetstore6_workflow_reduced.csv  \
+jpetstore6/limbo/jpetstore6_4_clusterProReqAPI.csv
+
 
 #-----------------------------------------------
 #generate all  componentAPI
 #in linux: ./batch_getcomponentAPI.sh
 
-
-
+'''
 #coreprocess automaticlaly decide the servernum and thr using NSGAII
 cd coreprocess/optionB-search
 python nsga2main.py   jpetstore6_nsga.csv   jpetstore6_nsga_best.csv #set parameter in config.py
@@ -74,16 +81,24 @@ python nsga2main.py   jpetstore6_nsga.csv   jpetstore6_nsga_best.csv #set parame
 
 #use the nsga average as the result, then analsis jpetstore6_nsga.csv
 #interface, api,peravg
-
+'''
 
 #measurement cohesion and coupling         public vs private
 python tosc-interd-msg-cohesion.py   servnum-thr-clusterAPI.csv
 python tosc-interd-dom-cohesion.py   servnum-thr-clusterAPI.csv
-python tosc-interd-dom-cohesion-public .py   testcasecluster.csv
+#python tosc-interd-dom-cohesion-public .py   testcasecluster.csv
 
-RQ2:
-pareto anaysis all possible answers
-python paretoanalysis.py    ../../../testcase_data/jpetstore6/coreprocess/jpetstore6_pareto_analysis_allbest.csv
+#measure our proposed metric by co-change benchmark
+measure/cochange_measure1.py   
+measure/cochange_measure2f.py  #biased, not use
+
+#icws process, refer to icws/cmd.sh
+#wca,limbo process, refer to traditionalClustering/cmd.sh
+
+
+# statatis trace data, commit data, trace-to-trace simlarity
+
+
 
 -------------------------------------------------------------------REFER TO CMD.SH
 #------------------------------------------------
