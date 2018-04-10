@@ -43,7 +43,7 @@ def getMethodName(fullStr):
         methodStr = methodStr + '()'
     else:
         methodStr = methodStr + '(' + paraStr + ')'
-    print 'XXXX  Fullstr:', fullStr, '  MethodStr:', methodStr
+    #print 'XXXX  Fullstr:', fullStr, '  MethodStr:', methodStr
     return methodStr
 
 #modifier returntype class.method
@@ -90,7 +90,7 @@ def getClassName(fullStr):
         onlyClassName = '.'.join(tmp)
         index = onlyClassName.index('_$$_jvst')
         className = onlyClassName[0 : index]
-    print 'XXXXX   Fullstr:', fullStr, 'className', className
+    #print 'XXXXX   Fullstr:', fullStr, 'className', className
     return className
 
 
@@ -160,7 +160,7 @@ class KiekerParser:
                     record = Record(tmp[1], tmp[2], tmp[3], tmp[4], tmp[5], tmp[6], tmp[7], int(tmp[8]), int(tmp[9]))
                     #update recordList
                     self.recordList.append(record)
-        print "record list len = ", len(self.recordList), "......"
+        print "origin: record list len = ", len(self.recordList), "......"
 
 	#begin: sorting records using sequence ID  for slice
         #sort all recordList using sequenceID. beacuse the distributed system logs come from different nodes, so we merge and sort all using sequenceID
