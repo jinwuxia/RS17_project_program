@@ -7,9 +7,13 @@ import re
 
 #COMMIT_LOG_PRE_NAME = 'src/main/java/'  #jpetstore, bvn13_springblog
 #COMMIT_LOG_PRE_NAME = 'app/src/main/java/' #roller
-COMMIT_LOG_PRE_NAME = 'src/main/java/' #solor270
+#COMMIT_LOG_PRE_NAME = 'src/main/java/' #solor270
+COMMIT_LOG_PRE_NAME = '' #xwiki
+
 ID2NAMEDict = dict()
 NAME2IDDict = dict()
+
+GLOBLE_THR = 36 # for roller and xwiki;  0 for others.  comit-together class number > this value, ignore the dependency
 
 #fileName = 'dir1/dir2/filename'
 def getSimpleName(fileName):
@@ -23,9 +27,17 @@ def getSimpleName(fileName):
         tmp = tmp[preLen: len(tmp)]
         tmp = tmp.split('/')
         fileName = '.'.join(tmp)
-        print fileName
+        #print fileName
     return fileName
 
+
+'''
+filter test file
+'''
+def isNonTest(filename):
+    if "/test/" in filename:
+        return False
+    return True
 
 
 
@@ -43,13 +55,14 @@ def processLog(fileName, fileType):
     ID2NameDict = dict()
     index = 0
 
-    with open(fileName) as fp:
+    with open(fileName, encoding="utf8") as fp:
         newList = list()
         for line in fp:
             if re.match(r'commit[\s][0-9,a-z,A-Z]+', line):
                 #print 'commit', line
-                if len(newList) >= 2:
+                if len(newList) >= 2 and (GLOBLE_THR == 0 or (GLOBLE_THR > 0 and len(newList) < GLOBLE_THR )):
                     listList.append(newList)
+
                 newList = list()
             elif re.match(r'[MAD][\t]', line):
                 #print 'MAD', line
@@ -57,8 +70,8 @@ def processLog(fileName, fileType):
                 commitType = line.split('\t')[0]
                 commitFileName = line.split('\t')[1] #'fileName\n'
                 commitFileName = commitFileName[0:len(commitFileName) - 1]
-                print commitType, commitFileName
-                if commitType == 'M' and isIncluded(commitFileName, fileType): #just modify, not include Delete and Add
+                #print commitType, commitFileName
+                if commitType == 'M' and isIncluded(commitFileName, fileType) and isNonTest(commitFileName): #just modify, not include Delete and Add
                     simpleName = getSimpleName(commitFileName)
                     if simpleName != '':
                         if simpleName not in name2IDDict:
@@ -67,7 +80,7 @@ def processLog(fileName, fileType):
                             index += 1
                         ID = name2IDDict[simpleName]
                         newList.append(ID)
-        if len(newList) >= 2:
+        if len(newList) >= 2 and (GLOBLE_THR == 0 or (GLOBLE_THR > 0 and len(newList) < GLOBLE_THR )):
             listList.append(newList)
 
     return listList, name2IDDict, ID2NameDict
@@ -94,10 +107,10 @@ def writeCSV(oneDict, fileName):
     for ID1 in oneDict:
         for ID2 in oneDict[ID1]:
             listList.append([ID2NAMEDict[ID1], ID2NAMEDict[ID2], oneDict[ID1][ID2] ])
-    with open(fileName, 'wb') as fp:
+    with open(fileName, 'w') as fp:  #"wb" in python2, "w" in python3
         writer = csv.writer(fp)
         writer.writerows(listList)
-    print fileName
+    print (fileName)
 
 
 #from commit log, extract the commit deps for class pairs
@@ -110,5 +123,5 @@ if __name__ == '__main__':
     commitDepDict = change2Pair(commitDepList)
     writeCSV(commitDepDict, commitDepFileName)
 
-    for each in commitDepList:
-        print each
+    #for each in commitDepList:
+    #    print each
