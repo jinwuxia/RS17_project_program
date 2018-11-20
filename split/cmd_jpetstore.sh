@@ -19,6 +19,9 @@ git log --name-status > ../testcase_data/jforum219/dependency/jforum219.gitlog
 und export -dependencies class cytoscape ${project}.xml  ${project}.udb
 python ${code_depend_dir}xmlParser.py  ${project}.xml   ${project}xml.csv
 python ${code_depend_dir}cmtParser.py  ${project}.gitlog   ${project}cmt.csv  java
+#if the filename in gitlog cannot easily mapped to classname, please add the following CMD
+#python classstatis/cmtfilenameMap2ClassName.py
+# process above cmt_file.csv (commit dependency at file level ) to cmt_class.csv (at class level)  by using the result of above cmd.
 python ${code_depend_dir}comParser.py  ../workflow/${project}_workflow_reduced.csv   ${project}com.csv
 
 cd testcase_data/${project}/coreprocess
@@ -26,13 +29,29 @@ code_core_dir='../../../split/coreprocess/'
 python ${code_core_dir}genTestCaseFv.py  ../workflow/${project}_workflow_reduced.csv   ../workflow/${project}_testcase_name.csv  null  ${project}_testcase0_in_entity.csv     ${project}_testcase0_class.csv  ${project}_testcase0_fv.csv
 python ${code_core_dir}testCaseClusteringByEntity.py   ${project}_testcase0_fv.csv   ${project}_testcase0_clusters.csv
 
-
+#if testcaseClusteringByEntity.py is not executed,
+#then in the following, exclude file = null, include file = "*workflow_reduced_class.csv"
 python  ${code_core_dir}genTestCaseFv.py  ../workflow/${project}_workflow_reduced.csv   ../workflow/${project}_testcase_name.csv  ${project}_testcase1_ex_actdao.csv  null ${project}_testcase1_class.csv  ${project}_testcase1_fv.csv
 python  ${code_core_dir}testCaseClustering.py   ${project}_testcase1_fv.csv    ${project}_testcase0_clusters.csv  jm AVG  1  ${project} 0.01
+
+
+
 mkdir testCaseClustering
 mv ${project}_testcase1_jm_AVG_*   testCaseClustering/
 
-./coreprocess/batch_analyzeCluster.sh  > log.csv
+#analyze the non-lapped , high-overlapped, low-overlapped classes for each clustering results above
+./coreprocess/batch_analyzeCluster.sh  > ${project}_analyzeCluster.csv#(.xls)
+
+#if the overlapped class is so many, we can use analyzeOneCluter to look the lapped class in detail, for on cluster results.
+python coreprocess/analyzeOneCluster.py
+../testcase_data/${project}/coreprocess/testcaseClustering/${project}_testcase1_jm_AVG_1463.csv
+../testcase_data/${project}/coreprocess/${project}_testcase1_fv.csv
+../testcase_data/${project}/coreprocess/${project}_testcase1_class.csv
+../testcase_data/${project}/${project}_analysis/${project}_1463_nonlapclass.csv
+../testcase_data/${project}/${project}_analysis/${project}_1463_lapclass.csv
+../testcase_data/${project}/${project}_analysis/${project}_1463_mergefv.csv
+../testcase_data/${project}/${project}_analysis/${project}_benchClsuters.csv
+
 python ../../../split/dependency/mixParser.py    ${project}xml.csv   null ${project}com.csv   ../coreprocess/${project}_testcase1_class.csv   ${project}_testcase1_mixedDep.csv
 
 
@@ -45,7 +64,7 @@ python ../../../split/dependency/mixParser.py    ${project}xml.csv   null ${proj
 
 #enum lapclass, nonlap class, all thr and servers' custer result
 cd coreprocess/optionA-enum
-python enum.py project_fitness.csv
+python enum.py project-fitness.csv
 
 #pareto anaysis all possible answers, fitness.loadFitness_noRepeat
 cd optionB-search
@@ -89,7 +108,7 @@ python tosc-interd-dom-cohesion.py   servnum-thr-clusterAPI.csv
 #python tosc-interd-dom-cohesion-public .py   testcasecluster.csv
 
 #measure our proposed metric by co-change benchmark
-measure/cochange_measure1.py   
+measure/cochange_measure1.py
 measure/cochange_measure2f.py  #biased, not use
 
 #icws process, refer to icws/cmd.sh
