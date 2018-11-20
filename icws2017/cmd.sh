@@ -1,6 +1,6 @@
 uperl identifierParser.pl jpetstore6.udb  org.mybatis.jpetstore   jpetstore6_words.txt
 
-python semanticParser.py  jpetstore6_words.txt   jpetstore6syn.csv   0.8 #(0.8no usage)
+python semanticParser.py  jpetstore6_words.txt   jpetstore6syn.csv   
 
 python semanticCosin.py  jpetstore6syn.csv   jpetstore6synsim.csv
 
