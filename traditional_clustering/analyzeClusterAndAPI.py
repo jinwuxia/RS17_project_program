@@ -71,7 +71,7 @@ def readWorkflowFile(filename):
     tmpMethodDict = dict() #dict(methodname) = ID
     tmpClassDict = dict()  #dict(className) = ID
     tmpEdgeDict = dict()  #dict[startID][endID] = edgeIndex
-    with open(filename, "rb") as fp:
+    with open(filename, "r", newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
             #print each
@@ -242,7 +242,7 @@ def writeAPI(clusterAPIDict, fileName):
             tmpList.append(oneMethod.returnType)
             resList.append(tmpList)
 
-    with open(fileName, 'wb') as fp:
+    with open(fileName, 'w', newline="") as fp:
         writer = csv.writer(fp)
         writer.writerows(resList)
     #print fileName
@@ -268,7 +268,7 @@ def readClusterFile(fileName):
     classID2ClusterDict = dict()
     clusterID2ClassDict = dict()
     classIndex = 0
-    with open(fileName, 'rb') as fp:
+    with open(fileName, 'r', newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
             [containes, clusterID, className] = each
@@ -294,11 +294,11 @@ def readClusterFile(fileName):
 
 
 #python pro.py
-#coreprocess/testcaseClusteirng/jforum219Testcase1_jm_AVG_20.csv
+#coreprocess/cluster.csv
 #workflow/jforum219_workflow_reduced.csv
 #apiFileName.csv
 if __name__ == '__main__':
-    clusterFileName = sys.argv[1]  #[classID, className, clusterID ]
+    clusterFileName = sys.argv[1]
     workflowFileName = sys.argv[2]
     apiFileName = sys.argv[3]
     [CLASSID2NAMEDict, CLASSNAME2IDDict, CLASSID2CLUSTERDict, CLUSTERID2CLASSDict] = readClusterFile(clusterFileName)
@@ -320,4 +320,4 @@ if __name__ == '__main__':
     resList.extend([APICount, APICount_avg])
     resStrList = [str(each) for each in resList]
     strstr = ','.join(resStrList)
-    print strstr
+    print (strstr)

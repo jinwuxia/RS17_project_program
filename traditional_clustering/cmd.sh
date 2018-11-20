@@ -11,9 +11,15 @@ python publicAPI.py  ../testcase_data/jpetstore6/workflow/jpetstore6_testcase_na
 python tosc-interf-dom-cohesion-public.py ...
 
 
+
+
+
 #######################batch
 #get rsf file
 getRSF.py    bvn13blogund.csv  bvn13blogund_class_dep.rsf
+
+#class coverage
+classstatis.py split/classstatis/*_all_class.txt  ./*und_class_dep.rsf
 #move clas_dep to arcade/input
 
 #arcade

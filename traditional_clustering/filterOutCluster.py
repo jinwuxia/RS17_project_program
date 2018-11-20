@@ -4,7 +4,7 @@ import csv
 #[contains,cluterID, className]
 def readCluster(fileName):
     clusterID2ClassList = dict()  #[cluterID] = [className1, className2]
-    with open(fileName, 'rb') as fp:
+    with open(fileName, 'r', newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
             [contains, clusterID, className] = each
@@ -17,7 +17,7 @@ def readCluster(fileName):
 #coverage classList
 def readClass(fileName):
     classNameList = list()
-    with open(fileName, 'rb') as fp:
+    with open(fileName, 'r', newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
             [classID, className] = each
@@ -39,8 +39,8 @@ def filterOut(classList, clusterDict):
             for className in clusterDict_1[clusterID]:
                 newClusterDict[newID].append(className)
             newID += 1
-    print 'old cluster num=', len(clusterDict)
-    print 'new cluster num=', len(newClusterDict)
+    print ('old cluster num=', len(clusterDict))
+    print ('new cluster num=', len(newClusterDict))
     return newClusterDict
 
 def writeCSV(fileName, newClusterDict):
@@ -49,13 +49,13 @@ def writeCSV(fileName, newClusterDict):
         for className in newClusterDict[clusterID]:
             listlist.append(['contains', clusterID,  className])
 
-    with open(fileName, 'wb') as fp:
+    with open(fileName, 'w', newline="") as fp:
         writer = csv.writer(fp)
         writer.writerows(listlist)
-    print fileName
+    print (fileName)
 
 '''
-python filterOutCluster.py classbenchmark.csv  oldCluter.csv newCluter.csv
+python filterOutCluster.py classbenchmark.csv(icws/TS_class.csv)  oldCluter.csv newCluter.csv
 '''
 if __name__ == '__main__':
     classFileName = sys.argv[1]
