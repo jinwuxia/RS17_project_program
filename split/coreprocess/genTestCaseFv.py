@@ -18,7 +18,7 @@ INCLUDEDCLASSNAMEList = list()
 
 def readTestCase(fileName):
     testCaseDict = dict()
-    with open(fileName, "rb") as fp:
+    with open(fileName, "r", newline="") as fp:
         reader = csv.reader(fp)
         index = 0
         for each in reader:
@@ -29,10 +29,22 @@ def readTestCase(fileName):
 
 def readCSV(fileName):
     resList = list()
-    with open(fileName, "rb") as fp:
+    with open(fileName, "r", newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
-            [traceID,order,structtype,method1,method2,m1_para,m2_para,className1,className2, m1_return, m2_return] = each
+            traceID = each[0]
+            order = each[1]
+            structtype = each[2]
+            method1 = each[3]
+            method2 = each[4]
+            m1_para = each[5]
+            m2_para = each[6]
+            className1 = each[7]
+            className2 = each[8]
+            m1_return = each[9]
+            m2_return = each[10]
+            #weight = each[11]
+            #[traceID,order,structtype,method1,method2,m1_para,m2_para,className1,className2, m1_return, m2_return] = each
             if traceID == 'traceID':
                 continue
             oneList = [int(traceID), className1, className2]
@@ -85,7 +97,7 @@ def isIncluded(className):
 #class or package name which should be excluded
 def readTaggedClass(fileName):
     resList = list()
-    with open(fileName, "rb") as fp:
+    with open(fileName, "r", newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
             [className] = each
@@ -111,6 +123,14 @@ def firstProcess(initList):
             className2IDDict[className2] = classIndex
             classID2NameDict[classIndex] = className2
             classIndex += 1
+
+        if isIncluded(className1):
+            classID1 = className2IDDict[className1]
+            if classID1 not in resList[traceID]:
+                resList[traceID][classID1] = 1
+            else:
+                resList[traceID][classID1] += 1
+
         if isIncluded(className2):
             classID2 = className2IDDict[className2]
             if classID2 not in resList[traceID]:
@@ -132,16 +152,16 @@ def secondProcess(aList):
     return resList
 
 def writeClass(fileName):
-    with open(fileName, "wb") as fp:
+    with open(fileName, "w", newline="") as fp:
         writer = csv.writer(fp)
         for classID in CLASSID2NAMEDict:
             tmpList = [classID, CLASSID2NAMEDict[classID]]
             writer.writerow(tmpList)
-    print fileName
+    print (fileName)
 
 #add first colmun save to file
 def writeMatrix(matrix, testCaseDict, fileName):
-    with open(fileName, "wb") as fp:
+    with open(fileName, "w", newline="") as fp:
         writer = csv.writer(fp)
         for traceID in range(0, len(matrix)):
             #print traceID, testCaseDict[traceID]
@@ -149,7 +169,7 @@ def writeMatrix(matrix, testCaseDict, fileName):
             tmpList = matrix[traceID]
             oneList.extend(tmpList)
             writer.writerow(oneList)
-    print fileName
+    print (fileName)
 
 #From workflowFile,  generate testcase featureVector, and classFile
 #python pro.py  workflowfile  testcaseFile excluededFile    includedFileName  outClassFile   outMatrixFile

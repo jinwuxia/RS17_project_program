@@ -22,7 +22,7 @@ class AlgClass:
     project = ""
 
     def __init__(self):
-        print "init: do nothing"
+        print ("init: do nothing")
 
     def setDistFunc(self, func):
         self.distFunc = func
@@ -50,18 +50,18 @@ class AlgClass:
 
 def readCSV(fileName):
     resList = list()
-    with open(fileName, "rb") as fp:
+    with open(fileName, "r", newline="") as fp:
         reader = csv.reader(fp, delimiter = ',')
         for eachLine in reader:
             resList.append(eachLine)
     return resList
 
 def writeCSV(fileName,listlist):
-    with open(fileName, "wb") as fp:
+    with open(fileName, "w", newline="") as fp:
         writer = csv.writer(fp)
         for eachList in listlist:
             writer.writerow(eachList)
-    print fileName
+    print (fileName)
 
 def isLess(floatNum, threshold):
     if floatNum - threshold <= 0.001:
@@ -121,7 +121,7 @@ def WCAFindDiffer(vector_i, vector_j, thr):
         elif not isLess(vector_i[index], thr) and isLess(vector_j[index], thr):
             onlyAIndex.append(index)
             onlyAVal.append(vector_i[index])
-	elif isLess(vector_i[index], thr) and  isLess(vector_j[index], thr):
+        elif isLess(vector_i[index], thr) and  isLess(vector_j[index], thr):
             bothNotIndex.append(index)
             bothNotVal.append(vector_i[index])
 
@@ -134,7 +134,7 @@ def WCACalDistClass_ij(i, j, class1Fv, class2Fv, distFunc, thr):
         return 0
 
     if len(class1Fv) != len(class2Fv):
-        print "this two feature vector donnot have same len\n"
+        print ("this two feature vector donnot have same len\n")
         return
 
 
@@ -193,7 +193,7 @@ def WCACalDistCluster_ij(cluster_i, cluster_j):
     elif oneAlg.mergeFunc == "AVG": # choose the avg nodeNodeDistance as cluster distance
         return sum(distList) / float(len(distList))
     else:
-        print "wrong merge function!!!!!!!!!!"
+        print ("wrong merge function!!!!!!!!!!")
 
 #sortedList = [[custer1, cluster2, simVal],  [],  [],]
 #to avoid that new clusters tend to be clutered to a large cluter
@@ -213,7 +213,7 @@ def chooseMinSizeClusterPair(aList, preIndex):
             break
         else:
             tmpIndex += 1
-    print tmpIndex
+    print (tmpIndex)
     if tmpIndex == 1:
         rd = 0
     else:
@@ -244,7 +244,7 @@ def WCAChooseMostSim(N):
             break
         else:
             tmpIndex += 1
-    print tmpIndex,'....',
+    print (tmpIndex,'....')
     '''
     #choose from 0 to tmpIndex-1 randomly
     import random
@@ -274,23 +274,23 @@ def WCAClustering(fv):
         (merge_i, merge_j, merge_simVal) = WCAChooseMostSim(N)
 
         if merge_i == -1 and merge_j == -1:
-            print merge_i, merge_j, "no merge"
+            print (merge_i, merge_j, "no merge")
             break
         else:
             #merge the cluster_i and cluster_j, and update FINALClusters
-            print FINALClusters[merge_i], " and ",  FINALClusters[merge_j], " simVal=", merge_simVal
+            print (FINALClusters[merge_i], " and ",  FINALClusters[merge_j], " simVal=", merge_simVal)
             PROCESSRECORDList.append([N - 1,  N - 1 - ZEROTSCount, merge_simVal])
             FINALClusters[merge_i].extend(FINALClusters[merge_j])
             del FINALClusters[merge_j]
 
             if N-1 <= int(origN):
                 outfileName = oneAlg.project + '_' + 'testcase1_' + oneAlg.distFunc + '_' + oneAlg.mergeFunc + '_' + str(N-1) + '.csv'
-                print "clustering result file: ", outfileName
+                print ("clustering result file: ", outfileName)
                 printClustering(outfileName)
         iterk = iterk + 1
         N = N - 1
 
-    print "clustering end...."
+    print ("clustering end....")
 
 
 def printClustering(fileName):

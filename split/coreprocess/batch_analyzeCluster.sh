@@ -44,9 +44,21 @@ python coreprocess/analyzeAllCluster.py   $file    ../testcase_data/${project}/c
 done
 eof
 
+:<<eof
 #solo270
 project=solo270
 cluster_num=70
+for((i=${cluster_num};i>=2;i--));
+do
+file='../testcase_data/'${project}'/coreprocess/testcaseClustering/'${project}'_testcase1_jm_AVG_'${i}'.csv'
+python coreprocess/analyzeAllCluster.py   $file    ../testcase_data/${project}/coreprocess/${project}_testcase1_fv.csv    ../testcase_data/${project}/coreprocess/${project}_testcase1_class.csv
+#mv 'comb_tmp.txt'   'comb_tmp_'${i}'.txt'
+done
+eof
+
+#xwiki-platform
+project=xwiki-platform108
+cluster_num=700
 for((i=${cluster_num};i>=2;i--));
 do
 file='../testcase_data/'${project}'/coreprocess/testcaseClustering/'${project}'_testcase1_jm_AVG_'${i}'.csv'

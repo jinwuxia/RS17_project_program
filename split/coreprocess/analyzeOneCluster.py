@@ -6,14 +6,14 @@ CLASSID2NAMEDict = dict()
 
 def readCSV(fileName):
     resList = list()
-    with open(fileName, "rb") as fp:
+    with open(fileName, "r", newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
             resList.append(each)
     return resList
 
 def writeCSV(listList, fileName):
-    with open(fileName, "wb") as fp:
+    with open(fileName, "w", newline="") as fp:
         writer = csv.writer(fp)
         writer.writerows(listList)
     #print fileName
@@ -58,7 +58,7 @@ def mergeClusterFv(clusterList, fvList, classCount):
         for eachTsID in tsIDList:
             #two list is sumed togeter for each element
             tmpList = map(lambda x, y : x + y, tmpList, fvList[eachTsID])
-        resList.append(tmpList)
+        resList.append(list(tmpList))
     return resList
 
 
@@ -95,7 +95,7 @@ def writeBuSet2File(clusterIDList, buSetList, clusterFvList, fileName):
         clusterID = clusterIDList[index]
         for classID in list(buSetList[index]):
             resList.append([classID, CLASSID2NAMEDict[classID], clusterID, clusterFvList[clusterID][classID]])
-    with open(fileName, "wb") as fp:
+    with open(fileName, "w", newline="") as fp:
         writer = csv.writer(fp)
         writer.writerows(resList)
     #print fileName
@@ -108,11 +108,11 @@ def writeBuSet2File(classID2ClusterDict , fileName ):
         if len(clusterIDList) == 1:
             tmp = [classID, CLASSID2NAMEDict[classID], clusterIDList[0] ]
             resList.append(tmp)
-    with open(fileName, "wb") as fp:
+    with open(fileName, "w", newline="") as fp:
         writer = csv.writer(fp)
         writer.writerow(['classID', 'className', 'clusterID'])
         writer.writerows(resList)
-    print fileName
+    print (fileName)
 
 #len(clusterIDList) > 1' s class
 def writeJiaoSet2File(classID2ClusterDict, fileName):
@@ -122,13 +122,44 @@ def writeJiaoSet2File(classID2ClusterDict, fileName):
         if len(clusterIDList) > 1:
             clusterIDList = [str(each) for each in clusterIDList]
             clusterIDStr = ':'.join(clusterIDList)
-            tmp = [classID, CLASSID2NAMEDict[classID], clusterIDStr ]
+            tmp = [classID, CLASSID2NAMEDict[classID], len(clusterIDList), clusterIDStr ]
             resList.append(tmp)
-    with open(fileName, "wb") as fp:
+    with open(fileName, "w", newline="") as fp:
         writer = csv.writer(fp)
-        writer.writerow(['classID', 'className', 'clusterIDList'])
+        writer.writerow(['classID', 'className', 'clusterCount', 'clusterIDList'])
         writer.writerows(resList)
-    print fileName
+    print (fileName)
+
+
+
+#if some class are appearing in same cluterList, then they should group togeter
+#that is, frequent items (classes) in traces are responsible for same functionality.
+
+def groupClassByCluters(classID2ClusterDict, fileName):
+    id = 0
+    newClusterIDDict = dict() #cluterIDstr->clusterID id
+    resDict = dict() #[id]= classID,
+    for classID in classID2ClusterDict:
+        clusterIDList = classID2ClusterDict[classID]
+        clusterIDList = [str(each) for each in clusterIDList]
+        clusterIDStr = ':'.join(clusterIDList)
+        if clusterIDStr not in newClusterIDDict:
+            newClusterIDDict[clusterIDStr] = id
+            id += 1
+
+        currentId = newClusterIDDict[clusterIDStr]
+        if currentId not in resDict:
+            resDict[currentId] = list()
+        resDict[currentId].append(classID)
+
+    with open(fileName, "w", newline="") as fp:
+        writer = csv.writer(fp)
+        writer.writerow(['classID','className','clusterID'])
+        for newClusterId in resDict:
+            for classId in resDict[newClusterId]:
+                tmp = [classId, CLASSID2NAMEDict[classId], newClusterId]
+                writer.writerow(tmp)
+    print (fileName)
 
 def writeMergedFv2File(clusterFvList, fileName):
     resList = list()
@@ -137,23 +168,27 @@ def writeMergedFv2File(clusterFvList, fileName):
             if clusterFvList[clusterID][classID] != 0:
                 tmp = [ CLASSID2NAMEDict[classID], clusterID, clusterFvList[clusterID][classID] ]
                 resList.append(tmp)
-    with open(fileName, "wb") as fp:
+    with open(fileName, "w", newline="") as fp:
         writer = csv.writer(fp)
         writer.writerow(['className', 'clusterID', 'count'])
         writer.writerows(resList)
-    print fileName
+    print (fileName)
 
 
-#process the clustering result
-#python pro.py    clusterFileName.csv  featureVectorFileName.csv  classFileName.csv  nonlapFileName lapFileName  class2clusterfv.csv
-#../testcase_data/jforum219/coreprocess/jforum219_testcase1_jm_AVG_'${i}'.csv'
+'''
+analyze one clutering result files, output lapped class, non-lapped class in detail.
+'''
+#python pro.py    clusterFileName.csv  featureVectorFileName.csv  classFileName.csv  nonlapFileName lapFileName  class2clusterfv.csv  idealCluter.csv
 if __name__ == '__main__':
     clusterFileName = sys.argv[1]
     featureVectorFileName = sys.argv[2]
     classFileName = sys.argv[3]
+
     nonlapFileName = sys.argv[4] #output
     lapFileName =sys.argv[5] #output
     mergedFvFileName = sys.argv[6]
+    idealCluterFileName = sys.argv[7]
+
     classList = readCSV(classFileName)
     CLASSID2NAMEDict = processClass(classList)
     fvList = readCSV(featureVectorFileName)
@@ -171,3 +206,6 @@ if __name__ == '__main__':
     writeBuSet2File(classID2ClusterDict , nonlapFileName )
     writeJiaoSet2File(classID2ClusterDict, lapFileName)
     writeMergedFv2File(clusterFvList, mergedFvFileName)
+
+    #
+    groupClassByCluters(classID2ClusterDict, idealCluterFileName)
