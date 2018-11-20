@@ -4,10 +4,10 @@ import math
 
 def readCSV(fileName):
     class2VectorDict = dict()#dict[0] = vector
-    with open(fileName, 'r') as fp:
+    with open(fileName, 'r', newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
-            print each
+            print (each)
             className = each[0]
             del each[0]
             class2VectorDict[className] = [float(ele) for ele in each]
@@ -43,10 +43,10 @@ def computeAllSim(class2VectorDict):
     return listList
 
 def writeCSV(listList, fileName):
-    with open(fileName, 'wb') as fp:
+    with open(fileName, 'w', newline='') as fp:
         writer = csv.writer(fp)
         writer.writerows(listList)
-    print fileName
+    print (fileName)
 
 if __name__ == "__main__":
     semanticFileName = sys.argv[1]

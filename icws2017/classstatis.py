@@ -3,7 +3,7 @@ import csv
 import sys
 def readClass(classFileName):
     classList = list()
-    with open(classFileName, 'rb') as fp:
+    with open(classFileName, 'r', newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
             [className] = each
@@ -12,7 +12,7 @@ def readClass(classFileName):
 
 def readCSV(rsfFileName):
     relationList = list()
-    with open(rsfFileName, 'rb') as fp:
+    with open(rsfFileName, 'r', newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
             [class1, class2, weight] = each
@@ -39,6 +39,6 @@ def statisAll(relationList, allClassList):
         resultDict[thr] = oneClassList
         print (str(thr) + ',' + str(len(oneClassList)))
 
-allClassList = readClass(sys.argv[1])
-relationList = readCSV(sys.argv[2])
+allClassList = readClass(sys.argv[1]) #all_class.txt
+relationList = readCSV(sys.argv[2]) #icws synsim.csv
 statisAll(relationList, allClassList)

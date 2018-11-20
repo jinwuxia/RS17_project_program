@@ -17,8 +17,11 @@ Java_stop_words = ['public', 'private','protected','static', 'null', 'class', 's
                     'list', 'map', 'lang', 'type', 'add','sub', 'next', \
                     'net', 'jforum', 'is','dao','entities', 'util','api', 'cache', 'context', 'exception', 'search', 'repository', 'admin', 'legacy',\
                     'weblogger', 'pojo', 'business', 'util', 'planet', 'roller', 'apache', 'org', 'core', 'config', 'rendering', 'ajax', 'admin', 'editor',\
-                    'tag', 'webservice', 'model', 'repository', 'service', 'controller'\
-		    'api', 'cache', 'event', 'dev', 'model', 'filter', 'processor', 'util']
+                    'tag', 'webservice', 'model', 'repository', 'service', 'controller',\
+		            'api', 'cache', 'event', 'dev', 'model', 'filter', 'processor', 'util',\
+                    'xwiki', 'wiki', "misc","flavor","storage","escaping","selenium","ui","webstandards","activeinstalls","admin","annotations","extension",\
+                    "filter","flamingo", "skin","theme","index","linkchecker","mail","menu","messagestream","notification","observation","office","panel",\
+                    "release","repository","resource","rest","scheduler","sharepage","user","directory","profile","vfs","watchlist","webjars","wiki","xclass"]
 
 
 
@@ -100,7 +103,7 @@ def processIdentifierFile(fileName):
     stopWords = nltk.corpus.stopwords.words('english')
     stopWords.extend(Java_stop_words)
 
-    with open (fileName, 'rb') as fp:
+    with open (fileName, 'r') as fp:
         for line in fp.readlines(): #eachline corresponds to a class
             line = line.strip()
             tmpList = line.split(',')
@@ -138,8 +141,10 @@ def processIdentifierFile(fileName):
             #print className, ':'
             #print ','.join(wordList)
             #print "\n"
-
-            firstPass(className, wordList)
+            if len(wordList) != 0:
+                 firstPass(className, wordList)
+            else:
+                 print(className, "wordList = 0")
     fp.close()
 
 
@@ -158,6 +163,7 @@ def computeIDF():
 def extractKeyWord(THR):
     for docName in Doc_word_freq_dict:
         Doc_word_tfidf_dict[docName] = dict()
+        #print(docName,Doc_word_freq_dict[docName])
         max_freq = max( Doc_word_freq_dict[docName].values() )
         for word in Doc_word_freq_dict[docName]:
             tf = Doc_word_freq_dict[docName][word] / float(max_freq)
@@ -193,17 +199,17 @@ def genVector():
     return vectorList
 
 def writeCSV(listList, fileName):
-    with open(fileName, 'wb') as fp:
+    with open(fileName, 'w', newline="") as fp:
         writer = csv.writer(fp)
         writer.writerows(listList)
-    print fileName
+    print (fileName)
 
 
 #python pro.py  jpetstore6_words.txt  fvname thr=0.9
 if __name__ == '__main__':
     wordFileName = sys.argv[1]
     fvFileName = sys.argv[2]
-    thr = float(sys.argv[3])
+    #thr = float(sys.argv[3])
     processIdentifierFile(wordFileName)
     '''
     print "\n"
@@ -215,13 +221,13 @@ if __name__ == '__main__':
         print 'word: ', word
         print 'doc_list:', Word_doc_dict[word]
     '''
-    print 'doc  count: ', len(Doc_word_freq_dict)
-    print 'word count: ', len(Word_doc_dict)
+    print ('doc  count: ', len(Doc_word_freq_dict))
+    print ('word count: ', len(Word_doc_dict))
 
     #compute tf-idf, sort and generate keywordList
     computeIDF()
     extractKeyWord(0.5) #60% word in each doc are as keywords
-    print 'total keyword: ', Keyword_set
-    print 'keyword count: ', len(Keyword_set)
+    print ('total keyword: ', Keyword_set)
+    print ('keyword count: ', len(Keyword_set))
     fvList = genVector()
     writeCSV(fvList, fvFileName)
