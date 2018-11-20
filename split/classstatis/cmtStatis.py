@@ -7,8 +7,9 @@ import csv
 import re
 
 #COMMIT_LOG_PRE_NAME = 'src/main/java/'  #jpetstore, bvn13_springblog
-COMMIT_LOG_PRE_NAME = 'app/src/main/java/' #roller
+#COMMIT_LOG_PRE_NAME = 'app/src/main/java/' #roller
 #COMMIT_LOG_PRE_NAME = 'src/main/java/' #solor270
+COMMIT_LOG_PRE_NAME = '' #xwiki
 ID2NAMEDict = dict()
 NAME2IDDict = dict()
 
@@ -24,10 +25,17 @@ def getSimpleName(fileName):
         tmp = tmp[preLen: len(tmp)]
         tmp = tmp.split('/')
         fileName = '.'.join(tmp)
-        print fileName
+        print (fileName)
     return fileName
 
 
+'''
+filter test file
+'''
+def isNonTest(filename):
+    if "/test/" in filename:
+        return False
+    return True
 
 
 def isIncluded(fileName, fileType):
@@ -44,9 +52,10 @@ def processLog(fileName, fileType):
     ID2NameDict = dict()
     index = 0
 
-    with open(fileName) as fp:
+    with open(fileName, encoding="utf8") as fp:
         newList = list()
         for line in fp:
+            #print ("line:  " + line)
             if re.match(r'commit[\s][0-9,a-z,A-Z]+', line):
                 #print 'commit', line
                 if len(newList) >= 1:
@@ -58,8 +67,8 @@ def processLog(fileName, fileType):
                 commitType = line.split('\t')[0]
                 commitFileName = line.split('\t')[1] #'fileName\n'
                 commitFileName = commitFileName[0:len(commitFileName) - 1]
-                print commitType, commitFileName
-                if commitType == 'M' and isIncluded(commitFileName, fileType): #just modify, not include Delete and Add
+                #print( commitType, commitFileName)
+                if commitType == 'M' and isIncluded(commitFileName, fileType) and isNonTest(commitFileName): #just modify, not include Delete and Add
                     simpleName = getSimpleName(commitFileName)
                     if simpleName != '':
                         if simpleName not in name2IDDict:
@@ -73,30 +82,47 @@ def processLog(fileName, fileType):
 
     return listList, name2IDDict, ID2NameDict
 
+#write filenames in commit history to a file
+def writeFileName(outfileName):
+    import csv
+    with open(outfileName, "w", newline="") as fp:
+        writer = csv.writer(fp)
+        for key in NAME2IDDict:
+            writer.writerow([key])
+
+
+
 
 #from commit log, extract the commit deps for class pairs
-#python  input_commit_log_file_name   out_put_commit_dep_file_name    type=java,python,
+#python  input_commit_log_file_name     type=java,python,
 if __name__ == '__main__':
     logFileName = sys.argv[1]        #input
     fileType = sys.argv[2]           #type = java,python
     [commitDepList, NAME2IDDict, ID2NAMEDict] = processLog(logFileName, fileType)
 
-    for each in commitDepList:
-        print each
+    #the filenames in commit log are more than the statis understand filename
+    #only works for xwiki, since the filename complexly corressponds to class
+    writeFileName("xwiki-platform-commit-filenames.csv")
+
+
+    #for each in commitDepList:
+    #    print (each)
+
 
 
     lenList = list()
 
     for each in commitDepList:
         lenList.append(len(each))
-    print 'len of the Classcommit times:', len(commitDepList)
-    print 'involved class count:  ', len(NAME2IDDict)
-    print 'min of EachCommit Len:', min(lenList)
-    print 'max of EachCommit Len:', max(lenList)
-    print 'avg of EachCommit Len:', sum(lenList) / float(len(lenList))
+    #print(lenList)
+    print ('len of the Classcommit times:',  len(commitDepList))
+    print ('involved class count:  ',  len(NAME2IDDict))
+    print ('min of EachCommit Len: ',  min(lenList))
+    print ('max of EachCommit Len: ',  max(lenList))
+    print ('avg of EachCommit Len: ',  sum(lenList) / float(len(lenList)))
 
 
-    '''
+
     #delete large commit beacause it is not relevant to class function evolve.
     FilterValue = 37
     newCommitDepList = list()
@@ -109,8 +135,8 @@ if __name__ == '__main__':
             for eachClassID in each:
                 if eachClassID not in newClassList:
                     newClassList.append(eachClassID)
-    print 'min of EachCommit Len:', min(newLenList)
-    print 'max of EachCommit Len:', max(newLenList)
-    print 'avg of EachCommit Len:', sum(newLenList) / float(len(newLenList))
-    print 'involved class count:  ', len(newClassList)
-    '''
+    print ('len of class commit times', len(newCommitDepList))
+    print ('min of EachCommit Len:', min(newLenList))
+    print ('max of EachCommit Len:', max(newLenList))
+    print ('avg of EachCommit Len:', sum(newLenList) / float(len(newLenList)))
+    print ('involved class count:  ', len(newClassList))
