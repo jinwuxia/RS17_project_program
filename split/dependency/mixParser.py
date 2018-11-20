@@ -39,7 +39,7 @@ class ComDep:
 #['className1', 'className2', 'call', 'p_num', 'r_num', 'call_f', 'p_num_f', 'r_num_f', 'total', 'total_f']
 def readCommunicationDepFile(fileName):
     resDict = dict()
-    with open(fileName, 'rb') as fp:
+    with open(fileName, 'r', newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
             [className1, className2, call, p_num, r_num, call_f, p_num_f, r_num_f, total, total_f] = each
@@ -55,7 +55,7 @@ def readCommunicationDepFile(fileName):
 #hypothisis: only call, set, use,Typed are the structure relation
 def readStructDepFile(fileName):
     resDict = dict()
-    with open(fileName, 'rb') as fp:
+    with open(fileName, 'r', newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
             [className1, className2, structBitStr] = each
@@ -67,7 +67,7 @@ def readStructDepFile(fileName):
 #commitFile=[[classname, classname, value],]
 def readCommitDepFile(fileName):
     resDict = dict()
-    with open(fileName, 'rb') as fp:
+    with open(fileName, 'r', newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
             [className1, className2, commitValue] = each
@@ -173,7 +173,7 @@ def normalizedMinMax(oneList):
     sortedList = sorted(oneList)
     maxValue= sortedList[fenweiIndex]
     minValue = min(oneList)
-    print minValue, maxValue
+    print (minValue, maxValue)
     for each in oneList:
         if each > maxValue:
             each = maxValue
@@ -206,17 +206,17 @@ def normCalMixedDep():
             structList.append(CLASSIDPAIRDICT[classID1][classID2][0])
             commitList.append(CLASSIDPAIRDICT[classID1][classID2][1])
             communList.append(CLASSIDPAIRDICT[classID1][classID2][2])
-    print structList,'\n'
-    print commitList,'\n'
-    print communList,'\n'
+    #print structList,'\n'
+    #print commitList,'\n'
+    #print communList,'\n'
     if sum(structList) > 0.00001:
-        print "normalizedMinMax ", 'structList'
+        print ("normalizedMinMax ", 'structList')
         structList = normalizedMinMax(structList)
     if sum(commitList) > 0.00001:
-        print "normalizedMinMax ", 'commitList'
+        print ("normalizedMinMax ", 'commitList')
         commitList= normalizedMinMax(commitList)
     if sum(communList) > 0.00001:
-        print "normalizedMinMax ", 'communList'
+        print ("normalizedMinMax ", 'communList')
         communList = normalizedMinMax(communList)
     #print structList,'\n'
     #print commitList,'\n'
@@ -234,7 +234,7 @@ def normCalMixedDep():
 
 #write CLASSIDPAIRDICT to file
 def writeDict2CSV(fileName):
-    with open(fileName, 'wb') as fp:
+    with open(fileName, 'w', newline="") as fp:
         writer = csv.writer(fp)
         for classID1 in CLASSIDPAIRDICT:
             for classID2 in CLASSIDPAIRDICT[classID1]:
@@ -244,11 +244,11 @@ def writeDict2CSV(fileName):
                 tmpList.append(CLASSID2NAMEDict[classID2])
                 tmpList.extend(depList)
                 writer.writerow(tmpList)
-    print fileName
+    print (fileName)
 
 def readClassListFile(fileName):
     resList = list()
-    with open(fileName, 'rb') as fp:
+    with open(fileName, 'r', newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
             if len(each) == 2:
@@ -276,10 +276,10 @@ def filterDep(classList):
 
 
 def writeCSV(fileName, resList):
-    with open(fileName, 'wb') as fp:
+    with open(fileName, 'w', newline="") as fp:
         writer = csv.writer(fp)
         writer.writerows(resList)
-    print fileName
+    print (fileName)
 
 #before make decison about how to cluster the classes,
 #we compute three features first, and merge them using pre-set weight,

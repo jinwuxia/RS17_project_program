@@ -43,7 +43,7 @@ DEPEND = Depend()
 
 def getDepList(deps):
     depsList = deps.split(', ')
-    print depsList
+    #print (depsList)
     resList = ['0'] * 10
     for dep in depsList:
         if dep == 'Extend':
@@ -67,7 +67,7 @@ def getDepList(deps):
         elif dep == 'Throw':
             resList[DEPEND.Throw] = '1'
         else:
-            print "[ERROR] not found this type: ", dep
+            print ("[ERROR] not found this type: ", dep)
     return resList
 
 def xmlParser(fileName):
@@ -79,7 +79,7 @@ def xmlParser(fileName):
         longname = node[3].attrib['value'] #longname
         oneNode = Node(nodeID, shortname, longname)
         NODEDict[nodeID] = oneNode
-        print nodeID, longname
+        #print (nodeID, longname)
 
     for edge in root.findall('{http://www.cs.rpi.edu/XGMML}edge'):
         startNodeID = edge.attrib['source']
@@ -90,7 +90,7 @@ def xmlParser(fileName):
         oneEdge = Edge(startNodeID, endNodeID, depStr)
         if startNodeID in NODEDict and endNodeID in NODEDict:
             EDGEList.append(oneEdge)
-            print startNodeID, endNodeID, depStr
+            #print (startNodeID, endNodeID, depStr)
 
 def writeCSV(fileName):
     resList = list()
@@ -100,10 +100,10 @@ def writeCSV(fileName):
         deps = edge.deps
         resList.append([startNodeLongname, endNodeLongName, deps])
 
-    with open(fileName, 'wb') as fp:
+    with open(fileName, 'w', newline="") as fp:
         writer = csv.writer(fp)
         writer.writerows(resList)
-    print fileName
+    print (fileName)
 
 #python pro.py    jforum.xml   jforumxml.csv
 if __name__ == '__main__':
