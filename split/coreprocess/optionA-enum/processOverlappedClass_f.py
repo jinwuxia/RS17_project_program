@@ -30,7 +30,7 @@ CLASSID2NAMEDict = dict()
 def readMixedDepFile(fileName):
     #print fileName
     resDict = dict()
-    with open(fileName, 'rb') as fp:
+    with open(fileName, 'r', newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
             [className1, className2, structDep, commitDep, communDep, mixedDep] = each
@@ -43,7 +43,7 @@ def readMixedDepFile(fileName):
 def readTraceDepFile(fileName):
     trace_dep_dict = dict()  #dict[classNAme][clusterID] = dep
     tmpList = list()
-    with open(fileName, 'r') as fp:
+    with open(fileName, 'r', newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
             [className, clusterID, depValue] = each
@@ -59,7 +59,7 @@ def readTraceDepFile(fileName):
 
 def readOrignalClusterFile (fileName):
     finalClusterDict = dict()  #dict[clusterID] = list()
-    with open(fileName) as fp:
+    with open(fileName, "r", newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
             [clusterID, testcaseID, testcaseName] = each
@@ -74,7 +74,7 @@ def readOrignalClusterFile (fileName):
 def readNonlapClassFile(fileName):
     classID2NameDict = dict()
     global FINALCLUSTERDict
-    with open(fileName, 'rb') as fp:
+    with open(fileName, 'r', newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
             [classID, className, clusterID] = each
@@ -89,7 +89,7 @@ def readNonlapClassFile(fileName):
 def readOverlapClassFile(fileName):
     global CLASSID2NAMEDict
     class2ClusterDict = dict()
-    with open(fileName, 'rb') as fp:
+    with open(fileName, 'r', newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
             [classID, className, clusterIDListStr] = each
@@ -223,7 +223,7 @@ def preProcess(class2ClusterDict):
     classSetList = list() #list[1] = classIDs
     clusterSetList = list() # list[1] = clusterIDs.   classIDs and clusterSetList is corresponding
 
-    classIDKeysList = class2ClusterDict.keys()
+    classIDKeysList = list(class2ClusterDict.keys())
     for index1 in range(0, len(classIDKeysList)):
         classID1 = classIDKeysList[index1]
         if classID1 not in isProcessed:
@@ -324,10 +324,10 @@ def write2CSV(fileName):
     for clusterID in FINALCLUSTERDict:
         for classID in FINALCLUSTERDict[clusterID]:
             listlist.append([classID, CLASSID2NAMEDict[classID], clusterID])
-    with open(fileName, 'wb') as fp:
+    with open(fileName, 'w',newline="") as fp:
         writer = csv.writer(fp)
         writer.writerows(listlist)
-    print fileName
+    print (fileName)
 
 
 #pro.py  mixDep.csv  traceDep.csv

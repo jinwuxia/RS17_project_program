@@ -2,19 +2,18 @@
 import sys
 import csv
 
-class EstimationObject:
-    def __init__(self, ts, thr, fitness):
-        self.ts = ts #core service count
-        self.thr = thr
-        self.fitness = fitness
-
-project               = 'roller520'
-data_dir              = "../../../testcase_data/roller520/"
+project               = 'xwiki-platform108'
+data_dir              = "../../../testcase_data/xwiki-platform108/"
 featureVectorFileName = data_dir + 'coreprocess/' + project + '_testcase1_fv.csv'
 classFileName         = data_dir + 'coreprocess/' + project + '_testcase1_class.csv'
 depFileName          = data_dir + 'dependency/' + project + '_testcase1_mixedDep.csv'
 workflowFileName     = data_dir + 'workflow/' + project + '_workflow_reduced.csv'
 
+class EstimationObject:
+    def __init__(self, ts, thr, fitness):
+        self.ts = ts #core service count
+        self.thr = thr
+        self.fitness = fitness
 
 #when service = service_count,compute the clusters metric
 def metric_analyzeCluster(tsclusterFileName):
@@ -33,13 +32,13 @@ def metric_analyzeCluster(tsclusterFileName):
 
 
 #when service = service_count,generate four files for next processing
-def analyzeCluster(tsclusterFileName, nonlapFileName, lapFileName, mergedFvFileName, traceDepFileName):
+def analyzeCluster(tsclusterFileName, nonlapFileName, lapFileName, mergedFvFileName, traceDepFileName, benchClusterFileName):
     global featureVectorFileName
     global classFileName
     import analyzeOneCluster_f as moduleB
     import traceParser_f  as moduleBB
     #generate file
-    moduleB.analyzeOneCluster(tsclusterFileName, featureVectorFileName, classFileName, nonlapFileName, lapFileName, mergedFvFileName)
+    moduleB.analyzeOneCluster(tsclusterFileName, featureVectorFileName, classFileName, nonlapFileName, lapFileName, mergedFvFileName, benchClusterFileName)
     moduleBB.traceParser(mergedFvFileName, traceDepFileName)
 
 #when service = service_count, thr = overlap_process_thr,  process the overlapped class, generate file
@@ -60,13 +59,13 @@ def metric_processOverlap(tsclusterFileName, outClusterFileName):
 
 
 def writeCSV(aList, fileName):
-    with open(fileName, 'wb') as fp:
+    with open(fileName, 'w',newline="") as fp:
         writer = csv.writer(fp)
         writer.writerows(aList)
-    print fileName
+    print (fileName)
 
-def processNextStep(overlap_process_thr, tsclusterFileName, lapFileName, nonlapFileName, mergedFvFileName, traceDepFileName, outClusterFileName):
-    analyzeCluster(tsclusterFileName, nonlapFileName, lapFileName, mergedFvFileName, traceDepFileName)  #gen last 4 files
+def processNextStep(overlap_process_thr, tsclusterFileName, lapFileName, nonlapFileName, mergedFvFileName, traceDepFileName, outClusterFileName, benchClusterFileName):
+    analyzeCluster(tsclusterFileName, nonlapFileName, lapFileName, mergedFvFileName, traceDepFileName, benchClusterFileName)  #gen last 4 files
 
     processOverlap(overlap_process_thr, tsclusterFileName, nonlapFileName, lapFileName, traceDepFileName, outClusterFileName)  #gen  outClusterFileName
 
@@ -97,22 +96,26 @@ def isEqualList(list1, list2):
     return False
 
 if __name__ == '__main__':
-    global data_dir
-    global project
-    global featureVectorFileName
-    global classFileName
-    global depFileName
-    #global traceDepFileName
-    global workflowFileName
-    project               = 'solo270'
-    data_dir              = "../../../testcase_data/solo270/"
+    '''
+    project               = 'xwiki-platform108'
+    data_dir              = "../../../testcase_data/xwiki-platform108/"
     featureVectorFileName = data_dir + 'coreprocess/' + project + '_testcase1_fv.csv'
     classFileName         = data_dir + 'coreprocess/' + project + '_testcase1_class.csv'
     depFileName           = data_dir + 'dependency/' + project + '_testcase1_mixedDep.csv'
     #traceDepFileName      = data_dir + 'dependency/' + project + '_testcase1_traceDep.csv'
     workflowFileName      = data_dir + 'workflow/' + project + '_workflow_reduced.csv'
+    '''
+    #global data_dir
+    #global project
+    #global featureVectorFileName
+    #global classFileName
+    #global depFileName
+    #global traceDepFileName
+    #global workflowFileName
 
-    serv_list = range(2,71)#solo270
+
+    serv_list = range(2,400) #xwiki108
+    #serv_list = range(2,71)#solo270
     #serv_list = range(1,27) #bvn13
     #serv_list = range(7, 73)  #roler520
     #serv_list = range(16, 48) #jforum219
@@ -127,6 +130,7 @@ if __name__ == '__main__':
         nonlapFileName    = data_dir + 'coreprocess/optionA-enum/' + project + '_testcase1_' + str(service_count) + '_class_nolap.csv'
         mergedFvFileName  = data_dir + 'coreprocess/optionA-enum/' + project + '_testcase1_' + str(service_count) + '_classclusterFv.csv'
         traceDepFileName  = data_dir + 'coreprocess/optionA-enum/' + project + '_testcase1_' + str(service_count) + '_traceDep.csv'
+        benchClusterFileName = data_dir + 'coreprocess/optionA-enum/' + project + '_testcase1_' + str(service_count) + '_benchCluster.csv'
 
         '''
         [nonOverlappedClassCount,  nonOverlappedAvg, \
@@ -143,20 +147,20 @@ if __name__ == '__main__':
         if overlappedClassCount == 0:
             overlap_process_thr = round(0.1, 1)
             outClusterFileName  = data_dir + 'coreprocess/optionA-enum/' + project + '_testcase1_clusters_' + str(service_count) + '_' + str(overlap_process_thr) + '.csv'
-            lapResMetricList = processNextStep(overlap_process_thr, tsclusterFileName, lapFileName, nonlapFileName, mergedFvFileName, traceDepFileName, outClusterFileName)
+            lapResMetricList = processNextStep(overlap_process_thr, tsclusterFileName, lapFileName, nonlapFileName, mergedFvFileName, traceDepFileName, outClusterFileName, benchClusterFileName)
             oneList = list()
             oneList.append(service_count)
             oneList.append(overlap_process_thr)
             oneList.extend(clusterMetricList)
             oneList.extend(lapResMetricList)
             resList.append(oneList)
-            print oneList
+            print (oneList)
             continue
         preList = list()
         for thr in thr_list:
             overlap_process_thr = round(thr, 1)
             outClusterFileName  = data_dir + 'coreprocess/optionA-enum/' + project + '_testcase1_clusters_' + str(service_count) + '_' + str(overlap_process_thr) + '.csv'
-            lapResMetricList = processNextStep(overlap_process_thr, tsclusterFileName, lapFileName, nonlapFileName, mergedFvFileName, traceDepFileName, outClusterFileName)
+            lapResMetricList = processNextStep(overlap_process_thr, tsclusterFileName, lapFileName, nonlapFileName, mergedFvFileName, traceDepFileName, outClusterFileName, benchClusterFileName)
 
             '''
             if isEqualList(preList, lapResMetricList) == False:

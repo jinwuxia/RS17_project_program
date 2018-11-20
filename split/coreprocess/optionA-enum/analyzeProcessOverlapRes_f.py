@@ -81,11 +81,11 @@ def readWorkflowFile(filename):
     tmpMethodDict = dict() #dict(methodname) = ID
     tmpClassDict = dict()  #dict(className) = ID
 
-    with open(filename, "rb") as fp:
+    with open(filename, "r", newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
             #print each
-            [traceID, order, structtype, startMethodName, endMethodName, m1_para, m2_para, class1, class2, m1_return, m2_return] = each
+            [traceID, order, structtype, startMethodName, endMethodName, m1_para, m2_para, class1, class2, m1_return, m2_return, weight] = each
             if traceID == 'traceID':
                 continue
             startLongName = getLongName(startMethodName, m1_para)
@@ -289,7 +289,7 @@ def readOverlapResFile(fileName):
     className2IDDict = dict()
     classID2ClusterDict = dict()
     clusterID2ClassDict = dict()
-    with open(fileName, 'rb') as fp:
+    with open(fileName, 'r', newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
             [classID, className, clusterID] = each
@@ -317,7 +317,7 @@ def readOverlapResFile(fileName):
 def readTestCaseClusterFile(fileName):
     clusterID2TsDict = dict()
     tsID2NameDict = dict()
-    with open(fileName, 'rb') as fp:
+    with open(fileName, 'r', newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
             [clusterID, testcaseID, testcaseName] = each

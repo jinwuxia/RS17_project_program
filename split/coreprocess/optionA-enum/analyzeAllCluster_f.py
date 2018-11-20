@@ -5,14 +5,14 @@ import csv
 
 def readCSV(fileName):
     resList = list()
-    with open(fileName, "rb") as fp:
+    with open(fileName, "r", newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
             resList.append(each)
     return resList
 
 def writeCSV(listList, fileName):
-    with open(fileName, "wb") as fp:
+    with open(fileName, "w", newline="") as fp:
         writer = csv.writer(fp)
         writer.writerows(listList)
     #print fileName
@@ -57,7 +57,7 @@ def mergeClusterFv(clusterList, fvList, classCount):
         for eachTsID in tsIDList:
             #two list is sumed togeter for each element
             tmpList = map(lambda x, y : x + y, tmpList, fvList[eachTsID])
-        resList.append(tmpList)
+        resList.append(list(tmpList))
     return resList
 
 

@@ -9,7 +9,7 @@ normalized tarcedep using  testcase1_20_classclusterFv
 #fileName = 'testcase1_20_classclusterFv'
 def readTraceDepFile(fileName):
     trace_dep_dict = dict()  #dict[classNAme][clusterID] = dep
-    with open(fileName, 'r') as fp:
+    with open(fileName, 'r', newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
             [className, clusterID, count] = each
@@ -47,11 +47,11 @@ def writeCSV(dep_dict, outfileName):
     for className in dep_dict:
         for clusterID in dep_dict[className]:
             resList.append([className, clusterID, round(dep_dict[className][clusterID], 5)])
-    with open(outfileName, 'wb') as fp:
+    with open(outfileName, 'w', newline="") as fp:
         writer = csv.writer(fp)
         writer.writerow(['className', 'clusterID', 'tracedep'])
         writer.writerows(resList)
-    print outfileName
+    print (outfileName)
 
 
 #fileName is classclusterFv.csv
