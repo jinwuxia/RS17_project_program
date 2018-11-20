@@ -38,10 +38,10 @@ def readCSV(fileName):
     resList = list()
     methodIndex = 0
     classIndex = 0
-    with open(fileName, 'rb') as fp:
+    with open(fileName, 'r', newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
-            [traceID, order, stype, callerName, calleeName, m1_para, m2_para, className1, className2, m1_return, m2_return] = each
+            [traceID, order, stype, callerName, calleeName, m1_para, m2_para, className1, className2, m1_return, m2_return, addweight] = each
             if traceID == 'traceID':
                 continue
             callerName = callerName + '(' + m1_para + ')'
@@ -158,11 +158,11 @@ def formatProcess(classEdgeDict):
 
 
 def writeCSV(listlist, fileName):
-    with open(fileName, 'wb') as fp:
+    with open(fileName, 'w', newline="") as fp:
         writer = csv.writer(fp)
         writer.writerow(['className1', 'className2', 'call', 'p_num', 'r_num', 'call_f', 'p_num_f', 'r_num_f', 'total', 'total_f'])
         writer.writerows(listlist)
-    print fileName
+    print (fileName)
 
 
 #python pro.py  workflow.csv   outfile.csv
