@@ -12,8 +12,8 @@ CLASSID2NAMEDict = dict() #[classID] = className
 CLASSID2CLUSTERDict = dict() #[classID] = list[clusterID]
 CLUSTERID2CLASSDict = dict() #[clusterID] = list[classID]
 
-CLUSTERID2TSDict = dict() #[clusterID] = [testcaseID1, id2, ..]
-TSID2NAMEDict = dict()   #[testcaseID] = testcaseName
+#CLUSTERID2TSDict = dict() #[clusterID] = [testcaseID1, id2, ..]
+#TSID2NAMEDict = dict()   #[testcaseID] = testcaseName
 
 
 TRACEList = list()  #[traceID] = list()=[ edgeID1, edgeID2 ...]
@@ -292,18 +292,17 @@ def readTestCaseClusterFile(fileName):
 
 #python pro.py
 #coreprocess/processOverlap/jforum219Testcase1_clusters_0.03csv
-#coreprocess/testcaseClusteirng/jforum219Testcase1_jm_AVG_20.csv
 #workflow/jforum219_workflow_reduced.csv
 #apiFileName.csv
 
 if __name__ == '__main__':
     overlapResFileName = sys.argv[1]  #[classID, className, clusterID ]
-    testcaseClusterFileName = sys.argv[2] #[clusterID, testcaseID, testcaseName]
-    workflowFileName = sys.argv[3]
-    apiFileName = sys.argv[4]
+    #testcaseClusterFileName = sys.argv[2] #[clusterID, testcaseID, testcaseName]
+    workflowFileName = sys.argv[2]
+    apiFileName = sys.argv[3]
 
     [CLASSID2NAMEDict, CLASSNAME2IDDict, CLASSID2CLUSTERDict, CLUSTERID2CLASSDict] = readOverlapResFile(overlapResFileName)
-    [CLUSTERID2TSDict, TSID2NAMEDict] = readTestCaseClusterFile(testcaseClusterFileName)
+    #[CLUSTERID2TSDict, TSID2NAMEDict] = readTestCaseClusterFile(testcaseClusterFileName)
     #return TRACEList, methodNodeList,    methodEdgeList. egdeDict
     readWorkflowFile(workflowFileName)
 
