@@ -7,7 +7,7 @@ def readCSV(fileName):
     with open(fileName, 'r', newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
-            print (each)
+            #print (each)
             className = each[0]
             del each[0]
             class2VectorDict[className] = [float(ele) for ele in each]
@@ -33,13 +33,17 @@ def computeAllSim(class2VectorDict):
     classList = class2VectorDict.keys()
     from itertools import combinations
     pairList = list(combinations(classList, 2))
+    print("len of pairlist", len(pairList))
 
     listList = list()
+    count = 1
     for [class1, class2] in pairList:
         v1 = class2VectorDict[class1]
         v2 = class2VectorDict[class2]
         value = cosin(v1,v2, len(v1))
         listList.append([class1, class2, value])
+        #print("current pair:", count)
+        count += 1
     return listList
 
 def writeCSV(listList, fileName):

@@ -7,8 +7,8 @@ def readAndInverseGraph(fileName):
     G = nx.read_weighted_edgelist(fileName, delimiter=",")
     #print G.nodes()
     #print G.edges(data=True)
-    print 'node number=', nx.number_of_nodes(G)
-    print 'edge number=', nx.number_of_edges(G)
+    print ('node number=', nx.number_of_nodes(G))
+    print ('edge number=', nx.number_of_edges(G))
 
     #invert weight as a new inverse_weight attribute
     originalWeight = nx.get_edge_attributes(G, 'weight')
@@ -19,7 +19,7 @@ def readAndInverseGraph(fileName):
         else:
             originalWeight[(c1,c2)] = 1 / originalWeight[(c1,c2)]
         #print c1,c2, originalWeight[(c1,c2)]
-    nx.set_edge_attributes(G, 'inverse_weight', originalWeight)
+    nx.set_edge_attributes(G, originalWeight, 'inverse_weight')
     #print G.edges(data=True)
 
     return G
@@ -47,8 +47,8 @@ def mstClustering(G, service_number):
     current_service_number = 1
     while(current_service_number < service_number):
         ((c1,c2), w) = edge_dict[0]
-        print 'delete edge: '
-        print c1, c2, w, '\n'
+        print ('delete edge: ')
+        print (c1, c2, w, '\n')
         current_service_number += 1
         del edge_dict[0] #remove the first key-value of the dict
 
@@ -64,22 +64,22 @@ def getServices(node_list, edge_list):
     G = nx.Graph()
     G.add_nodes_from(node_list)
     G.add_weighted_edges_from(edge_list)
-    print  'node=', nx.number_of_nodes(G), '    edge=',nx.number_of_edges(G)
+    print  ('node=', nx.number_of_nodes(G), '    edge=',nx.number_of_edges(G))
 
     #connected component as the services
     components = list(nx.connected_components(G))
     for service_id in range(0, len(components)):
-        print service_id, len(components[service_id])
+        print (service_id, len(components[service_id]))
         for className in components[service_id]:
             result.append(['contain', service_id, className])
     return result
 
 
 def writeCSV(listList, fileName):
-    with open(fileName, 'wb') as fp:
+    with open(fileName, 'w', newline="") as fp:
         writer = csv.writer(fp)
         writer.writerows(listList)
-    print fileName
+    print (fileName)
 
 if __name__ == '__main__':
     graphFileName = sys.argv[1]

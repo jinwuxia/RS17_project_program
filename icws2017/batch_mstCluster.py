@@ -9,10 +9,20 @@ for servnum in range(16,48):
     returncode  = subprocess.call(cmd)
 
 '''
+'''
 for servnum in range(2,73):
     inputfileName = 'data/roller520/roller520synsim.csv'
     outfileName = 'data/roller520/clusters/roller520_' + str(servnum)+ '_cluster.csv'
     cmd = ('python mstClustering.py ' +  inputfileName + '  '  + outfileName + '  ' +  str(servnum) )
     print cmd
+
+    returncode  = subprocess.call(cmd, shell=True)
+'''
+
+for servnum in range(100,300):
+    inputfileName = 'data/xwiki-platform108/xwiki-platform108synsim.csv'
+    outfileName = 'data/xwiki-platform108/clusters-TS-all-as-benchmark/xwiki-platform108_' + str(servnum)+ '_cluster.csv'
+    cmd = ('python mstClustering.py ' +  inputfileName + '  '  + outfileName + '  ' +  str(servnum) )
+    print (cmd)
 
     returncode  = subprocess.call(cmd, shell=True)
