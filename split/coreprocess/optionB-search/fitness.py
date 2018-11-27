@@ -7,12 +7,12 @@ class ObjectStruct:
                     realClusterNum, repeatClassCount, repeatClassCount_avg,\
                     interWorklow, withinWorkflow, interCallNum, interCallNum_avg, \
                     interCallNum_f, interCallNum_avg_f, APINum, APINum_avg):
-        self.servnum = servnum
+        self.servnum = servnum   #it is the parameter: cluster number
         self.nonlapClassCount = nonlapClassCount
         self.nonlapClassCount_avg = nonlapClassCount_avg
         self.overlapClassCount = overlapClassCount
         self.overlapClassCount_avg = overlapClassCount_avg
-        self.realClusterNum = realClusterNum
+        self.realClusterNum = realClusterNum   #it is the final service number
         self.repeatClassCount = repeatClassCount
         self.repeatClassCount_avg  =repeatClassCount_avg
         self.interWorklow = interWorklow
@@ -96,11 +96,11 @@ def GetFitnessList(fitness_method, pop_list):
         indiv = pop_list[index]
         [x, y] = initpop.TransCode2Indiv(indiv, X_S, X_E, Y_S, Y_E, BIT_COUNT_X, BIT_COUNT_Y)  #=[x,y]=[serv, thr_int]
         #print 'info fit[x][y]:', x, y
-        if fitness_method == 'servnum':
+        if fitness_method == 'servnum':  # is the parameter cluster number
             fitness_value_list.append(OBJECT_STRUCT_DICT[x][y].servnum)
         elif fitness_method == 'withinwf':
             fitness_value_list.append(OBJECT_STRUCT_DICT[x][y].withinWorkflow)
-        elif fitness_method == 'clusternum':
+        elif fitness_method == 'realClusternum':
             fitness_value_list.append(OBJECT_STRUCT_DICT[x][y].realClusterNum)
         elif fitness_method == 'repclassnum':
             fitness_value_list.append(-OBJECT_STRUCT_DICT[x][y].repeatClassCount)
@@ -125,11 +125,11 @@ def GetFitness(fitness_method, indiv):
 
     [x, y] = initpop.TransCode2Indiv(indiv, X_S, X_E, Y_S, Y_E, BIT_COUNT_X, BIT_COUNT_Y)  #=[x,y]=[serv, thr_int]
     #print 'info fit[x][y]:', x, y
-    if fitness_method == 'servnum':
+    if fitness_method == 'servnum':   # is the parameter cluster number
         fitness_value = OBJECT_STRUCT_DICT[x][y].servnum
     elif fitness_method == 'withinwf':
         fitness_value = OBJECT_STRUCT_DICT[x][y].withinWorkflow
-    elif fitness_method == 'clusternum':
+    elif fitness_method == 'realClusternum':
         fitness_value = OBJECT_STRUCT_DICT[x][y].realClusterNum
     elif fitness_method == 'repclassnum':
         fitness_value = (-OBJECT_STRUCT_DICT[x][y].repeatClassCount)

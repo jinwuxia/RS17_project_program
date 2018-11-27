@@ -121,10 +121,38 @@ def GetServnumBestAns(serv2ThrDict, serv2RankDict, reduced_object_struct_dict):
     return resultList
 
 
-def Write2CSV(bestAnsList, outputFileName):
+
+def AllRankedResult(layerList, real_dict, reduced_object_struct_dict):
+    #change indiv to [xi, yi]
+    realLayerList = list() #[0] = [[x,y], []]
+    for index in range(0, len(layerList)):
+        realLayerList.append(list())
+        for indiv in layerList[index]:
+            xi = real_dict[indiv][0]
+            yi = real_dict[indiv][1]
+            realLayerList[index].append([xi,yi])
+
+    resultList = list()
+    for index in range(0, len(realLayerList)):
+        rank = index
+        for each in realLayerList[index]:
+            [clusterNum,thr] = each
+            one = reduced_object_struct_dict[clusterNum][thr]
+            resultList.append([one.servnum, thr, one.withinWorkflow, \
+                               -one.repeatClassCount, one.overlapClassCount,\
+                               one.interWorklow, one.interCallNum, \
+                               one.APINum, one.realClusterNum, rank])
+    return resultList
+
+
+def Write2CSV(resultList, outputFileName):
     with open(outputFileName, 'wb') as fp:
         writer = csv.writer(fp)
-        writer.writerows(bestAnsList)
+        writer.writerow(['cluternum', 'thr', 'withinWorkflow', \
+                           'repeatClassCount', 'overlapClassCount',\
+                           'interWorklow', 'interCallNum', \
+                           'APINum', 'realClusterNum', 'rank'])
+        writer.writerows(resultList)
     print 'Finish write ', outputFileName
 
 #python pro.py best_ans_file_name
@@ -136,12 +164,12 @@ if __name__ == '__main__':
         fitness.loadFitness(FITNESSFILENAME) #set object_struct_dict
     elif repeatFlag == 'no':
         fitness.loadFitness_noRepeat(FITNESSFILENAME)
-        
+
     object_struct_dict = config.get_object_struct()
     for serv in object_struct_dict:
         for thr_int in object_struct_dict[serv]:
             one = object_struct_dict[serv][thr_int]
-            print serv, thr_int, one.nonlapClassCount, one.nonlapClassCount_avg, one.withinWorkflow, one.interWorklow, one.APINum, one.APINum_avg
+            print serv, thr_int, one.realClusterNum, one.withinWorkflow
     print 'loadFitness finished....\n'
 
     #Remove the whole same duplicated records
@@ -163,6 +191,10 @@ if __name__ == '__main__':
     #Write2CSV(bestAnsList, outputFileName)
 
     # for each serv, find its non-dominated(best) answer set
-    [bestServ2ThrDict, serv2RankDict] = FindServnumBestThr(layerList, real_dict)
-    resultList = GetServnumBestAns(bestServ2ThrDict, serv2RankDict, reduced_object_struct_dict)
+    #[bestServ2ThrDict, serv2RankDict] = FindServnumBestThr(layerList, real_dict)
+    #resultList = GetServnumBestAns(bestServ2ThrDict, serv2RankDict, reduced_object_struct_dict)
+
+
+    #save all ranked indiv
+    resultList = AllRankedResult(layerList, real_dict, reduced_object_struct_dict)
     Write2CSV(resultList, outputFileName)
