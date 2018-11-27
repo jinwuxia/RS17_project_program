@@ -58,8 +58,8 @@ eof
 
 #xwiki-platform
 project=xwiki-platform108
-cluster_num=700
-for((i=${cluster_num};i>=2;i--));
+cluster_num=300
+for((i=${cluster_num};i>=50;i--));
 do
 file='../testcase_data/'${project}'/coreprocess/testcaseClustering/'${project}'_testcase1_jm_AVG_'${i}'.csv'
 python coreprocess/analyzeAllCluster.py   $file    ../testcase_data/${project}/coreprocess/${project}_testcase1_fv.csv    ../testcase_data/${project}/coreprocess/${project}_testcase1_class.csv
