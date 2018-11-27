@@ -216,8 +216,13 @@ def isEqualList(list1, list2):
     else:
         return False
 
-
- #if merge class into classList, when the classes appears same dependency pattern with clusters
+#preprocess the overlappedclass :  class2clusterDict[overlapclass]=clusterid list
+#if merge class into classList, when the classes appears same dependency pattern with clusters
+#function:  group the overlapped classes into groups.
+#if class1 and class2 are overlapped in same clusterlist, then group them together.
+#output:
+#   classSetlsit: list[1] = the grouped classes
+#   clusterSetList:  list[1]= the clusterlist of the above grouped classes.
 def preProcess(class2ClusterDict):
     isProcessed = dict()  #[classID] = 1
     classSetList = list() #list[1] = classIDs
@@ -244,7 +249,9 @@ def preProcess(class2ClusterDict):
 
 
 
-
+'''
+process the grouped overlapped classes
+'''
 def coreProcess(mergedClassList, mergedClusterList, currentClusterIndex):
     #for classID in class2ClusterDict:
     global CONSIDER_FLAG
@@ -284,7 +291,9 @@ def coreProcess(mergedClassList, mergedClusterList, currentClusterIndex):
 
 
 
-
+'''
+not use the result of grouped overlapped classes. 
+'''
 def coreProcess1(class2ClusterDict, currentClusterIndex):
     global CONSIDER_FLAG
     for classID in class2ClusterDict:
@@ -368,7 +377,8 @@ def processOverlappedClass(depFileName, traceDepFileName, orignalClusterFileName
 
     #overlappedClassFIle and nonoverlapclassFIle are not including fv=0 clusterID, alloverlapedCLusterID
     FINALCLUSTERDict = readOrignalClusterFile (orignalClusterFileName)   #init FINALCLUSTERS.key
-    CLASSID2NAMEDict = readNonlapClassFile(clusterFileName)  #init dict[clusterID] = classIDList
+    #init dict[clusterID] = classIDList, init FINALCLUSTERDict
+    CLASSID2NAMEDict = readNonlapClassFile(clusterFileName)
     class2ClusterDict = readOverlapClassFile(classListFileName) #dict[classID] = clusterIDList
     #print 'class2ClusterDict=',class2ClusterDict
 
