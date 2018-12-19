@@ -1,6 +1,8 @@
 import sys
 import os
 import subprocess
+
+#notice: we should use the  simsyn.csv file after filter.
 '''
 for servnum in range(16,48):
     inputfileName = 'data/jforum219/jforum219synsim.csv'
@@ -19,8 +21,10 @@ for servnum in range(2,73):
     returncode  = subprocess.call(cmd, shell=True)
 '''
 
-for servnum in range(100,300):
-    inputfileName = 'data/xwiki-platform108/xwiki-platform108synsim.csv'
+for servnum in range(2,200):
+    #use 100% testcase class to filter
+    inputfileName = 'data/xwiki-platform108/xwiki-platform108synsim_filter_ts_all.csv'
+
     outfileName = 'data/xwiki-platform108/clusters-TS-all-as-benchmark/xwiki-platform108_' + str(servnum)+ '_cluster.csv'
     cmd = ('python mstClustering.py ' +  inputfileName + '  '  + outfileName + '  ' +  str(servnum) )
     print (cmd)
