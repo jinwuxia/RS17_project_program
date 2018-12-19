@@ -27,15 +27,18 @@ def GetInterf(api):
     interface = '.'.join(apiList)
     return interface
 
-def ReadAPIFile(fileName):
+def ReadAPIFile(fileName, fileType):
     apiID = 0
     clusterID2Interf2ApiDict = dict()
     apiDict = dict()
 
-    with open(fileName,'r') as fp:
+    with open(fileName,'r', newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
-            [clusterID, apiName, parameterstr, returnstr] = each
+            if fileType == 'fome':
+                [clusterID, interfName, apiName, parameterstr, returnstr] = each
+            else:
+                [clusterID, apiName, parameterstr, returnstr] = each
             if each[0] == 'clusterID':
                 continue
             clusterID = int(clusterID)
@@ -74,76 +77,79 @@ def GetUnionset(apiID1, apiID2):
 def GetEdge_half(interSet, unionSet):
     edge_unwei = 0
     edge_wei = 0
+    if len(unionSet) == 0:
+        return -1, -1
     if len(interSet) != 0:
         edge_unwei = 1
         edge_wei = len(interSet) / float(len(unionSet))
     #print edge_unwei, edge_wei
     return edge_unwei, edge_wei
 
+#get api list for a cluster
+##g_clusterID2Interf2APIDict[clusterID][interface] = [api id ....]
+def getAllAPIForCluster(clusterID):
+    apiIDList = list()
+    global g_clusterID2Interf2APIDict
+    for interface in g_clusterID2Interf2APIDict[clusterID]:
+        apis = g_clusterID2Interf2APIDict[clusterID][interface]
+        apiIDList.extend(apis)
+    return apiIDList
+
 
 
 #measure the meg-level 's interface cohesion'
-def Metric_msg_cohesion(clusterID, interface):
+def Metric_msg_cohesion(clusterID):
     global g_clusterID2Interf2APIDict
-    apiIDList = g_clusterID2Interf2APIDict[clusterID][interface]
+    apiIDList = getAllAPIForCluster(clusterID)
     if len(apiIDList) == 1:
         cohesion_wei = 1
-        cohesion_unwei= 1
     else:
         from itertools import combinations
         apiIDPairList = list(combinations(apiIDList, 2))
         fenmu = len(apiIDPairList)  #perfect graph's edge number
-
-        fenzi_para_unweight = 0
-        fenzi_para_weight = 0
-        fenzi_return_unweight = 0
-        fenzi_return_weight = 0
+        apiSimList = list()
         for apiPair in apiIDPairList:
             [para_interset, return_interset] = GetIntersect(apiPair[0], apiPair[1])
             [para_unionset, return_unionset] = GetUnionset(apiPair[0], apiPair[1])
 
             [para_unweight, para_weight] = GetEdge_half(para_interset, para_unionset)
-            fenzi_para_weight += para_weight
-            fenzi_para_unweight += para_unweight
-
             [return_unweight, return_weight] = GetEdge_half(return_interset, return_unionset)
-            fenzi_return_weight += return_weight
-            fenzi_return_unweight += return_unweight
-
-        fenzi_unweight = (fenzi_para_unweight + fenzi_return_unweight) / float(2.0)
-        fenzi_weight  = (fenzi_para_weight + fenzi_return_weight) / float(2.0)
-        cohesion_unwei = fenzi_unweight / float(fenmu)
-        cohesion_wei = fenzi_weight / float(fenmu)
-
-    return cohesion_wei, cohesion_unwei
-
+            if para_weight != -1 and return_weight != -1:
+                sim = (para_weight + return_weight ) / float(2.0)
+                apiSimList.append(sim)
+            elif para_weight == -1 and return_weight != -1:
+                sim = return_weight
+                apiSimList.append(sim)
+            elif para_weight != -1 and return_weight == -1:
+                sim = para_weight
+                apiSimList.append(sim)
+        cohesion_wei = sum(apiSimList) / float(len(apiSimList))
+    return cohesion_wei
 
 
 
 if __name__ == '__main__':
     apiFileName = sys.argv[1]
+    fileType=sys.argv[2] #'fome', 'fom', 'icws', 'limbo', 'wca-uem'
 
     global g_clusterID2Interf2APIDict #[clusterID][interface] = [api id ....]
     global g_apiDict
 
-    [g_clusterID2Interf2APIDict, g_apiDict] = ReadAPIFile(apiFileName)
+    [g_clusterID2Interf2APIDict, g_apiDict] = ReadAPIFile(apiFileName, fileType)
     msg_cohesion_wei_list = list()
-    msg_cohesion_unwei_list = list()
-
     if len(g_clusterID2Interf2APIDict) == 0:
-        print  'msg_avg_wei=', 1, 'msg_avg_unwei', 1,
+        tmp =['avg_msg_cohesion', str(1), 'interface_numb', str(0), 'clusterHasinf', str(0)]
+        print  (','.join(tmp))
     else:
         for clusterID in g_clusterID2Interf2APIDict:
-            for interface in g_clusterID2Interf2APIDict[clusterID]:
-                [msg_cohesion_wei, msg_cohesion_unwei] = Metric_msg_cohesion(clusterID, interface)
-                #print str(clusterID) + ',' + interface + ',' + str(msg_cohesion_wei) + ',' +  str(msg_cohesion_unwei)
-                msg_cohesion_wei_list.append(msg_cohesion_wei)
-                msg_cohesion_unwei_list.append(msg_cohesion_unwei)
+            msg_cohesion_wei = Metric_msg_cohesion(clusterID)
+            #print ('cluster,' + str(clusterID) + ',' + str(msg_cohesion_wei) )
+            msg_cohesion_wei_list.append(msg_cohesion_wei)
         msg_avg_wei = sum(msg_cohesion_wei_list) / float(len(msg_cohesion_wei_list))
-        msg_avg_unwei = sum(msg_cohesion_unwei_list) / float(len(msg_cohesion_unwei_list))
-        print 'msg_avg_wei=', msg_avg_wei, 'msg_avg_unwei', msg_avg_unwei,
 
         interface_number = 0
         for clusterID in g_clusterID2Interf2APIDict:
             interface_number += len(g_clusterID2Interf2APIDict[clusterID])
-        print 'interface number=', interface_number
+        #print ('interface number=', interface_number)
+        tmp =['avg_msg_cohesion', str(msg_avg_wei), 'interface_numb', str(interface_number), 'clusterHasinf', str(len(g_clusterID2Interf2APIDict))]
+        print  (','.join(tmp))
