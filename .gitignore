@@ -4,5 +4,4 @@
 *.pyc
 *.txt
 icws2017/data/*
-legacy/*
 testcase_data/*
