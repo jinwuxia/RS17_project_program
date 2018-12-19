@@ -6,22 +6,31 @@ import sys
 import csv
 import re
 
+COMMIT_LOG_PRE_NAME = list()
 #COMMIT_LOG_PRE_NAME = 'src/main/java/'  #jpetstore, bvn13_springblog
 #COMMIT_LOG_PRE_NAME = 'app/src/main/java/' #roller
 #COMMIT_LOG_PRE_NAME = 'src/main/java/' #solor270
-COMMIT_LOG_PRE_NAME = '' #xwiki
+#COMMIT_LOG_PRE_NAME = '' #xwiki
+COMMIT_LOG_PRE_NAME.append('webapp/src/main/java/') #agilefant
+COMMIT_LOG_PRE_NAME.append('src/') #agilefant
+
 ID2NAMEDict = dict()
 NAME2IDDict = dict()
 
 #fileName = 'dir1/dir2/filename'
 def getSimpleName(fileName):
-    if COMMIT_LOG_PRE_NAME == '':
+    if COMMIT_LOG_PRE_NAME[0] == '':
         return fileName
-    if fileName.startswith(COMMIT_LOG_PRE_NAME) == False:
+
+    if fileName.startswith(COMMIT_LOG_PRE_NAME[0]) == False and fileName.startswith(COMMIT_LOG_PRE_NAME[1]) == False:
         fileName = ''
     else:
         tmp = fileName.split('.java')[0]
-        preLen = len(COMMIT_LOG_PRE_NAME)
+        if fileName.startswith(COMMIT_LOG_PRE_NAME[0]):
+            pre = COMMIT_LOG_PRE_NAME[0]
+        else:
+            pre = COMMIT_LOG_PRE_NAME[1]
+        preLen = len(pre)
         tmp = tmp[preLen: len(tmp)]
         tmp = tmp.split('/')
         fileName = '.'.join(tmp)
@@ -102,7 +111,7 @@ if __name__ == '__main__':
 
     #the filenames in commit log are more than the statis understand filename
     #only works for xwiki, since the filename complexly corressponds to class
-    writeFileName("xwiki-platform-commit-filenames.csv")
+    writeFileName("agilefantcmt_class.csv")
 
 
     #for each in commitDepList:

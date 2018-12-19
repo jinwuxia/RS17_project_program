@@ -3,7 +3,7 @@ import csv
 
 def readClass(AllclassFileName):
     classList = list()
-    with open(AllclassFileName, 'rb') as fp:
+    with open(AllclassFileName, 'r', newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
             [className] = each
@@ -13,7 +13,7 @@ def readClass(AllclassFileName):
 
 def readCSV(tsClassFileName):
     classList = list()
-    with open(tsClassFileName, 'rb') as fp:
+    with open(tsClassFileName, 'r', newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
             [className] = each
@@ -25,8 +25,8 @@ def diffClass(allList,tsList):
     for each in allList:
         if each not in tsList:
             noClassList.append(each)
-            print each
-    print 'classes not covered in workflow: ', len(noClassList)
+            print (each)
+    print ('classes not covered in workflow: ', len(noClassList))
 
 allClassList = readClass(sys.argv[1])
 tsClassList = readCSV(sys.argv[2])
