@@ -4,7 +4,8 @@ python icws-batch.py
 [method=]icws
 [filter=]all
 [pkgpre=]org.xwiki
-[log=] > all-in-one-log.txt 
+[log=] > all-in-one-log.txt
+
 '''
 #the following are procedures step by step
 uperl identifierParser.pl jpetstore6.udb  org.mybatis.jpetstore   jpetstore6_words.txt
@@ -26,6 +27,3 @@ python batch_analyzeClusterAndAPI.py  #private
 python batch_measure.py roller520  private  private-msg
 python batch_measure.py roller520  private  private-dom
 '''
-
-
-#python batch_publicAPI.py  #public
