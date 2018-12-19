@@ -1,20 +1,25 @@
 '''
-#from commit log, extract the commit deps(history/evolutionary coupling) for class pairs
+#from commit log, extract the commit deps(history/evolutionary coupling) for class/file pairs
+cochange[a,b] = cochange[b,a]  both are recorded.
 '''
 import sys
 import csv
 import re
 
+COMMIT_LOG_PRE_NAME = list()
 #COMMIT_LOG_PRE_NAME = 'src/main/java/'  #jpetstore, bvn13_springblog
 #COMMIT_LOG_PRE_NAME = 'app/src/main/java/' #roller
 #COMMIT_LOG_PRE_NAME = 'src/main/java/' #solor270
-COMMIT_LOG_PRE_NAME = '' #xwiki
+#COMMIT_LOG_PRE_NAME = '' #xwiki  if =null, it outputs the filename but not class name.
+COMMIT_LOG_PRE_NAME.append('webapp/src/main/java/') #agilefant
+COMMIT_LOG_PRE_NAME.append('src/') #agilefant
 
 ID2NAMEDict = dict()
 NAME2IDDict = dict()
 
-GLOBLE_THR = 36 # for roller and xwiki;  0 for others.  comit-together class number > this value, ignore the dependency
-
+GLOBLE_THR = 36
+# for roller and xwiki;  0 for others.  comit-together class number > this value, ignore the dependency
+'''
 #fileName = 'dir1/dir2/filename'
 def getSimpleName(fileName):
     if COMMIT_LOG_PRE_NAME == '':
@@ -29,7 +34,26 @@ def getSimpleName(fileName):
         fileName = '.'.join(tmp)
         #print fileName
     return fileName
+'''
+#fileName = 'dir1/dir2/filename'
+def getSimpleName(fileName):
+    if COMMIT_LOG_PRE_NAME[0] == '':
+        return fileName
 
+    if fileName.startswith(COMMIT_LOG_PRE_NAME[0]) == False and fileName.startswith(COMMIT_LOG_PRE_NAME[1]) == False:
+        fileName = ''
+    else:
+        tmp = fileName.split('.java')[0]
+        if fileName.startswith(COMMIT_LOG_PRE_NAME[0]):
+            pre = COMMIT_LOG_PRE_NAME[0]
+        else:
+            pre = COMMIT_LOG_PRE_NAME[1]
+        preLen = len(pre)
+        tmp = tmp[preLen: len(tmp)]
+        tmp = tmp.split('/')
+        fileName = '.'.join(tmp)
+        print (fileName)
+    return fileName
 
 '''
 filter test file
@@ -86,6 +110,7 @@ def processLog(fileName, fileType):
     return listList, name2IDDict, ID2NameDict
 
 #dict[classID1][classID2] = commit_times_together
+#dict[classId1][classID2] is also recored,beacuse we use permutations(2), not combinations
 def change2Pair(listList):
     commitDict = dict()
     for eachList in listList:
@@ -107,7 +132,7 @@ def writeCSV(oneDict, fileName):
     for ID1 in oneDict:
         for ID2 in oneDict[ID1]:
             listList.append([ID2NAMEDict[ID1], ID2NAMEDict[ID2], oneDict[ID1][ID2] ])
-    with open(fileName, 'w') as fp:  #"wb" in python2, "w" in python3
+    with open(fileName, 'w', newline="") as fp:  #"wb" in python2, "w" in python3
         writer = csv.writer(fp)
         writer.writerows(listList)
     print (fileName)
