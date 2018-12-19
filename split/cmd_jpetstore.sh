@@ -40,7 +40,7 @@ mkdir testCaseClustering
 mv ${project}_testcase1_jm_AVG_*   testCaseClustering/
 
 #analyze the non-lapped , high-overlapped, low-overlapped classes for each clustering results above
-./coreprocess/batch_analyzeCluster.sh  > ${project}_analyzeCluster.csv#(.xls)
+./coreprocess/batch_analyzeCluster.sh  > ${project}_high_low_lap_analyzeCluster.csv#(.xls)
 
 #if the overlapped class is so many, we can use analyzeOneCluter to look the lapped class in detail, for on cluster results.
 python coreprocess/analyzeOneCluster.py
