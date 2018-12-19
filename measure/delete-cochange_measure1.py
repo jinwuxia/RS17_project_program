@@ -5,7 +5,7 @@ import csv
 #note: input file includes a->b, and also b->a
 def readCommit(fileName):
     commitDict = dict()
-    with open(fileName, 'rb') as fp:
+    with open(fileName, 'r', newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
             [class1, class2, commit] = each
@@ -17,10 +17,12 @@ def readCommit(fileName):
 #[serviceID] = [class1, class2, ...]
 def readCluster(fileName, fileType):
     serviceDict = dict()
-    with open(fileName, 'rb') as fp:
+    with open(fileName, 'r', newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
-            if fileType == 'FOME':
+            if each[0] == 'classID':
+                continue
+            if fileType == 'fome':
                 [classID, className, serviceID] = each
             else:
                 [contain, serviceID, className] = each
@@ -102,6 +104,8 @@ def interCo(serviceID1, serviceID2, serviceDict, commitDict):
     resList = list()
     for class1 in serviceDict[serviceID1]:
         for class2 in serviceDict[serviceID2]:
+        #    if class1 == class2:
+        #        continue
             if class1 in commitDict and class2 in commitDict[class1]:
                 res = 1
             else:
@@ -119,6 +123,8 @@ def interCoWei(serviceID1, serviceID2,  serviceDict, commitDict):
     resList = list()
     for class1 in serviceDict[serviceID1]:
         for class2 in serviceDict[serviceID2]:
+            #if class1 == class2:
+            #    continue
             if class1 in commitDict and class2 in commitDict[class1]:
                 res = commitDict[class1][class2]
             else:
@@ -132,7 +138,7 @@ def interCoWei(serviceID1, serviceID2,  serviceDict, commitDict):
     return [avgV, minV, maxV, pre4V, midV, post4V]
 
 def statis(serviceDict, commitDict):
-
+    '''
     #compute the intraCo for each service
     print '\n'
     print 'intraCo:  serviceID,avg,  minV, pre4V, midV, post4V, maxV'
@@ -141,17 +147,17 @@ def statis(serviceDict, commitDict):
         tmp = [serviceID, avgV, minV, pre4V, midV, post4V, maxV]
         tmp = [str(each) for each in tmp]
         print ','.join(tmp)
-
+    '''
 
     #compute the intraCoWei for each service
-    print '\n'
-    print 'intraCowei:  serviceID, avg, minV, pre4V, midV, post4V, maxV'
+    print ('serviceID,avg,minV,pre4V,midV,post4V,maxV')
     for serviceID in serviceDict:
         [avgV,minV, maxV, pre4V, midV, post4V] = intraCoWei(serviceID, serviceDict, commitDict)
         tmp = [serviceID, avgV, minV, pre4V, midV, post4V, maxV]
         tmp = [str(each) for each in tmp]
-        print ','.join(tmp)
+        print (','.join(tmp))
 
+    '''
     #compute the interCo for each service
     print '\n'
     print 'interCo:  serviceID1, serviceID2, avg, minV, pre4V, midV, post4V, maxV'
@@ -162,31 +168,45 @@ def statis(serviceDict, commitDict):
                 tmp = [serviceID1, serviceID2, avgV,minV, pre4V, midV, post4V, maxV]
                 tmp = [str(each) for each in tmp]
                 print ','.join(tmp)
+    '''
 
     #compute the interCowei for each service
-    print '\n'
-    print 'interCoWei:  serviceID1, serviceID2, avg, minV, pre4V, midV, post4V, maxV'
+    #print '\n'
+    print ('serviceID1,serviceID2,avg,minV,pre4V,midV,post4V,maxV')
     for serviceID1 in serviceDict:
         for serviceID2 in serviceDict:
             if serviceID1 != serviceID2:
                 [avgV,minV, maxV, pre4V, midV, post4V] = interCoWei(serviceID1, serviceID2, serviceDict, commitDict)
                 tmp = [serviceID1, serviceID2, avgV, minV, pre4V, midV, post4V, maxV]
                 tmp = [str(each) for each in tmp]
-                print ','.join(tmp)
+                print (','.join(tmp))
 
+
+def readFileList(filename):
+    alist = list()
+    with open(filename, 'r', newline='') as fp:
+        reader = csv.reader(fp)
+        for each in reader:
+            [servicefile, apifile] = each
+            alist.append([servicefile apifile])
+    return alist
 
 #python cochange_1.py
 #../testcase_data/jpetstore6/dependency/jpetstore6cmt.csv
-#../../FoME/services/jpetstore/FoME/jpetstore_service_4.csv   FOME
+#../../FoME/services/jpetstore/FoME/jpetstore_service_4.csv   fome/other
 if __name__ == '__main__':
     commitFileName  = sys.argv[1]
     serviceFileName = sys.argv[2]
-    fileType = sys.argv[3]
+    fileType = sys.argv[3]#fome, other
+    beprocessedFile = sys.argv[4] #serviceFile  list
 
     #commitDict[class1][class2]= commitTimes
     commitDict = readCommit(commitFileName)
+    beprocessedList = readFileList(beprocessedFile)
 
-    #serviceDict[serviceID] = [class1, class2, ...]
-    serviceDict = readCluster(serviceFileName, fileType)
-
-    statis(serviceDict, commitDict)
+    for each in beprocessedList:
+        serviceFileName = each[0]
+        #serviceDict[serviceID] = [class1, class2, ...]
+        serviceDict = readCluster(serviceFileName, fileType)
+        print("\n" + serviceFileName)
+        statis(serviceDict, commitDict)
