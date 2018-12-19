@@ -16,15 +16,10 @@ CLASSNAME2IDDict = dict()
 EXCLUDEDCLASSNAMEList = list()
 INCLUDEDCLASSNAMEList = list()
 
-def readTestCase(fileName):
+def getTestCaseDict(testcaseCount):
     testCaseDict = dict()
-    with open(fileName, "r", newline="") as fp:
-        reader = csv.reader(fp)
-        index = 0
-        for each in reader:
-            [testCaseName] = each
-            testCaseDict[index] = testCaseName
-            index += 1
+    for i in range(0, testcaseCount):
+        testCaseDict[i] = 'TS' + str(i)
     return testCaseDict
 
 def readCSV(fileName):
@@ -175,13 +170,14 @@ def writeMatrix(matrix, testCaseDict, fileName):
 #python pro.py  workflowfile  testcaseFile excluededFile    includedFileName  outClassFile   outMatrixFile
 if __name__ == "__main__":
     workflowFileName = sys.argv[1]
-    testcaseFileName = sys.argv[2]
+    #testcaseFileName = sys.argv[2]
+    testcaseCount = int(sys.argv[2])
     excludedFileName = sys.argv[3]
     includedFileName = sys.argv[4]
     outClassFileName = sys.argv[5]
     outFeatureVectorFileName = sys.argv[6]
 
-    testCaseDict = readTestCase(testcaseFileName)
+    testCaseDict = getTestCaseDict(testcaseCount) #according to testcount , generate testcaseDict
     initList = readCSV(workflowFileName)
 
     if  excludedFileName != 'null':

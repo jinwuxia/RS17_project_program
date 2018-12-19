@@ -82,11 +82,11 @@ def readWorkflowFile(filename):
     tmpMethodDict = dict() #dict(methodname) = ID
     tmpClassDict = dict()  #dict(className) = ID
 
-    with open(filename, "rb") as fp:
+    with open(filename, "r", newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
             #print each
-            [traceID, order, structtype, startMethodName, endMethodName, m1_para, m2_para, class1, class2, m1_return, m2_return] = each
+            [traceID, order, structtype, startMethodName, endMethodName, m1_para, m2_para, class1, class2, m1_return, m2_return, weight] = each
             if traceID == 'traceID':
                 continue
             startLongName = getLongName(startMethodName, m1_para)
@@ -236,10 +236,10 @@ def writeAPI(clusterAPIDict, fileName):
             tmpList.append(oneMethod.returnType)
             resList.append(tmpList)
 
-    with open(fileName, 'wb') as fp:
+    with open(fileName, 'w', newline="") as fp:
         writer = csv.writer(fp)
         writer.writerows(resList)
-    print fileName
+    print (fileName)
 
 
 def readOverlapResFile(fileName):
@@ -247,7 +247,7 @@ def readOverlapResFile(fileName):
     className2IDDict = dict()
     classID2ClusterDict = dict()
     clusterID2ClassDict = dict()
-    with open(fileName, 'rb') as fp:
+    with open(fileName, 'r', newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
             [classID, className, clusterID] = each
@@ -272,43 +272,34 @@ def readOverlapResFile(fileName):
     return classID2NameDict, className2IDDict, classID2ClusterDict, clusterID2ClassDict
 
 
-def readTestCaseClusterFile(fileName):
-    clusterID2TsDict = dict()
-    tsID2NameDict = dict()
-    with open(fileName, 'rb') as fp:
+def readFileList(filename):
+    alist =list()
+    with open(filename, "r", newline="") as fp:
         reader = csv.reader(fp)
         for each in reader:
-            [clusterID, testcaseID, testcaseName] = each
-            clusterID = int(clusterID)
-            testcaseID = int(testcaseID)
-            if clusterID not in clusterID2TsDict:
-                clusterID2TsDict[clusterID] = list()
-            clusterID2TsDict[clusterID].append(testcaseID)
+            [clusterfile, apifile] = each
+            alist.append([clusterfile, apifile])
+    return alist
 
-            if testcaseID not in tsID2NameDict:
-                tsID2NameDict[testcaseID] = testcaseName
-    return clusterID2TsDict, tsID2NameDict
-
-
-#python pro.py
-#coreprocess/processOverlap/jforum219Testcase1_clusters_0.03csv
-#workflow/jforum219_workflow_reduced.csv
-#apiFileName.csv
-
+#python pro.py workflow/jforum219_workflow_reduced.csv  beprocesslist
 if __name__ == '__main__':
-    overlapResFileName = sys.argv[1]  #[classID, className, clusterID ]
-    #testcaseClusterFileName = sys.argv[2] #[clusterID, testcaseID, testcaseName]
-    workflowFileName = sys.argv[2]
-    apiFileName = sys.argv[3]
+    workflowFileName = sys.argv[1]
+    clusterapilistfile = sys.argv[2]
+    #apiFileName = sys.argv[3]
 
-    [CLASSID2NAMEDict, CLASSNAME2IDDict, CLASSID2CLUSTERDict, CLUSTERID2CLASSDict] = readOverlapResFile(overlapResFileName)
-    #[CLUSTERID2TSDict, TSID2NAMEDict] = readTestCaseClusterFile(testcaseClusterFileName)
+    #store all clusterfilename, outputapifilename in the file
+    beprocessFileList = readFileList(clusterapilistfile)
+
     #return TRACEList, methodNodeList,    methodEdgeList. egdeDict
     readWorkflowFile(workflowFileName)
 
-    #operate TRACEList[traceID]=[edgeID1, edgeID2], generate interTsEdgeDict[traceID][interedgeID] = count
-    interTsEdgeDict = filterOutInterEdge()
-    #extrace API
-    clusterAPIDict = extractAPI(interTsEdgeDict)
-    #save to file
-    writeAPI(clusterAPIDict, apiFileName)
+    for each in beprocessFileList:
+        finalClusterFileName = each[0] #finalClusterFileName = sys.argv[1]  #[classID, className, clusterID ]
+        apiFileName = each[1]
+        [CLASSID2NAMEDict, CLASSNAME2IDDict, CLASSID2CLUSTERDict, CLUSTERID2CLASSDict] = readOverlapResFile(finalClusterFileName)
+        #operate TRACEList[traceID]=[edgeID1, edgeID2], generate interTsEdgeDict[traceID][interedgeID] = count
+        interTsEdgeDict = filterOutInterEdge()
+        #extrace API
+        clusterAPIDict = extractAPI(interTsEdgeDict)
+        #save to file
+        writeAPI(clusterAPIDict, apiFileName)

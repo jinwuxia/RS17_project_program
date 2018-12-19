@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*
 import sys
 import csv
+import subprocess
 
-project               = 'xwiki-platform108'
-data_dir              = "../../../testcase_data/xwiki-platform108/"
-featureVectorFileName = data_dir + 'coreprocess/' + project + '_testcase1_fv.csv'
-classFileName         = data_dir + 'coreprocess/' + project + '_testcase1_class.csv'
-depFileName          = data_dir + 'dependency/' + project + '_testcase1_mixedDep.csv'
-workflowFileName     = data_dir + 'workflow/' + project + '_workflow_reduced.csv'
-
+project               = sys.argv[1] #'xwiki-platform108'
+data_dir              = sys.argv[2]#"../../../testcase_data/xwiki-platform108/
+featureVectorFileName = sys.argv[3]#data_dir + 'coreprocess/' + project + '_testcase1_fv.csv'
+classFileName         = sys.argv[4]#data_dir + 'coreprocess/' + project + '_testcase1_class.csv'
+depFileName          = sys.argv[5]#data_dir + 'dependency/' + project + '_testcase1_mixedDep.csv'
+workflowFileName     = sys.argv[6]#data_dir + 'workflow/' + project + '_workflow_reduced.csv'
+clusternum_start     = sys.argv[7]
+clusternum_end       = sys.argv[8]
+MetricFileName       = sys.argv[9] #fitness file
 class EstimationObject:
     def __init__(self, ts, thr, fitness):
         self.ts = ts #core service count
@@ -78,16 +81,26 @@ def isEqualList(list1, list2):
 
     return False
 
+
+
+def getOverlapClassCount(lapFileName):
+    overlappedClassCount = 0
+    with open(lapFileName, "r", newline="") as fp:
+        reader = csv.reader(fp)
+        overlappedClassCount = len(list(reader)) - 1
+
+    return overlappedClassCount
+
 #generate outClusterFileName: _servenum_thr_cluster.csv
 def produceFinalClusterFiles():
-    serv_list = range(50,301) #xwiki108
+    serv_list = range(clusternum_start,clusternum_end + 1) #xwiki108
     #serv_list = range(2,71)#solo270
     #serv_list = range(1,27) #bvn13
     #serv_list = range(7, 73)  #roler520
     #serv_list = range(16, 48) #jforum219
     #serv_list = range(1, 11)  #jpetstore
     #thr_list = range(1, 11)
-    thr_list=[2, 4, 6, 8, 10]
+    thr_list=[1,2, 3,4, 5,6, 7,8, 9,10]
     thr_list = [ round(each/float(10), 1) for each in thr_list]
     resList = list() #[0] = [TS, thr]
 
@@ -102,6 +115,7 @@ def produceFinalClusterFiles():
         #this step is not related with thrprocess cluster from testcase clustering, get overlap, nonlap, benchclusters, etc.
         analyzeCluster(tsclusterFileName, nonlapFileName, lapFileName, mergedFvFileName, traceDepFileName, benchClusterFileName)  #gen last 4 files
         # has no overlap class, the next processes needed once
+        overlappedClassCount = getOverlapClassCount(lapFileName)
         if overlappedClassCount == 0:
             overlap_process_thr = round(0.1, 1)
             outClusterFileName  = data_dir + 'coreprocess/optionA-enum/' + project + '_testcase1_clusters_' + str(service_count) + '_' + str(overlap_process_thr) + '.csv'
@@ -116,14 +130,8 @@ def produceFinalClusterFiles():
 
 
 def finalMetric():
-    serv_list = range(50,301) #xwiki108
-    #serv_list = range(2,71)#solo270
-    #serv_list = range(1,27) #bvn13
-    #serv_list = range(7, 73)  #roler520
-    #serv_list = range(16, 48) #jforum219
-    #serv_list = range(1, 11)  #jpetstore
-    #thr_list = range(1, 11)
-    thr_list=[2, 4, 6, 8, 10]
+    serv_list = range(clusternum_start,clusternum_end + 1) #xwiki108
+    thr_list=[1,2,3, 4, 5,6, 7,8, 9,10]
     thr_list = [ round(each/float(10), 1) for each in thr_list]
     resList = list() #[0] = [TS, thr]
 
@@ -131,20 +139,12 @@ def finalMetric():
         tsclusterFileName = data_dir + 'coreprocess/testcaseClustering/' + project + '_testcase1_jm_AVG_' + str(service_count) + '.csv'
         lapFileName       = data_dir + 'coreprocess/optionA-enum/' + project + '_testcase1_' + str(service_count) + '_class_lap.csv'
 
-        overlappedClassCount = 0
-        with open(lapFileName, "r", newline="") as fp:
-            reader = csv.reader(fp)
-            for each in reader:
-                [classID, className, clusterIDList] = each
-                if classID == "classID":
-                    continue
-                else:
-                    overlappedClassCount = overlappedClassCount + 1
+        overlappedClassCount = getOverlapClassCount(lapFileName)
         # has no overlap class, the next processes needed once
         if overlappedClassCount == 0:
             overlap_process_thr = round(0.1, 1)
             outClusterFileName  = data_dir + 'coreprocess/optionA-enum/' + project + '_testcase1_clusters_' + str(service_count) + '_' + str(overlap_process_thr) + '.csv'
-            #when service = service_count, thr = overlap_process_thr, analyze the metric
+            #when service = service_count, thr = overlap_process_thr, analyze the metric such as interwf, apinum
             lapResMetricList = metric_processOverlap(tsclusterFileName, outClusterFileName)
             oneList = list()
             oneList.append(service_count)
@@ -163,12 +163,16 @@ def finalMetric():
             oneList.extend(lapResMetricList)
             resList.append(oneList)
             print(oneList)
-    fileName = sys.argv[1]
-    writeCSV(resList, fileName)
+    writeCSV(resList, MetricFileName)
+
 
 if __name__ == "__main__":
+
     #step 1: batch process all cases, generate final cluter files after overlap processing
-    #produceFinalClusterFiles()
+    produceFinalClusterFiles()
 
     #step2: batch process all final clusterf files, generate metrics
     finalMetric()
+    
+    #step3: batch process all , generate api for each clusters.
+    getComponentAPI_batch()

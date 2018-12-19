@@ -126,9 +126,9 @@ def GenOtherGeneration(pop_list, selectedSize):
     return merged_pop_list
 
 
-#judge the search iteration condition
 def IsStop(kgen, old_pop_list, new_pop_list):
     import config
+    #judge the search iteration condition
     import initpop
     old_pop_num_list = list()
     for each in old_pop_list:
@@ -218,8 +218,8 @@ if __name__ == '__main__':
     best_fitness_list.append(['withinWorkflow', '-repeatClassCount', 'realClusterNum'])
     all_fitness_list = list()
     all_fitness_list.append(['servnum', 'thr', 'overlapClassCount', 'interWorklow', 'interCallNum', 'APINum', 'withinWorkflow', '-repeatClassCount', 'realClusterNum'])
-    for times in range(0, 30):
-        new_pop_list = Mainloop()
+    for times in range(0, 30):    #run nsga fo for 30 times, get the best fitness's populations
+        new_pop_list = Mainloop()   #nsga core
         for indiv in new_pop_list:
             [xi, yi] = initpop.TransCode2Indiv(indiv, X_S, X_E, Y_S, Y_E, BIT_COUNT_X, BIT_COUNT_Y)
             one = OBJECT_STRUCT_DICT[xi][yi]
