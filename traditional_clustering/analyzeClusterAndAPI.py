@@ -75,7 +75,18 @@ def readWorkflowFile(filename):
         reader = csv.reader(fp)
         for each in reader:
             #print each
-            [traceID, order, structtype, startMethodName, endMethodName, m1_para, m2_para, class1, class2, m1_return, m2_return] = each
+            traceID = each[0]
+            #order = each[1]
+            #structtype = each[2]
+            startMethodName = each[3]
+            endMethodName = each[4]
+            m1_para = each[5]
+            m2_para = each[6]
+            class1 = each[7]
+            class2 = each[8]
+            m1_return = each[9]
+            m2_return = each[10]
+            #weight = each[11]
             if traceID == 'traceID':
                 continue
             #print traceID, order, structtype, startMethodName
@@ -292,32 +303,63 @@ def readClusterFile(fileName):
     return classID2NameDict, className2IDDict, classID2ClusterDict, clusterID2ClassDict
 
 
-
-#python pro.py
-#coreprocess/cluster.csv
-#workflow/jforum219_workflow_reduced.csv
-#apiFileName.csv
-if __name__ == '__main__':
-    clusterFileName = sys.argv[1]
-    workflowFileName = sys.argv[2]
-    apiFileName = sys.argv[3]
-    [CLASSID2NAMEDict, CLASSNAME2IDDict, CLASSID2CLUSTERDict, CLUSTERID2CLASSDict] = readClusterFile(clusterFileName)
-    readWorkflowFile(workflowFileName) #return TRACEList, methodNodeList,    methodEdgeList.
-    #print 'TRACEList', TRACEList
-    #print 'METHODList', METHODList
-
-    #operate TRACEList[traceID]=[edgeID1, edgeID2], generate res[traceID][interedgeID] = count
-    interTsEdgeDict = filterOutInterEdge()
-    ##print 'interTsEdgeDict=',interTsEdgeDict
-
+def measure(interTsEdgeDict):
     [interComWfCount, interCallCount, interCallCount_avg, interCallCount_f, interCallCount_avg_f] = workflowMetric(interTsEdgeDict)
-    clusterAPIDict = extractAPI(interTsEdgeDict)
-    writeAPI(clusterAPIDict, apiFileName)
     (APICount, APICount_avg) = APIMetric(clusterAPIDict)
-
     resList = list()
+    resList.append(realclustercount)
     resList.extend([interComWfCount, interCallCount, interCallCount_avg, interCallCount_f, interCallCount_avg_f])
     resList.extend([APICount, APICount_avg])
-    resStrList = [str(each) for each in resList]
-    strstr = ','.join(resStrList)
-    print (strstr)
+    return resList
+
+
+def readList(filelistfile):
+    alist=list()
+    with open(filelistfile, "r", newline='') as fp:
+        reader = csv.reader(fp)
+        for each in reader:
+            clusterfile = each[0]
+            apifile = each[4]
+            alist.append([clusterfile, apifile])
+    return alist
+
+#python pro.py
+#workflow/jforum219_workflow_reduced.csv
+#cluster_apifilelist
+if __name__ == '__main__':
+    #clusterFileName = sys.argv[1]
+    workflowFileName = sys.argv[1]
+    #apiFileName = sys.argv[3]
+    filelistfile = sys.argv[2]
+
+    readWorkflowFile(workflowFileName) #return TRACEList, methodNodeList,    methodEdgeList.
+
+    filelist = readList(filelistfile)
+    for each in filelist:
+        clusterFileName = each[0]
+        apiFileName = each[1]
+
+        [CLASSID2NAMEDict, CLASSNAME2IDDict, CLASSID2CLUSTERDict, CLUSTERID2CLASSDict] = readClusterFile(clusterFileName)
+        realclustercount = len(CLUSTERID2CLASSDict)
+        #print 'TRACEList', TRACEList
+        #print 'METHODList', METHODList
+
+        '''
+        extractAPI
+        '''
+        #operate TRACEList[traceID]=[edgeID1, edgeID2], generate res[traceID][interedgeID] = count
+        interTsEdgeDict = filterOutInterEdge()
+        ##print 'interTsEdgeDict=',interTsEdgeDict
+        clusterAPIDict = extractAPI(interTsEdgeDict)
+        writeAPI(clusterAPIDict, apiFileName)
+
+        '''
+        measurement interworkflow, intercall, api number
+        '''
+        alist = list()
+        alist.append(realclustercount)
+        measurelist = measure(interTsEdgeDict)
+        alist.extend(measurelist)
+        resStrList = [str(each) for each in alist]
+        strstr = ','.join(resStrList)
+        print (strstr)
