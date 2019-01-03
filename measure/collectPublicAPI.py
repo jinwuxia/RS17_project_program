@@ -10,10 +10,12 @@ GLOBAL_INTERFACE_DICT = dict()#dict[interfaceclass] = [methodNameList]
 USED_INTERFACE_DICT = dict() #dict[interfaceclass][methodName]= [paras, returns]
 #filterStrList = ['com.raysmond.blog.controllers', 'com.raysmond.blog.admin.controllers', 'com.raysmond.blog.seo.controllers' ]
 #filterStrList=['org.b3log.solo.processor']
-filterStrList=['org.apache.roller.weblogger.ui.rendering.servlets', 'org.apache.roller.weblogger.ui.struts2.ajax', 'org.apache.roller.weblogger.webservices.tagdata.TagDataServlet', 'org.apache.roller.weblogger.webservices.oauth']
-
-filterStrList=['fi.hut.soberit.agilefant.web']
+#filterStrList=['org.apache.roller.weblogger.ui.rendering.servlets', 'org.apache.roller.weblogger.ui.struts2.ajax', 'org.apache.roller.weblogger.webservices.tagdata.TagDataServlet', 'org.apache.roller.weblogger.webservices.oauth']
+#filterStrList=['fi.hut.soberit.agilefant.web']
+filterStrList= [] #xwki
 def isPublicInterface(className):
+    if len(filterStrList) == 0:
+        return True
     for filterStr in filterStrList:
         if className.startswith(filterStr):
             return True
@@ -50,8 +52,12 @@ def getInterfaceDetailFromUnd(undFile):
 #use GLOBAL_INTERFACE_DICT,
 def isInterface(className, startMethodName):
     if className in GLOBAL_INTERFACE_DICT:
+        print("######class Y ", className)
         if startMethodName in GLOBAL_INTERFACE_DICT[className]:
             return True
+        print("######method N", startMethodName)
+    print('######class N', className)
+
     return False
 
 
@@ -72,8 +78,8 @@ def getUsedAPIByWorkflowFile(fileName):
             traceID = each[0]
             startMethodName = each[3]
             endMethodName = each[4]
-            startMethodName.replace('#', '.')
-            endMethodName.replace('#', '.')
+            startMethodName = startMethodName.replace('#', '.')
+            endMethodName = endMethodName.replace('#', '.')
             m1_para = each[5]
             m2_para = each[6]
             class1 = each[7]
@@ -121,7 +127,8 @@ if __name__ == "__main__":
     GLOBAL_INTERFACE_DICT = getInterfaceDetailFromUnd(undFile)
     for classname in GLOBAL_INTERFACE_DICT:
         for methodName in GLOBAL_INTERFACE_DICT[classname]:
-            print ("und interface: ", classname, methodName)
+            pass
+            #print ("und interface: ", classname, methodName)
 
 
     # generate USED_INTERFACE_DICT
