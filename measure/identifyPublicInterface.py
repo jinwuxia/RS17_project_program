@@ -1,6 +1,11 @@
 import sys
 import csv
 
+'''
+according to the service candidate clusters and the api in collectPublicAPI.py
+identify public interface and apis.
+'''
+
 APIdetailDict = dict()#dict[classname][methodname]=[paras, returns]
 ClusterDict = dict() # ClusterDict[clusterId] = [className1, className2]
 

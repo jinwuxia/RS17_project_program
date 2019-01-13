@@ -153,3 +153,9 @@ if __name__ == '__main__':
         #print ('interface number=', interface_number)
         tmp =['avg_msg_cohesion', str(msg_avg_wei), 'interface_numb', str(interface_number), 'clusterHasinf', str(len(g_clusterID2Interf2APIDict))]
         print  (','.join(tmp))
+
+
+        #print apidetail, using do and m_cohesion_wei_list interface_number_list
+        #print('\ninterface msg cohesion detail:')
+        #for index in range(0, len(msg_cohesion_wei_list)):
+        #    print(msg_cohesion_wei_list[index])

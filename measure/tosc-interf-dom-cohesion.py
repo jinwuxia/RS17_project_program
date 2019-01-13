@@ -56,9 +56,11 @@ def SplitHump(oneList):
 def GetItems(nameSet):
     itemList = list()
     for name in nameSet:
-        #split
-        #tmp = name.split('.')
-        #name = tmp[len(tmp) - 1]
+        #split, for xwiki, the filter words shoud delete the first three pacakageprefix
+        tmp = name.split('.')
+        if len(tmp) > 3:
+            name =  tmp[len(tmp) - 3] + "." + tmp[len(tmp) - 2]+ "." + tmp[len(tmp) - 1]
+        ############
         tmpList = re.split( r'[._]', name)
         tmpList = SplitHump(tmpList)
         tmpList = [each.lower() for each in tmpList]
@@ -190,7 +192,8 @@ if __name__ == '__main__':
                       'request',  'resource', 'response', 'object', 'factory', 'access', 'model', 'action', 'abstract', \
                       'customiz', 'generator', 'load',  'build', 'listen', 'descriptor', 'script', 'repository', 'action', \
                       'cache', 'type',  'resolve', 'convert', 'and', 'provid', 'of', 'in', 'list', 'from', 'impl', 'check', \
-                      'serializer', 'serialize', 'xwiki', 'wiki', 'context','reference', 'translation', 'configuration']
+                      'serializer', 'serialize', 'xwiki', 'wiki', 'context','reference', 'translation', 'configuration',\
+                      'annotation', 'bridge']
 
     [g_clusterID2Interf2APIDict, g_apiDict] = ReadAPIFile(apiFileName, fileType)
 
@@ -206,7 +209,19 @@ if __name__ == '__main__':
         avg_dom_cohesion_wei = sum(dom_cohesion_wei_list) / float(len(dom_cohesion_wei_list))
 
         interface_number = 0
+        interface_number_list = list()
         for clusterID in g_clusterID2Interf2APIDict:
             interface_number += len(g_clusterID2Interf2APIDict[clusterID])
+            interface_number_list.append(len(g_clusterID2Interf2APIDict[clusterID]))
         tmp = ['avg_dom_cohesion', str(avg_dom_cohesion_wei), 'interface_number', str(interface_number), 'clusterHasinf', str(len(g_clusterID2Interf2APIDict))]
         print(','.join(tmp))
+
+        '''
+        #print apidetail, using do and m_cohesion_wei_list interface_number_list
+        print('\ninterface dom cohesion detail:')
+        for index in range(0, len(dom_cohesion_wei_list)):
+            print(dom_cohesion_wei_list[index])
+        print('\ninterface number detail:')
+        for index in range(0, len(dom_cohesion_wei_list)):
+            print(interface_number_list[index])
+        '''

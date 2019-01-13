@@ -346,5 +346,17 @@ if __name__ == '__main__':
         final_REI = final_ECF / float(final_ICF)
         writer_final.writerow([final_ICF, final_ECF, final_REI])
 
+
+        #print detail
+        print(serviceFileName)
+        [list1, list2, icf_list1, ecf_list1] = summarizeList
+        print('icf detail:')
+        for each in icf_list1:
+            print(each)
+        print('\n\necf detail:')
+        for each in ecf_list1:
+            print(each)
+
+
     fp_detail.close()
     fp_final.close()
