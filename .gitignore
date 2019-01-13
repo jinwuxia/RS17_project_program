@@ -3,5 +3,6 @@
 *.xls
 *.pyc
 *.txt
+*.numbers
 icws2017/data/*
 testcase_data/*
