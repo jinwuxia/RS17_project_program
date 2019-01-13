@@ -172,7 +172,7 @@ def get_call_coh_ForIndiv(indiv):
         coh = all_candidate_call_coh_dict[uni_candidate]
         coh_list.append(coh)
     indiv_metric = sum(coh_list) / float(len(coh_list))
-    return indiv_metric
+    return indiv_metric, coh_list
 
 
 def get_call_coup_ForIndiv(indiv):
@@ -185,7 +185,7 @@ def get_call_coup_ForIndiv(indiv):
             coup = all_candidate_call_coup_dict[cand1][cand2]
             coup_list.append(coup)
     indiv_metric = sum(coup_list) / float(len(coup_list))
-    return indiv_metric
+    return indiv_metric,coup_list
 
 
 
@@ -198,7 +198,7 @@ def get_con_coh_ForIndiv(indiv):
         coh = all_candidate_con_coh_dict[uni_candidate]
         coh_list.append(coh)
     indiv_metric = sum(coh_list) / float(len(coh_list))
-    return indiv_metric
+    return indiv_metric,coh_list
 
 
 def get_con_coup_ForIndiv(indiv):
@@ -211,12 +211,27 @@ def get_con_coup_ForIndiv(indiv):
             coup = all_candidate_con_coup_dict[cand1][cand2]
             coup_list.append(coup)
     indiv_metric = sum(coup_list) / float(len(coup_list))
-    return indiv_metric
+    return indiv_metric,coup_list
 
 
 def get_four_metrics(indiv):
-    call_coh = get_call_coh_ForIndiv(indiv)
-    call_coup = get_call_coup_ForIndiv(indiv)
-    con_coh = get_con_coh_ForIndiv(indiv)
-    con_coup = get_con_coup_ForIndiv(indiv)
+    [call_coh, call_coh_detail]  = get_call_coh_ForIndiv(indiv)
+    [call_coup, call_coup_detail] = get_call_coup_ForIndiv(indiv)
+    [con_coh, con_coh_detail] = get_con_coh_ForIndiv(indiv)
+    [con_coup, con_coup_detail] = get_con_coup_ForIndiv(indiv)
+
+    #print detail
+    print('call coh detail:')
+    printList(call_coh_detail)
+    print('\ncall coup detail')
+    printList(call_coup_detail)
+    print('\nsema coh detail')
+    printList(con_coh_detail)
+    print('\n sema coup detail')
+    printList(con_coup_detail)
+
     return call_coh, call_coup, con_coh, con_coup
+
+def printList(qlist):
+    for each in qlist:
+        print(each)

@@ -72,6 +72,7 @@ if __name__ == "__main__":
     #compute metrics for each indiv
     measureList = list()
     for index in range(0, len(indivList)):
+        print(clusterFileList[index])
         indiv = indivList[index]
         clusterfilename = clusterFileList[index]
         [call_coh, call_coup, con_coh, con_coup] = metric.get_four_metrics(indiv)
