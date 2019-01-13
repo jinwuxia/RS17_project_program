@@ -115,6 +115,20 @@ def measure_ioe_batch(project, method, filename, ioe_old_file, ioe_new_file):
     cmd = "python ../measure/ioe-measure.py " + commitfile + " " + method + " " + filename + " " + ioe_old_file + " " + ioe_new_file
     returncode  = subprocess.call(cmd, shell=True)
 
+def measure_modularity_batch(project, filter, fileListFile, modularity_file):
+    classfileName_withcoverage = '../testcase_data/improvement/fv/' + project + '_testcase_class_' + filter + '.csv'
+    calldepfileName_withccoverage = '../testcase_data/improvement/calldep/' + project + '_calldep_' + filter + '.csv'
+    concerndepFileName = '../testcase_data/improvement/concerndep/' + project + '_concerndep.csv'
+    cmd_list = ['python']
+    cmd_list.append('../measure/modularity/modularity-measure.py')
+    cmd_list.append(classfileName_withcoverage)
+    cmd_list.append(calldepfileName_withccoverage)
+    cmd_list.append(concerndepFileName)
+    cmd_list.append(fileListFile)
+    cmd_list.append(modularity_file) #outfile containing measures
+    cmd = '  '.join(cmd_list)
+    returncode  = subprocess.call(cmd, shell=True)
+
 
 if __name__ == "__main__":
     project = sys.argv[1]
@@ -127,21 +141,7 @@ if __name__ == "__main__":
     ioe_old_file = sys.argv[6]#detail value for each service
     ioe_new_file = sys.argv[7]#final value fot the system
 
-    '''
-    if project == 'jforum219':
-        servnum_start = 16
-        servnum_end = 47
-    elif project == 'jpetstore6':
-        servnum_start = 1
-        servnum_end = 23
-    elif project == 'roller520':
-        servnum_start = 2
-        servnum_end = 72
-    elif project == 'xwiki-platform108':
-        servnum_start = 2
-        servnum_end = 51
-    '''
-
+    modularity_file = sys.argv[8] #modularity measures
 
     #step1: filter the clusters by using tescase class benchmark
     #filter_batch(filter, project, servnum_start,servnum_end,alg)
@@ -151,17 +151,21 @@ if __name__ == "__main__":
     filename= "../testcase_data/" + project + "/traditional_clustering/"  + project + "-" + alg + "-filter-" + filter + "/" + project + "_beprocessedList.csv"
     filelist = genFilelistFile(filter, project,servnum_start, servnum_end, alg, filename)
 
-    #generate public interface and api
-    generatePublicApi_batch(filter, project, alg, filelist)
-    measurePublicCohesion_batch(project, alg, filelist)
 
+    #generate public interface and api
+    #generatePublicApi_batch(filter, project, alg, filelist)
+    measurePublicCohesion_batch(project, alg, filelist)
+    '''
     #step2:generate api file for the filtered clsuters.
     #step3: measure api num, inter-call, and such metrics. into log
     generatePrivateApi_batch(filter, project, alg, filename)
     #step4: measure CHM and CHD metrics.
     measurePrivateCohesion_batch(filter, project, alg, filelist)
     #print("finish cohesion measurement batch")
-
+    '''
     #step5:measure ioe
     #measure_ioe_batch(project, alg, filename, ioe_old_file, ioe_new_file)
     #print("finish ioe measuremnt batch")
+
+    #measure modularity
+    #measure_modularity_batch(project, filter, filename, modularity_file)
