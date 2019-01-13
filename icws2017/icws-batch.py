@@ -161,6 +161,20 @@ def measure_ioe_batch(project, method, filelistfilename, ioe_old_file, ioe_new_f
     returncode  = subprocess.call(cmd, shell=True)
 
 
+def measure_modularity_batch(project, filter, fileListFile, modularity_file):
+    classfileName_withcoverage = '../testcase_data/improvement/fv/' + project + '_testcase_class_' + filter + '.csv'
+    calldepfileName_withccoverage = '../testcase_data/improvement/calldep/' + project + '_calldep_' + filter + '.csv'
+    concerndepFileName = '../testcase_data/improvement/concerndep/' + project + '_concerndep.csv'
+    cmd_list = ['python']
+    cmd_list.append('../measure/modularity/modularity-measure.py')
+    cmd_list.append(classfileName_withcoverage)
+    cmd_list.append(calldepfileName_withccoverage)
+    cmd_list.append(concerndepFileName)
+    cmd_list.append(fileListFile)
+    cmd_list.append(modularity_file) #outfile containing measures
+    cmd = '  '.join(cmd_list)
+    returncode  = subprocess.call(cmd, shell=True)
+
 if __name__ == "__main__":
     project = sys.argv[1]
     alg = sys.argv[2] #icws
@@ -172,6 +186,7 @@ if __name__ == "__main__":
     servnum_end = int(sys.argv[6])
     ioe_old_file = sys.argv[7] #detail value for each service
     ioe_new_file = sys.argv[8] #final value fot the system
+    modularity_file = sys.argv[9]
 
     '''
     if project == 'jforum219':
@@ -201,17 +216,22 @@ if __name__ == "__main__":
     filelist = genFilelistFile(filter, project,servnum_start, servnum_end, alg, filename)
 
 
+
     #generate public interface and api
     #step: measure CHM and CHD metrics.
-    generatePublicApi_batch(filter, project, alg, filelist)
+    #generatePublicApi_batch(filter, project, alg, filelist)
     measurePublicCohesion_batch(filter, project, alg, filelist)
 
+    '''
     #step2:generate api file for the filtered clsuters.
     #step3: measure api num, inter-call, and such metrics. into log
     generatePrivateApi_batch(filter, project, alg, filename)
     measurePrivateCohesion_batch(filter, project, alg, filelist)
-
+    '''
 
     #6:measure ioe
     #measure_ioe_batch(project, alg, filename, ioe_old_file, ioe_new_file)
     #print("finish ioe measuremnt batch")
+
+    #measure modularity
+    #measure_modularity_batch(project, filter, filename, modularity_file)
