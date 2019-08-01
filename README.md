@@ -74,7 +74,9 @@ measure interface size;
 
 [Notice: interService calling is computed in directory of respective methods.]
 
+## 7) improvesplit/
 
+use the updated NSGAII algorithm to group funtional atoms into different candidates.
 
 
 
